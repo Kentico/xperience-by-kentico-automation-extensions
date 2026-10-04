@@ -1,5 +1,5 @@
 using Kentico.Xperience.Admin.Base.FormAnnotations;
-using Kentico.Xperience.Labs.AutomationExperiments.Core;
+using Kentico.Xperience.Labs.AutomationExtensions.Core;
 
 namespace Samples.DancingGoat;
 

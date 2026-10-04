@@ -5,13 +5,13 @@
 1. Add the package to your Xperience by Kentico application:
 
    ```powershell
-   dotnet add package Kentico.Xperience.Labs.AutomationExperiments
+   dotnet add package Kentico.Xperience.Labs.AutomationExtensions
    ```
 
 2. Register the services in `Program.cs` (after `AddKentico`):
 
    ```csharp
-   builder.Services.AddAutomationExperiments(builder.Configuration);
+   builder.Services.AddAutomationExtensions(builder.Configuration);
    ```
 
 3. Enable the components you want to use (all are **disabled by default**) – see [Enable components](#enable-components).
@@ -33,7 +33,7 @@ At application start, the library logs which components are enabled and warns ab
 
 ```json
 {
-  "AutomationExperiments": {
+  "AutomationExtensions": {
     "EnabledByDefault": false,
     "Components": {
       "ContactDateAnniversary": true,
@@ -49,7 +49,7 @@ At application start, the library logs which components are enabled and warns ab
 
 ```json
 {
-  "AutomationExperiments": {
+  "AutomationExtensions": {
     "EnabledByDefault": true,
     "Components": {
       "SendWebhook": false
@@ -64,10 +64,10 @@ Component names are case-insensitive. Restart the application after changing the
 
 | Component | Name (configuration key) | Identifier |
 | --- | --- | --- |
-| Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExperiments.ContactDateAnniversary` |
-| Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExperiments.PreviousStepSucceeded` |
-| Action – Send webhook | `SendWebhook` | `Labs.AutomationExperiments.SendWebhook` |
-| Action – Write to log | `WriteToLog` | `Labs.AutomationExperiments.WriteToLog` |
+| Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExtensions.ContactDateAnniversary` |
+| Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` |
+| Action – Send webhook | `SendWebhook` | `Labs.AutomationExtensions.SendWebhook` |
+| Action – Write to log | `WriteToLog` | `Labs.AutomationExtensions.WriteToLog` |
 
 ### Trigger – Contact date anniversary
 
@@ -77,7 +77,7 @@ Only the month and day of the date are compared. February 29 dates match on Febr
 **Requires** a scheduled task configuration – without it the trigger never fires:
 
 1. Open the **Scheduled tasks** application and select **New scheduled task configuration**.
-2. Set **Task implementation** to `Labs.AutomationExperiments.ContactDateAnniversaryTask`.
+2. Set **Task implementation** to `Labs.AutomationExtensions.ContactDateAnniversaryTask`.
 3. Set the **Task schedule** to run **once per day** (more frequent runs are not recommended by Xperience and fire duplicate triggers).
 4. Select **Enabled** and **Save**.
 
@@ -87,7 +87,7 @@ Configuration:
 
 ```json
 {
-  "AutomationExperiments": {
+  "AutomationExtensions": {
     "ContactDateAnniversary": {
       "DateFields": [ "ContactBirthday", "ContactSignupDate" ],
       "DaysBefore": [ 0, 7, 30 ],
@@ -126,7 +126,7 @@ Configuration:
 
 ```json
 {
-  "AutomationExperiments": {
+  "AutomationExtensions": {
     "Webhooks": {
       "Endpoints": {
         "crm": {
@@ -164,7 +164,7 @@ Payload:
   "eventName": "lead-qualified",
   "occurredAt": "2026-10-04T12:00:00+00:00",
   "processName": "Lead nurture",
-  "triggerIdentifier": "Labs.AutomationExperiments.ContactDateAnniversary",
+  "triggerIdentifier": "Labs.AutomationExtensions.ContactDateAnniversary",
   "contact": {
     "guid": "8f6c2b8e-6d33-4c4a-9c47-0e2b1d1f6a10",
     "email": null,
@@ -194,7 +194,7 @@ Log entry (event ID `41000`, name `AutomationLog`):
 Automation 'Example automation', contact c382…: Contact 4 reached this step. | Step results: DancingGoat.CoffeeClubEnrollment.1: succeeded (Enrolled, …); SendWebhook.1: failed (HTTP 500, …) | Trigger: Kentico.FormSubmissionTrigger (form 1, record 3)
 ```
 
-Entries use the logger category `Kentico.Xperience.Labs.AutomationExperiments.WriteToLog`. With the default Xperience logging configuration (`Logging:XperienceEventLog:LogLevel:Kentico` = `Information`) they appear in the **Event log** application, and in any other logging provider configured in the application.
+Entries use the logger category `Kentico.Xperience.Labs.AutomationExtensions.WriteToLog`. With the default Xperience logging configuration (`Logging:XperienceEventLog:LogLevel:Kentico` = `Information`) they appear in the **Event log** application, and in any other logging provider configured in the application.
 
 Only the contact ID/GUID is logged – never email or name. Keep personal data out of messages.
 
@@ -277,11 +277,11 @@ Keep your own property and category `Order` values below `SkippableStep.CATEGORY
 
 Custom automation actions from your project or other packages can save results and appear in the **Step** list of the *Previous step succeeded* condition.
 
-1. Register the step type (after `AddAutomationExperiments`):
+1. Register the step type (after `AddAutomationExtensions`):
 
    ```csharp
    builder.Services
-       .AddAutomationExperiments(builder.Configuration)
+       .AddAutomationExtensions(builder.Configuration)
        .AddStepResultSource("Acme.SyncToCrm", "acme.automation.synctocrm.displayname");
    ```
 
@@ -319,7 +319,7 @@ If a registered step type is removed later, conditions that reference it keep th
 
 ### Saved result format
 
-Results are stored in the `StepResultData` automation process data (identifier `Labs.AutomationExperiments.StepResultData`): a dictionary keyed by `<step name>.<result number>`, e.g. `SendWebhook.1` or `Acme.SyncToCrm.2`.
+Results are stored in the `StepResultData` automation process data (identifier `Labs.AutomationExtensions.StepResultData`): a dictionary keyed by `<step name>.<result number>`, e.g. `SendWebhook.1` or `Acme.SyncToCrm.2`.
 Values: `Succeeded`, `ActionIdentifier`, `RecordedAt` (UTC), `Message`. The data is deleted together with the contact.
 
 ## Logging
@@ -327,7 +327,7 @@ Values: `Succeeded`, `ActionIdentifier`, `RecordedAt` (UTC), `Message`. The data
 > **Known issue – long logger categories:** the Xperience event log stores the logger category (full type name of `T` in
 > `ILogger<T>`) in a 100-character **Source** column and the event name in a 100-character **Code** column. Entries that
 > exceed either limit are silently dropped from the Event log – they still appear in the console and other logging
-> providers. The library uses short component-based categories (`Kentico.Xperience.Labs.AutomationExperiments.<Component>`, shown as **Source**) to stay within the limit. If you write custom steps (e.g. to
+> providers. The library uses short component-based categories (`Kentico.Xperience.Labs.AutomationExtensions.<Component>`, shown as **Source**) to stay within the limit. If you write custom steps (e.g. to
 > [support Previous step succeeded](#support-previous-step-succeeded-in-custom-steps)), keep the full names of classes
 > that log via `ILogger<T>` at 100 characters or less.
 
@@ -348,4 +348,4 @@ All library log entries use named event IDs, shown in the **Code** column of the
 
 ## Localization
 
-All marketer-facing texts are in `Resources/AutomationExperimentsResources.resx` (English). To translate, add `AutomationExperimentsResources.<culture>.resx` files in your project and register them with `RegisterLocalizationResource` – see [Admin UI localization](https://docs.kentico.com/documentation/developers-and-admins/customization/admin-ui-localization).
+All marketer-facing texts are in `Resources/AutomationExtensionsResources.resx` (English). To translate, add `AutomationExtensionsResources.<culture>.resx` files in your project and register them with `RegisterLocalizationResource` – see [Admin UI localization](https://docs.kentico.com/documentation/developers-and-admins/customization/admin-ui-localization).

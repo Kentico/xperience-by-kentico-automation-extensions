@@ -31,7 +31,7 @@ stages:
             value: true
 
           - name: slnPath
-            value: src/Kentico.Xperience.Labs.AutomationExperiments.Libs.slnx
+            value: src/Kentico.Xperience.Labs.AutomationExtensions.Libs.slnx
 
         steps:
           - task: UseDotNet@2
@@ -43,7 +43,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                $fileContent = Get-Content -Path 'src/Kentico.Xperience.Labs.AutomationExperiments.Admin/Client/package.json' -Raw
+                $fileContent = Get-Content -Path 'src/Kentico.Xperience.Labs.AutomationExtensions.Admin/Client/package.json' -Raw
                 $jsonObject = ConvertFrom-Json -InputObject $fileContent
 
                 # Get the value of engines.node
@@ -96,11 +96,11 @@ stages:
               Configuration: $(Configuration)
               artifacts:
                 - Core:
-                  artifactName: "Kentico.Xperience.Labs.AutomationExperiments"
-                  projectPath: "src/Kentico.Xperience.Labs.AutomationExperiments"
+                  artifactName: "Kentico.Xperience.Labs.AutomationExtensions"
+                  projectPath: "src/Kentico.Xperience.Labs.AutomationExtensions"
                 - Admin:
-                  artifactName: "Kentico.Xperience.Labs.AutomationExperiments-Admin"
-                  projectPath: "src/Kentico.Xperience.Labs.AutomationExperiments.Admin"
+                  artifactName: "Kentico.Xperience.Labs.AutomationExtensions-Admin"
+                  projectPath: "src/Kentico.Xperience.Labs.AutomationExtensions.Admin"
 
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
       - stage: PublishNuGetPackages

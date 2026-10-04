@@ -1,4 +1,4 @@
-# Kentico.Xperience.Labs.AutomationExperiments – Plan
+# Kentico.Xperience.Labs.AutomationExtensions – Plan
 
 Labs library of reusable Xperience by Kentico (XbyK) automation **triggers**, **conditions**, and **actions** for common marketing scenarios, plus appsettings-driven enable/disable with admin UI visibility.
 
@@ -80,7 +80,7 @@ Key rules:
 ### 1.5 Existing repo state
 
 - Package versions: `Kentico.Xperience.*` 31.9.1 (root `Directory.Packages.props`). Older versions not tested (see 8.6).
-- `src/Kentico.Xperience.Labs.AutomationExperiments` – empty placeholder (`Class1.cs`).
+- `src/Kentico.Xperience.Labs.AutomationExtensions` – empty placeholder (`Class1.cs`).
 - `examples/DancingGoat/Samples/Automation` – existing samples: `SendNotificationAutomationAction` (internal email notification), `ContactKeyFieldChangedAutomationTrigger` (+ handler). Library should not duplicate these 1:1.
 
 ---
@@ -97,11 +97,11 @@ Key rules:
 
 ```json
 {
-  "AutomationExperiments": {
+  "AutomationExtensions": {
     "EnabledByDefault": false,
     "Components": {
-      "Labs.AutomationExperiments.Action.SendWebhook": { "Enabled": true },
-      "Labs.AutomationExperiments.Trigger.InactiveContact": { "Enabled": true, "Schedule": "daily" }
+      "Labs.AutomationExtensions.Action.SendWebhook": { "Enabled": true },
+      "Labs.AutomationExtensions.Trigger.InactiveContact": { "Enabled": true, "Schedule": "daily" }
     },
     "Webhooks": {
       "Endpoints": {
@@ -114,7 +114,7 @@ Key rules:
 
 - Key = component identifier (stable). `EnabledByDefault` lets teams opt-in (safe default `false`) or opt-out.
 - Component-specific settings (endpoints, secrets, API keys) live here, **not** in step properties (GDPR/secrets guidance). Step properties pick a **named** endpoint via `IDropDownOptionsProvider`.
-- Registration: `services.AddAutomationExperiments(configuration)` binds `IOptionsMonitor<AutomationExperimentsOptions>` (supports reload).
+- Registration: `services.AddAutomationExtensions(configuration)` binds `IOptionsMonitor<AutomationExtensionsOptions>` (supports reload).
 
 ### 2.3 Runtime behavior when disabled
 
@@ -129,7 +129,7 @@ Implementation: thin base classes (`LabsAutomationAction<TProps>`, `LabsAutomati
 
 ### 2.4 Admin UI visibility (options, pick in implementation)
 
-1. **Custom admin application** "Automation experiments" (Configuration category):
+1. **Custom admin application** "Automation extensions" (Configuration category):
    - Lists every package component: kind, display name, identifier, enabled state, config source, and **processes using it** (query `ma.automationstep` / trigger rows) **[verify storage of custom identifiers]**.
    - Callout warning when a disabled component is used by an enabled process.
    - `ListingPage` requires an object type; list is code-defined → likely needs a small custom React template or a simple page with a table **[verify cheapest built-in template option]**.
@@ -143,7 +143,7 @@ Recommendation: do 3 first (trivial), then 1.
 
 ## 3. Proposed components (20)
 
-Identifier prefix: `Labs.AutomationExperiments.` (final prefix TBD – never change after release).
+Identifier prefix: `Labs.AutomationExtensions.` (final prefix TBD – never change after release).
 
 Legend: **T** trigger, **C** condition, **A** action. "Showcases" = XbyK automation capability demonstrated.
 
@@ -210,7 +210,7 @@ Source: [Scheduled tasks](https://docs.kentico.com/documentation/developers-and-
 ### 4.1 Decisions
 
 1. **One task per trigger** (not one shared task). Own schedule, own enable toggle, own *Last result*; matches per-component appsettings enablement.
-2. **Tie into appsettings enablement.** If the trigger component is disabled, task returns early with result text like `Disabled via appsettings (AutomationExperiments:Components:<id>:Enabled)`. Visible in *Last result* column = free admin visibility.
+2. **Tie into appsettings enablement.** If the trigger component is disabled, task returns early with result text like `Disabled via appsettings (AutomationExtensions:Components:<id>:Enabled)`. Visible in *Last result* column = free admin visibility.
 3. **Task configuration setup: documentation only** (Usage Guide: create configuration, pick implementation, set daily schedule, enable). No auto-creation, no CI/CD-shipped config for now.
 4. **Duplicate firing / state:**
    - #2 date anniversary – no state needed (date match is naturally once per period).
@@ -234,7 +234,7 @@ Event-driven triggers (#4 activity handler, #5 endpoint, #6 order event) need no
 > **Event log length limits (not in Xperience docs – found in testing):** the `XperienceEventLog` provider stores the logger
 > category in `CMS_EventLog.Source` and `EventId.Name` in `CMS_EventLog.EventCode`, both `nvarchar(100)`. Entries exceeding
 > either limit are **silently dropped** from the Event log (they still reach other providers, e.g. console). With the
-> `Kentico.Xperience.Labs.AutomationExperiments.` prefix (45 chars) full type names (`<Kind>.<Component>.<ClassName>`)
+> `Kentico.Xperience.Labs.AutomationExtensions.` prefix (45 chars) full type names (`<Kind>.<Component>.<ClassName>`)
 > easily exceed this. **Rule: never inject `ILogger<T>` in the library** – inject `ILoggerFactory` and call
 > `CreateLogger(LogCategories.For(AutomationComponentCatalog.<Component>))` (or `LogCategories.CONFIGURATION`).
 > Enforced by `LogCategoryLengthTests`. Reported to Kentico core product (2026-10-04):
@@ -297,13 +297,13 @@ Required:
 Sources: [Admin UI localization](https://docs.kentico.com/documentation/developers-and-admins/customization/admin-ui-localization), [Integrate custom code – resource files](https://docs.kentico.com/documentation/developers-and-admins/customization/integrate-custom-code#store-application-resources-in-resource-files)
 
 - Strings live in `.resx` files in the package assembly. One resource class per `.cs` file (empty class encapsulating the `.resx`).
-- Register: `[assembly: RegisterLocalizationResource(typeof(AutomationExperimentsResources), LocalizationTarget.Server, SystemContext.SYSTEM_CULTURE_NAME)]`.
+- Register: `[assembly: RegisterLocalizationResource(typeof(AutomationExtensionsResources), LocalizationTarget.Server, SystemContext.SYSTEM_CULTURE_NAME)]`.
   - Targets: `Server` (default, resolved per request in API responses), `Client` (bundled to browser at admin load), `Builder` (Page/Form Builder components).
   - DancingGoat sample registers its automation strings with `LocalizationTarget.Builder` – **verified:** `Builder` is sufficient for step names/properties in the Automation Builder (DancingGoat coffee club step). The library registers both `Server` and `Builder` (open item 2).
 - Usage patterns seen in `examples/DancingGoat/Samples/Automation`:
-  - registration attribute `displayName` / `Description`: plain key (`"labs.automationexperiments.sendwebhook.displayname"`).
-  - property attributes (`Label`, `ExplanationText`, …): macro form `"{$labs.automationexperiments.sendwebhook.endpoint.label$}"`.
-- Key naming: `labs.automationexperiments.<component>.<element>` (lowercase, matches identifier prefix).
+  - registration attribute `displayName` / `Description`: plain key (`"labs.automationextensions.sendwebhook.displayname"`).
+  - property attributes (`Label`, `ExplanationText`, …): macro form `"{$labs.automationextensions.sendwebhook.endpoint.label$}"`.
+- Key naming: `labs.automationextensions.<component>.<element>` (lowercase, matches identifier prefix).
 - Fallback: user culture → `en-US` → raw key. So **ship `en-US` for every key**; a missing key shows the raw key to marketers.
 - Other languages: optional, add `.<culture>.resx` + registration; map multiple variants via `LogicalName` in `.csproj` or one class per culture (see Training guides repo `TrainingGuides.Admin`).
 - Verify coverage with `dotnet run --no-build -- --kxp-export-localization-resources --export-path ./loc-export` (custom resources exported under `custom/`).
@@ -314,8 +314,8 @@ Sources: [Admin UI localization](https://docs.kentico.com/documentation/develope
 ## 6. Proposed solution layout
 
 ```text
-src/Kentico.Xperience.Labs.AutomationExperiments/
-  Configuration/       options, AddAutomationExperiments(), component status service
+src/Kentico.Xperience.Labs.AutomationExtensions/
+  Configuration/       options, AddAutomationExtensions(), component status service
   Core/                gated base classes, StepResultData, token resolver, option providers
   Triggers/            one folder per trigger (trigger, data, props, firing handler/task/endpoint)
   Conditions/
@@ -335,17 +335,17 @@ examples/DancingGoat/  wire-up + appsettings + demo processes (CI/CD repository 
 
 **Core**
 
-- Identifier prefix `Labs.AutomationExperiments.`; config section `AutomationExperiments`; components keyed by short name (`SendWebhook`). Disabled by default; opt-in/opt-out via `EnabledByDefault` + `Components`. Restart after changing (reload via `IOptionsMonitor` not verified).
+- Identifier prefix `Labs.AutomationExtensions.`; config section `AutomationExtensions`; components keyed by short name (`SendWebhook`). Disabled by default; opt-in/opt-out via `EnabledByDefault` + `Components`. Restart after changing (reload via `IOptionsMonitor` not verified).
 - `AutomationComponentCatalog`, `IAutomationComponentStatus`, startup `ComponentStatus` log, `DisabledComponentLog` (once/hour/process).
 - Step results: `StepResultData` process data keyed `<source>.<number>` (e.g. `SendWebhook.1`). Sources registered via DI (`AddStepResultSource`) so custom steps from other projects/packages opt in to *Previous step succeeded*; condition has two dropdowns (Step + Result number 1–5). Public `StepResultRecorder`, `StepResultNumberOptionsProvider`.
 - Skippable steps: `SkippableActionProperties` / `SkippableConditionProperties` base classes ("Step behavior" category, order 10000); skipped actions save `StepResult.CreateSkipped`; skipped conditions follow the selected branch. Applied to all library steps + DancingGoat coffee club. Reason: Xperience blocks deleting steps once a process has contact history.
 - Logging: named event IDs in `LogEvents` (41000–41031); loggers created via `ILoggerFactory` + `LogCategories.For(component)` – never `ILogger<T>` (see 5.1).
-- Localization: all marketer-facing text in `AutomationExperimentsResources.resx`, registered for `Server` and `Builder`.
+- Localization: all marketer-facing text in `AutomationExtensionsResources.resx`, registered for `Server` and `Builder`.
 - Library assembly discoverable via `<AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />` in the `.csproj` (without it no `Register*` attribute is processed).
 
 **Tests:** 82 unit tests (status, catalog vs. registrations, resx keys, discovery attribute, webhook sender/signature, step result keys/sources, skippable steps, anniversary math, options binding, log categories/event names ≤ 100 chars).
 
-**DancingGoat:** references the library; own `Directory.Build.props`, package versions from root `Directory.Packages.props` (all Kentico packages 31.9.1); Development config enables all components + `local-test` / `local-test-failing` webhook endpoints; dev-only receiver `/automation-experiments/webhook-test`; demo action `CoffeeClubEnrollmentAutomationAction` opting in to *Previous step succeeded*; *Example automation* uses the form submission trigger (CI repository).
+**DancingGoat:** references the library; own `Directory.Build.props`, package versions from root `Directory.Packages.props` (all Kentico packages 31.9.1); Development config enables all components + `local-test` / `local-test-failing` webhook endpoints; dev-only receiver `/automation-extensions/webhook-test`; demo action `CoffeeClubEnrollmentAutomationAction` opting in to *Previous step succeeded*; *Example automation* uses the form submission trigger (CI repository).
 
 **Validated in the running app**
 
@@ -378,7 +378,7 @@ examples/DancingGoat/  wire-up + appsettings + demo processes (CI/CD repository 
 
 ## 8. Open questions
 
-1. ~~Final identifier prefix?~~ Resolved: `Labs.AutomationExperiments.`; display text via localization resources (5.5).
+1. ~~Final identifier prefix?~~ Resolved: `Labs.AutomationExtensions.`; display text via localization resources (5.5).
 2. ~~Default enabled state?~~ Resolved: disabled by default, opt-in/opt-out via appsettings.
 3. Admin UI: read-only status page enough, or also DB-stored overrides editable in admin?
 4. Commerce components (#6, #13) – include in core package or separate `.Commerce` package?

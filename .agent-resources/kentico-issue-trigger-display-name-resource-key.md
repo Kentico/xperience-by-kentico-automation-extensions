@@ -32,7 +32,7 @@ raw key instead of the localized text.
 - Event log: `CREATEOBJ` / `UPDATEOBJ` entries read `Create Trigger 'acme.automation.mytrigger.displayname'`
 - CI/CD repository: the trigger file is named after the key and stores it as the display name
 
-Observed in this repository with `labs.automationexperiments.contactdateanniversary.displayname`
+Observed in this repository with `labs.automationextensions.contactdateanniversary.displayname`
 (Event log entries #953 and #963, process *Contact Anniversary*). CI store output:
 
 ```text
@@ -42,7 +42,7 @@ App_Data/CIRepository/@global/cms.objectworkflowtrigger/contactanniversary@74d07
 
 ```xml
 <TriggerDisplayName>
-  <![CDATA[labs.automationexperiments.contactdateanniversary.displayname]]>
+  <![CDATA[labs.automationextensions.contactdateanniversary.displayname]]>
 </TriggerDisplayName>
 ```
 

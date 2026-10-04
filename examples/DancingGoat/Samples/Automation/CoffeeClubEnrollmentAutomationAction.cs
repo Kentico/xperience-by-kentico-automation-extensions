@@ -6,7 +6,7 @@ using CMS.Automation;
 using CMS.ContactManagement;
 
 using Kentico.Xperience.Admin.Base;
-using Kentico.Xperience.Labs.AutomationExperiments.Core;
+using Kentico.Xperience.Labs.AutomationExtensions.Core;
 
 using Microsoft.Extensions.Logging;
 
@@ -22,7 +22,7 @@ namespace Samples.DancingGoat;
 
 /// <summary>
 /// Demo custom automation action that "enrolls" the contact in the Dancing Goat coffee club and opts in to the
-/// "Previous step succeeded" condition of the automation experiments library.
+/// "Previous step succeeded" condition of the automation extensions library.
 /// </summary>
 /// <remarks>
 /// Opt-in consists of registering a step result source (<see cref="SOURCE_NAME"/>) via <c>AddStepResultSource</c> in

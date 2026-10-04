@@ -13,7 +13,7 @@ no error is visible in the Event log application, and the documentation doesn't 
 ## Steps to reproduce
 
 1. Create a class whose full type name is longer than 100 characters, e.g.
-   `Kentico.Xperience.Labs.AutomationExperiments.Triggers.ContactDateAnniversary.ContactDateAnniversaryScheduledTask` (112).
+   `Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary.ContactDateAnniversaryScheduledTask` (112).
 2. Inject `ILogger<ThatClass>` and log a Warning (passes the default `XperienceEventLog` filter for any code).
 3. In the same method, log a Warning via `ILoggerFactory.CreateLogger("Acme.Test")`.
 

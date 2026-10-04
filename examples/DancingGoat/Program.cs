@@ -69,7 +69,7 @@ builder.Services.AddLocalization()
 
 builder.Services.AddDancingGoatServices();
 builder.Services
-    .AddAutomationExperiments(builder.Configuration)
+    .AddAutomationExtensions(builder.Configuration)
     .AddStepResultSource(CoffeeClubEnrollmentAutomationAction.SOURCE_NAME, CoffeeClubEnrollmentAutomationAction.DISPLAY_NAME);
 builder.Services.AddSingleton<IEmailActivityTrackingEvaluator, EmailActivityTrackingEvaluator>();
 
