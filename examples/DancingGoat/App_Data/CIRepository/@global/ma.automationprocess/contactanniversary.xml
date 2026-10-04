@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ma.automationprocess>
+  <WorkflowAllowedObjects>;om.contact;</WorkflowAllowedObjects>
+  <WorkflowAutomationType>0</WorkflowAutomationType>
+  <WorkflowDisplayName>Contact Anniversary</WorkflowDisplayName>
+  <WorkflowEnabled>True</WorkflowEnabled>
+  <WorkflowGUID>70b1f7ab-7b57-4467-919b-b275328e0e6b</WorkflowGUID>
+  <WorkflowName>ContactAnniversary</WorkflowName>
+  <WorkflowRecurrenceType>3</WorkflowRecurrenceType>
+  <WorkflowType>3</WorkflowType>
+</ma.automationprocess>

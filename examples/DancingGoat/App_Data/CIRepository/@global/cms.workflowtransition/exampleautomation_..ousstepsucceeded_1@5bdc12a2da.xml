@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.workflowtransition>
+  <Parent>
+    <CodeName>PreviousStepSucceeded_1</CodeName>
+    <GUID>21dfde7f-a07e-4971-88a4-d95dd221b12a</GUID>
+    <ObjectType>ma.automationstep</ObjectType>
+    <Parent>
+      <CodeName>ExampleAutomation</CodeName>
+      <GUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</GUID>
+      <ObjectType>ma.automationprocess</ObjectType>
+    </Parent>
+  </Parent>
+  <Bindings>
+    <Binding id="ma.automationstep_WriteToLog_Enrollment_webhookSuccess_ma.automationprocess_ExampleAutomation-ma.automationstep_WriteToLog_Enrollment_webhookSuccess_ma.automationprocess_ExampleAutomation">
+      <TransitionEndStepID>
+        <CodeName>WriteToLog_Enrollment_webhookSuccess</CodeName>
+        <GUID>22548fd2-406e-4228-b09e-5effa5b278ef</GUID>
+        <ObjectType>ma.automationstep</ObjectType>
+        <Parent>
+          <CodeName>ExampleAutomation</CodeName>
+          <GUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</GUID>
+          <ObjectType>ma.automationprocess</ObjectType>
+        </Parent>
+      </TransitionEndStepID>
+      <TransitionSourcePointGUID>238979bb-0a03-4867-b9d0-6f83a39f651c</TransitionSourcePointGUID>
+      <TransitionType>1</TransitionType>
+      <TransitionWorkflowID>
+        <CodeName>ExampleAutomation</CodeName>
+        <GUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</GUID>
+        <ObjectType>ma.automationprocess</ObjectType>
+      </TransitionWorkflowID>
+    </Binding>
+    <Binding id="ma.automationstep_WriteToLog_WebhookFailure_1_ma.automationprocess_ExampleAutomation-ma.automationstep_WriteToLog_WebhookFailure_1_ma.automationprocess_ExampleAutomation">
+      <TransitionEndStepID>
+        <CodeName>WriteToLog_WebhookFailure_1</CodeName>
+        <GUID>ed8e7311-0d76-4d27-bad3-140c87ba1b4d</GUID>
+        <ObjectType>ma.automationstep</ObjectType>
+        <Parent>
+          <CodeName>ExampleAutomation</CodeName>
+          <GUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</GUID>
+          <ObjectType>ma.automationprocess</ObjectType>
+        </Parent>
+      </TransitionEndStepID>
+      <TransitionSourcePointGUID>1ce5c42a-3d75-4661-b625-9e19b189e4b9</TransitionSourcePointGUID>
+      <TransitionType>1</TransitionType>
+      <TransitionWorkflowID>
+        <CodeName>ExampleAutomation</CodeName>
+        <GUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</GUID>
+        <ObjectType>ma.automationprocess</ObjectType>
+      </TransitionWorkflowID>
+    </Binding>
+  </Bindings>
+</cms.workflowtransition>

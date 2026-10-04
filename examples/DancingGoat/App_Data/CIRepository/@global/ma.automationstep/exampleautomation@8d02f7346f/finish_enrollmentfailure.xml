@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ma.automationstep>
+  <StepActionParameters />
+  <StepDefinition>
+    <Step xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <TimeoutEnabled>false</TimeoutEnabled>
+      <TimeoutTarget>00000000-0000-0000-0000-000000000000</TimeoutTarget>
+      <SourcePoints />
+      <DefinitionPoint Guid="7187e5a0-6158-43ed-be0f-a49fe498cfef">
+        <Label>workflowsourcepoint.standard</Label>
+        <Type>0</Type>
+        <StepRolesSecurity>0</StepRolesSecurity>
+        <StepUsersSecurity>0</StepUsersSecurity>
+      </DefinitionPoint>
+      <Position>
+        <X>-1</X>
+        <Y>-1</Y>
+      </Position>
+    </Step>
+  </StepDefinition>
+  <StepDisplayName>Finish: Enrollment failure</StepDisplayName>
+  <StepGUID>510c71e1-7873-4355-9bdc-fdd80aad1626</StepGUID>
+  <StepName>Finish_EnrollmentFailure</StepName>
+  <StepRolesSecurity>0</StepRolesSecurity>
+  <StepType>99</StepType>
+  <StepUsersSecurity>0</StepUsersSecurity>
+  <StepWorkflowID>
+    <CodeName>ExampleAutomation</CodeName>
+    <GUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</GUID>
+    <ObjectType>ma.automationprocess</ObjectType>
+  </StepWorkflowID>
+  <StepWorkflowType>3</StepWorkflowType>
+</ma.automationstep>

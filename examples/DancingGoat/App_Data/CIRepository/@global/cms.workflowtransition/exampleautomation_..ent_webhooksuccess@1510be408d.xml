@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.workflowtransition>
+  <Parent>
+    <CodeName>WriteToLog_Enrollment_webhookSuccess</CodeName>
+    <GUID>22548fd2-406e-4228-b09e-5effa5b278ef</GUID>
+    <ObjectType>ma.automationstep</ObjectType>
+    <Parent>
+      <CodeName>ExampleAutomation</CodeName>
+      <GUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</GUID>
+      <ObjectType>ma.automationprocess</ObjectType>
+    </Parent>
+  </Parent>
+  <Bindings>
+    <Binding id="ma.automationstep_Finish_WebhookSuccess_ma.automationprocess_ExampleAutomation-ma.automationstep_Finish_WebhookSuccess_ma.automationprocess_ExampleAutomation">
+      <TransitionEndStepID>
+        <CodeName>Finish_WebhookSuccess</CodeName>
+        <GUID>57c29c0a-2211-438f-a3ec-9d4fabe7a819</GUID>
+        <ObjectType>ma.automationstep</ObjectType>
+        <Parent>
+          <CodeName>ExampleAutomation</CodeName>
+          <GUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</GUID>
+          <ObjectType>ma.automationprocess</ObjectType>
+        </Parent>
+      </TransitionEndStepID>
+      <TransitionSourcePointGUID>ad53efdf-f70d-4fab-8d63-1daf742b2848</TransitionSourcePointGUID>
+      <TransitionType>1</TransitionType>
+      <TransitionWorkflowID>
+        <CodeName>ExampleAutomation</CodeName>
+        <GUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</GUID>
+        <ObjectType>ma.automationprocess</ObjectType>
+      </TransitionWorkflowID>
+    </Binding>
+  </Bindings>
+</cms.workflowtransition>

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ma.automationstep>
+  <StepActionID>
+    <CodeName>Custom_action</CodeName>
+    <GUID>b3a1f7e2-5c4d-4a8b-9e6f-1d2c3b4a5e6f</GUID>
+    <ObjectType>ma.automationaction</ObjectType>
+  </StepActionID>
+  <StepActionParameters>
+    <Parameters>
+      <CustomActionIdentifier>Labs.AutomationExperiments.WriteToLog</CustomActionIdentifier>
+      <IncludeStepResults>true</IncludeStepResults>
+      <IncludeTriggerDetails>true</IncludeTriggerDetails>
+      <Level>
+        <![CDATA["Warning"]]>
+      </Level>
+      <Message>
+        <![CDATA["Enrollment failure.\n\nContact {contactId} ({contactGuid}) reached this step in process \u0027{processName}\u0027, started by trigger \u0027{triggerIdentifier}\u0027."]]>
+      </Message>
+      <SkipStep>false</SkipStep>
+    </Parameters>
+  </StepActionParameters>
+  <StepDefinition>
+    <Step xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <TimeoutEnabled>false</TimeoutEnabled>
+      <TimeoutTarget>00000000-0000-0000-0000-000000000000</TimeoutTarget>
+      <SourcePoints>
+        <SourcePoint Guid="c8484079-a58e-489f-917d-c5a073c5d306">
+          <Label>workflowsourcepoint.standard</Label>
+          <Type>0</Type>
+          <StepRolesSecurity>0</StepRolesSecurity>
+          <StepUsersSecurity>0</StepUsersSecurity>
+        </SourcePoint>
+      </SourcePoints>
+      <Position>
+        <X>-1</X>
+        <Y>-1</Y>
+      </Position>
+    </Step>
+  </StepDefinition>
+  <StepDisplayName>Write to log: enrollment failure</StepDisplayName>
+  <StepGUID>b7fe0389-fd29-49ea-834e-7fc72c72b091</StepGUID>
+  <StepName>WriteToLog_EnrollmentFailure</StepName>
+  <StepRolesSecurity>0</StepRolesSecurity>
+  <StepType>11</StepType>
+  <StepUsersSecurity>0</StepUsersSecurity>
+  <StepWorkflowID>
+    <CodeName>ExampleAutomation</CodeName>
+    <GUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</GUID>
+    <ObjectType>ma.automationprocess</ObjectType>
+  </StepWorkflowID>
+  <StepWorkflowType>3</StepWorkflowType>
+</ma.automationstep>

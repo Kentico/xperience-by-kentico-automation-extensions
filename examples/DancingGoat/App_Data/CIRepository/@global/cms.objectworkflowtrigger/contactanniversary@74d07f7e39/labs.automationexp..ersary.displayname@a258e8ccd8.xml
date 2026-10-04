@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<cms.objectworkflowtrigger>
+  <TriggerDisplayName>
+    <![CDATA[labs.automationexperiments.contactdateanniversary.displayname]]>
+  </TriggerDisplayName>
+  <TriggerGUID>ba4ed81b-8679-4e14-8cc6-1ce8ed7775b0</TriggerGUID>
+  <TriggerObjectType>om.contact</TriggerObjectType>
+  <TriggerParameters>
+    <Parameters>
+      <CustomTrigger>Labs.AutomationExperiments.ContactDateAnniversary</CustomTrigger>
+      <DateField>
+        <![CDATA["ContactBirthday"]]>
+      </DateField>
+      <DaysBefore>
+        <![CDATA["0"]]>
+      </DaysBefore>
+    </Parameters>
+  </TriggerParameters>
+  <TriggerType>3</TriggerType>
+  <TriggerWorkflowID>
+    <CodeName>ContactAnniversary</CodeName>
+    <GUID>70b1f7ab-7b57-4467-919b-b275328e0e6b</GUID>
+    <ObjectType>ma.automationprocess</ObjectType>
+  </TriggerWorkflowID>
+</cms.objectworkflowtrigger>

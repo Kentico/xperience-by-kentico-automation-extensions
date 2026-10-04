@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ma.automationprocess>
+  <WorkflowAllowedObjects>;om.contact;</WorkflowAllowedObjects>
+  <WorkflowAutomationType>0</WorkflowAutomationType>
+  <WorkflowDisplayName>Form submission automation</WorkflowDisplayName>
+  <WorkflowEnabled>False</WorkflowEnabled>
+  <WorkflowGUID>b379b683-5ceb-47e2-b822-401c37d73b76</WorkflowGUID>
+  <WorkflowName>FormSubmissionAutomation</WorkflowName>
+  <WorkflowRecurrenceType>3</WorkflowRecurrenceType>
+  <WorkflowType>3</WorkflowType>
+</ma.automationprocess>

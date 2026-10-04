@@ -1,0 +1,6 @@
+<Project>
+  <!--
+    Stops inheriting the library build settings (target framework, analyzers, nullable errors) from the repository root.
+    Package versions still come from the root Directory.Packages.props (resolved independently of this file).
+  -->
+</Project>

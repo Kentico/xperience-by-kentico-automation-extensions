@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ma.automationstep>
+  <StepActionID>
+    <CodeName>Custom_action</CodeName>
+    <GUID>b3a1f7e2-5c4d-4a8b-9e6f-1d2c3b4a5e6f</GUID>
+    <ObjectType>ma.automationaction</ObjectType>
+  </StepActionID>
+  <StepActionParameters>
+    <Parameters>
+      <CustomActionIdentifier>DancingGoat.CoffeeClubEnrollment</CustomActionIdentifier>
+      <Outcome>
+        <![CDATA["automatic"]]>
+      </Outcome>
+      <RecordResult>false</RecordResult>
+      <ResultNumber>
+        <![CDATA["1"]]>
+      </ResultNumber>
+      <SkipStep>false</SkipStep>
+    </Parameters>
+  </StepActionParameters>
+  <StepDefinition>
+    <Step xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <TimeoutEnabled>false</TimeoutEnabled>
+      <TimeoutTarget>00000000-0000-0000-0000-000000000000</TimeoutTarget>
+      <SourcePoints>
+        <SourcePoint Guid="4ea53027-32d4-462e-a99d-8d13933a47a9">
+          <Label>workflowsourcepoint.standard</Label>
+          <Type>0</Type>
+          <StepRolesSecurity>0</StepRolesSecurity>
+          <StepUsersSecurity>0</StepUsersSecurity>
+        </SourcePoint>
+      </SourcePoints>
+      <Position>
+        <X>-1</X>
+        <Y>-1</Y>
+      </Position>
+    </Step>
+  </StepDefinition>
+  <StepDisplayName>Enroll in coffee club</StepDisplayName>
+  <StepGUID>360d25bd-fa99-4895-a7a5-eb2a7e9b3e6f</StepGUID>
+  <StepName>EnrollInCoffeeClub</StepName>
+  <StepRolesSecurity>0</StepRolesSecurity>
+  <StepType>11</StepType>
+  <StepUsersSecurity>0</StepUsersSecurity>
+  <StepWorkflowID>
+    <CodeName>FormSubmissionAutomation</CodeName>
+    <GUID>b379b683-5ceb-47e2-b822-401c37d73b76</GUID>
+    <ObjectType>ma.automationprocess</ObjectType>
+  </StepWorkflowID>
+  <StepWorkflowType>3</StepWorkflowType>
+</ma.automationstep>

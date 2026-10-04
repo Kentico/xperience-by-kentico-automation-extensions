@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>Kentico.Xperience.Labs.AutomationExperiments</PackageId>
+    <Title>Xperience by Kentico: Automation Experiments</Title>
+    <Description>Library of automation triggers, conditions, and actions for Xperience by Kentico.</Description>
+    <PackageTags>$(PackageTags);automation;marketing</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Kentico.Xperience.Admin" />
+    <PackageReference Include="Kentico.Xperience.WebApp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Required for Xperience to process the assembly's registration attributes (automation steps, triggers, scheduled tasks, localization resources) -->
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+    <InternalsVisibleTo Include="Kentico.Xperience.Labs.AutomationExperiments.Tests" />
+  </ItemGroup>
+
+</Project>

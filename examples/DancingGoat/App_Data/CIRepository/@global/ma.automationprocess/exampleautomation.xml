@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ma.automationprocess>
+  <WorkflowAllowedObjects>;om.contact;</WorkflowAllowedObjects>
+  <WorkflowAutomationType>0</WorkflowAutomationType>
+  <WorkflowDisplayName>Example automation</WorkflowDisplayName>
+  <WorkflowEnabled>True</WorkflowEnabled>
+  <WorkflowGUID>37d60a4c-066c-4ae3-ba0a-9cfe300179a2</WorkflowGUID>
+  <WorkflowName>ExampleAutomation</WorkflowName>
+  <WorkflowRecurrenceType>3</WorkflowRecurrenceType>
+  <WorkflowType>3</WorkflowType>
+</ma.automationprocess>
