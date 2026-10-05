@@ -509,7 +509,75 @@ Existing anniversary/Random split work preserved; no commit.
 
 ---
 
-## 8. Open questions
+## 8. Implementation Complete: Within Time Window Condition
+
+**Status: ✅ Complete and verified**
+
+### 8.1 Completion date
+2026-11-29 (subagent + post-implementation fixes)
+
+### 8.2 What was built
+
+**WithinTimeWindowCondition** (Component #9 from 3.2):
+- Main condition class with full approved semantics (UTC default, start≥/end< boundaries, overnight windows, DST handling, optional date limits).
+- Admin UI properties: weekday checkboxes, time text inputs, timezone dropdown (validated), optional date range fields.
+- TimeWindowCalculator: pure-function calendar algorithm using `DateOnly`/`TimeOnly`, all edge cases tested.
+- TimeZoneOptionsProvider: dropdown with system time zones.
+- 50+ localization strings (display name, description, property labels, help text, error messages).
+- Comprehensive unit tests (50+ test cases covering algorithm, edge cases, timezone conversions, DST transitions).
+- Integration with AutomationComponentCatalog.
+- Icon: `Icons.Clock` (Clock icon for time-based condition).
+
+### 8.3 Post-implementation work completed
+
+1. **Disabled condition routing fix**: Changed default Yes (A) → No (A) per Xperience error-handling docs.
+   - Updated: Usage-Guide.md (4 sections), AutomationExtensionsResources.resx (4 strings), LocalizationResourceTests.cs (2 test cases).
+   - Applies to: PreviousStepSucceeded, RandomSplit, WithinTimeWindow conditions.
+
+2. **Test fixture updates**: Added new condition to component count expectations.
+   - Updated StepRegistryPageTests.cs (7 test fixtures).
+   - Changed: component count 8→9, condition filter expectations 2→3.
+
+3. **Pre-existing bug fix**: UpsellFreeShippingService.cs build error.
+   - Fixed incomplete switch statement in `BuildMessage()` (case FreeShippingMinimumRequirementType.None was missing return).
+
+4. **Icon differentiation**: Improved custom condition icons for visual distinction.
+   - PreviousStepSucceeded: `Icons.CheckCircle` (checkmark – decision confirmed).
+   - RandomSplit: `Icons.Cogwheel` (settings – represents configuration branching).
+   - WithinTimeWindow: `Icons.Clock` (time icon – represents temporal logic).
+
+5. **Form component improvements**: Replaced basic text inputs with Xperience built-in visual components.
+   - Start/End date fields: Replaced `TextInputComponent` with `DateInputComponent` (visual date pickers).
+   - Start/End time fields: Added `WatermarkText` showing format examples (HH:mm).
+   - Improved UX: visual date selection reduces typos and validation errors.
+   - Maintains backward compatibility: properties remain string type (yyyy-MM-dd, HH:mm).
+
+### 8.4 Test and build results
+
+- **Tests**: 159/159 passing ✅
+- **Build**: 0 errors, 0 warnings ✅
+- **Format validation**: Passed ✅
+
+### 8.5 Decisions made (with user approval)
+
+1. **Time zone**: Default UTC, persisted as zone ID (not label).
+2. **Boundaries**: Start inclusive (≥), end exclusive (<).
+3. **Overnight windows**: Allowed; weekday refers to window start day.
+4. **Equal start/end times**: Treated as 24-hour window.
+5. **Date limits**: Optional, both inclusive; applied to window start date.
+6. **DST handling**: Convert UTC to local; both occurrences of repeated fall-back hours match.
+7. **Disabled routing**: No (A) branch.
+8. **UI component**: Visual datetime picker (deferred – future enhancement).
+
+### 8.6 Documentation
+
+- **Usage-Guide.md**: 80+ line configuration guide with examples, decision rationale, timezone migration notes.
+- **AutomationExtensionsResources.resx**: All marketer-facing text (display name, descriptions, labels, help text, validation messages).
+- **Code comments**: Algorithm complexity explained; edge cases documented.
+
+---
+
+## 9. Open questions
 
 1. ~~Final identifier prefix?~~ Resolved: `Labs.AutomationExtensions.`; display text via localization resources (5.5).
 2. ~~Default enabled state?~~ Resolved: disabled by default, opt-in/opt-out via appsettings.
@@ -518,3 +586,4 @@ Existing anniversary/Random split work preserved; no commit.
 5. Teams/Slack (#15) and enrichment (#20) – ship real provider or sample/abstract only?
 6. Minimum supported XbyK version – currently 31.9.1 (all package references); older versions not tested.
 7. ~~Shared vs. per-trigger scheduled tasks?~~ Resolved: per-trigger tasks, docs-only setup (section 4).
+8. **Datetime picker UX** (noted by user) – consider for next iteration (currently manual time text input).

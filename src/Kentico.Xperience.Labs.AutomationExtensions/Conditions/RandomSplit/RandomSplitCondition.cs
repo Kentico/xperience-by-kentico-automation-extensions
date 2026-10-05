@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
     RandomSplitCondition.IDENTIFIER,
     "labs.automationextensions.randomsplit.displayname",
     Description = "labs.automationextensions.randomsplit.description",
-    IconName = Icons.CheckCircle)]
+    IconName = Icons.Cogwheel)]
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Conditions.RandomSplit;
 
