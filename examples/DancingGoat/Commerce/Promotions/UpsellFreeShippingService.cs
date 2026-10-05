@@ -128,11 +128,11 @@ public class UpsellFreeShippingService
 
     private async Task<string> BuildMessage(DancingGoatFreeShippingProperties properties, FreeShippingThresholdProgress progress, CancellationToken cancellationToken)
     {
-        var hasProductScope = string.Equals(properties.Scope, DancingGoatFreeShippingPromotionRuleUtils.SCOPE_PRODUCTS, StringComparison.InvariantCultureIgnoreCase);
-        var hasCategoryOrTagScope = string.Equals(properties.Scope, DancingGoatFreeShippingPromotionRuleUtils.SCOPE_CATEGORIES, StringComparison.InvariantCultureIgnoreCase)
+        bool hasProductScope = string.Equals(properties.Scope, DancingGoatFreeShippingPromotionRuleUtils.SCOPE_PRODUCTS, StringComparison.InvariantCultureIgnoreCase);
+        bool hasCategoryOrTagScope = string.Equals(properties.Scope, DancingGoatFreeShippingPromotionRuleUtils.SCOPE_CATEGORIES, StringComparison.InvariantCultureIgnoreCase)
             || string.Equals(properties.Scope, DancingGoatFreeShippingPromotionRuleUtils.SCOPE_TAGS, StringComparison.InvariantCultureIgnoreCase);
 
-        var scopeDescription = await GetScopeDescription(properties, cancellationToken);
+        string scopeDescription = await GetScopeDescription(properties, cancellationToken);
         if ((hasProductScope || hasCategoryOrTagScope) && string.IsNullOrEmpty(scopeDescription))
         {
             return null;
@@ -141,7 +141,7 @@ public class UpsellFreeShippingService
         switch (progress.RequirementType)
         {
             case FreeShippingMinimumRequirementType.Price:
-                var missingAmount = priceFormatter.Format(progress.MissingValue, new PriceFormatContext());
+                string missingAmount = priceFormatter.Format(progress.MissingValue, new PriceFormatContext());
                 if (hasProductScope)
                 {
                     return string.Format(localizer["Spend {0} more on {1} and get free shipping."], missingAmount, scopeDescription);
@@ -153,7 +153,7 @@ public class UpsellFreeShippingService
                 return string.Format(localizer["Spend {0} more and get free shipping."], missingAmount);
 
             case FreeShippingMinimumRequirementType.Quantity:
-                var missingQuantity = (int)Math.Ceiling(progress.MissingValue);
+                int missingQuantity = (int)Math.Ceiling(progress.MissingValue);
                 if (hasProductScope)
                 {
                     return string.Format(localizer["Add {0} more of {1} and get free shipping."], missingQuantity, scopeDescription);
@@ -169,7 +169,7 @@ public class UpsellFreeShippingService
                 return string.Format(localizer["Add {0} more items and get free shipping."], missingQuantity);
 
             case FreeShippingMinimumRequirementType.ItemPrice:
-                var requiredItemPrice = priceFormatter.Format(progress.TargetValue, new PriceFormatContext());
+                string requiredItemPrice = priceFormatter.Format(progress.TargetValue, new PriceFormatContext());
                 if (hasProductScope)
                 {
                     return string.Format(localizer["Add one of {1} costing at least {0} and get free shipping."], requiredItemPrice, scopeDescription);
@@ -179,9 +179,10 @@ public class UpsellFreeShippingService
                     return string.Format(localizer["Add a {1} product costing at least {0} and get free shipping."], requiredItemPrice, scopeDescription);
                 }
                 return string.Format(localizer["Add an item costing at least {0} and get free shipping."], requiredItemPrice);
-
-            default:
+            case FreeShippingMinimumRequirementType.None:
                 // A promotion without a minimum requirement qualifies as soon as a scope item is in the cart. There is nothing to upsell.
+                return null;
+            default:
                 return null;
         }
     }
@@ -213,7 +214,7 @@ public class UpsellFreeShippingService
             return null;
         }
 
-        var languageName = preferredLanguageRetriever.Get();
+        string languageName = preferredLanguageRetriever.Get();
         var tags = await taxonomyRetriever.RetrieveTags(tagReferences.Select(tag => tag.Identifier), languageName, cancellationToken);
 
         return PromotionMessageFormatter.JoinWithOr(localizer, tags.Select(tag => tag.Title));
