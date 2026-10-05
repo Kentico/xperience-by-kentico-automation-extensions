@@ -39,8 +39,8 @@ public sealed class WithinTimeWindowCondition(
     {
         if (!componentStatus.IsEnabled(AutomationComponentCatalog.WithinTimeWindow))
         {
-            DisabledComponentLog.Write(logger, AutomationComponentCatalog.WithinTimeWindow, context.Process.DisplayName, "sends all contacts through the Yes (A) branch");
-            return true;
+            DisabledComponentLog.Write(logger, AutomationComponentCatalog.WithinTimeWindow, context.Process.DisplayName, "sends all contacts through the No branch");
+            return false;
         }
 
         if (SkippableStep.TryGetSkippedResult(properties, out bool skippedResult))

@@ -29,7 +29,7 @@ Removing a registered component would break any process that uses it, so compone
 | State | Trigger | Condition | Action |
 | --- | --- | --- | --- |
 | Enabled | Starts processes | Evaluates normally | Runs normally |
-| Disabled | Never starts processes (its scheduled task fires nothing) | All contacts follow **No (A)**; condition isn't evaluated and disablement overrides skip settings | Does nothing, the contact moves to the next step |
+| Disabled | Never starts processes (its scheduled task fires nothing) | All contacts follow **No**; condition isn't evaluated and disablement overrides skip settings | Does nothing, the contact moves to the next step |
 
 Disabled components used in a process log a warning (at most once per hour per process).
 At application start, the library logs which components are enabled and warns about unknown component names in configuration.
@@ -107,7 +107,7 @@ Builder steps such as Wait and Finish. Configuration values, endpoint secrets, a
 step-property values are not listed.
 
 The top callouts explain scope and disablement: all disabled library conditions follow
-**No (A)** without evaluation; administrator disablement overrides marketer skip settings;
+**No** without evaluation; administrator disablement overrides marketer skip settings;
 disabled actions no-op; disabled triggers cannot start processes.
 
 No database object or custom frontend is required. The package's discoverable assembly
@@ -297,7 +297,7 @@ Marketer properties:
 - **Result number** – the number selected on the earlier step (*Result 1–5*).
 
 **Works with:** *Send webhook* (or a registered custom step) with **Record result for later steps** turned on and the same **Result number**.
-If no earlier step saved that result (missing step, different number, or the earlier step was disabled), an enabled condition follows **No** and logs a warning. If this condition itself is disabled, all contacts follow **No (A)** without reading the saved result.
+If no earlier step saved that result (missing step, different number, or the earlier step was disabled), an enabled condition follows **No** and logs a warning. If this condition itself is disabled, all contacts follow **No** without reading the saved result.
 
 Each step type has its own numbered results, so different step types never overwrite each other. Within a process, give each step of the same type a different number. Steps can't detect which other steps exist in a process, so the step and number must be matched manually.
 
@@ -314,7 +314,7 @@ The allocation is approximate, not an exact count or guaranteed 50/50 distributi
 
 The split key is used exactly as entered: matching is case-sensitive and whitespace in a nonblank key is significant. Changing the key or percentage can change branch outcomes. Increasing the percentage never moves a contact from **Yes** to **No**.
 
-When the component is disabled globally, all contacts follow **No (A)** without evaluating the condition. This takes precedence over **Skip this step** for every library condition. For Random split (A/B), this also means no contact is read and no bucket is calculated. The disabled-component warning records this branch behavior. When enabled, **Skip this step** follows the selected skip branch without reading the contact.
+When the component is disabled globally, all contacts follow **No** without evaluating the condition. This takes precedence over **Skip this step** for every library condition. For Random split (A/B), this also means no contact is read and no bucket is calculated. The disabled-component warning records this branch behavior. When enabled, **Skip this step** follows the selected skip branch without reading the contact.
 
 The Builder's step description and percentage help explain this disabled behavior. This is static guidance, not a live enabled/disabled indicator; ask your administrator to confirm the current configuration. Marketers can choose the skip branch per step only while the component is enabled.
 

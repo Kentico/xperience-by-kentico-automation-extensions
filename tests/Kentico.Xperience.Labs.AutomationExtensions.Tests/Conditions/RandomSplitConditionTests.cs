@@ -131,7 +131,7 @@ public class RandomSplitConditionTests
     [TestCase(false, "no")]
     [TestCase(true, "no")]
     [TestCase(true, "yes")]
-    public async Task Evaluate_DisabledComponentReturnsYesBeforeSkipOrValidation(bool skipStep, string skippedBranch)
+    public async Task Evaluate_DisabledComponentReturnsNoBeforeSkipOrValidation(bool skipStep, string skippedBranch)
     {
         var condition = CreateCondition(enabled: false);
         var properties = new RandomSplitConditionProperties
@@ -145,7 +145,7 @@ public class RandomSplitConditionTests
 
         bool result = await condition.Evaluate(properties, context, CancellationToken.None);
 
-        Assert.That(result, Is.True);
+        Assert.That(result, Is.False);
     }
 
 

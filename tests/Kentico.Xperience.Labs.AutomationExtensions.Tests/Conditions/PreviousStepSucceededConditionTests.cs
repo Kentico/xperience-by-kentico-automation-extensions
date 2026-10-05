@@ -13,13 +13,13 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Conditions;
 public class PreviousStepSucceededConditionTests
 {
     [Test]
-    public async Task Evaluate_DisabledConditionReturnsYesBeforeSkipAndResultLookup()
+    public async Task Evaluate_DisabledConditionReturnsNoBeforeSkipAndResultLookup()
     {
         var condition = CreateCondition(enabled: false);
         var properties = new PreviousStepSucceededConditionProperties
         {
             SkipStep = true,
-            SkippedBranch = "no",
+            SkippedBranch = "yes",
             SourceName = null!,
             ResultNumber = null!
         };
@@ -27,7 +27,7 @@ public class PreviousStepSucceededConditionTests
 
         bool result = await condition.Evaluate(properties, context, CancellationToken.None);
 
-        Assert.That(result, Is.True);
+        Assert.That(result, Is.False);
     }
 
 

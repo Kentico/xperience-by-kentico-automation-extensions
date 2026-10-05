@@ -84,13 +84,13 @@ public partial class LocalizationResourceTests
     {
         string? text = resourceManager.GetString(key, CultureInfo.InvariantCulture);
 
-        Assert.That(text, Does.Contain("all contacts follow No (A)").And.Contain("regardless of").And.Contain("skip settings"));
+        Assert.That(text, Does.Contain("all contacts follow No (B)").And.Contain("regardless of").And.Contain("skip settings"));
     }
 
 
-    [TestCase("labs.automationextensions.skipstep.condition.explanation", "No (A)")]
+    [TestCase("labs.automationextensions.skipstep.condition.explanation", "follow No,")]
     [TestCase("labs.automationextensions.stepregistry.disabled.content", "\"No\" path")]
-    public void DisabledConditionHelp_ExplainsYesBranchForAllLibraryConditions(string key, string branchText)
+    public void DisabledConditionHelp_ExplainsNoBranchForAllLibraryConditions(string key, string branchText)
     {
         string? text = resourceManager.GetString(key, CultureInfo.InvariantCulture);
 

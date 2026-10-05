@@ -39,8 +39,8 @@ public sealed class RandomSplitCondition(
     {
         if (!componentStatus.IsEnabled(AutomationComponentCatalog.RandomSplit))
         {
-            DisabledComponentLog.Write(logger, AutomationComponentCatalog.RandomSplit, context.Process.DisplayName, "sends all contacts through the Yes (A) branch");
-            return true;
+            DisabledComponentLog.Write(logger, AutomationComponentCatalog.RandomSplit, context.Process.DisplayName, "sends all contacts through the No branch");
+            return false;
         }
 
         if (SkippableStep.TryGetSkippedResult(properties, out bool skippedResult))

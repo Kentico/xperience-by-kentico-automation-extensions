@@ -121,7 +121,7 @@ Key rules:
 | Kind | Behavior | Why |
 | --- | --- | --- |
 | Action | `Execute` no-op, log warning (component + process name) | contact continues, nothing external happens |
-| Condition | return `true` (Yes/A) without evaluating | Disabled library conditions send everyone to variant A; administrator disablement overrides marketer skip settings |
+| Condition | return `false` (**No**) without evaluating | Fails closed, matches Xperience (condition error/timeout → No); administrator disablement overrides marketer skip settings. **Final decision 2026-10-05** (see below) |
 | Trigger | firing code (handler, scheduled task, webhook endpoint) skips dispatch; `Evaluate` returns `false` as backstop | avoids filling shared trigger queue |
 | Scheduled task / endpoint | task returns early; endpoint returns 404 | no hidden work |
 
@@ -524,6 +524,14 @@ Existing anniversary/Random split work preserved; no commit.
 - Unit tests can't reach the write path without the Xperience container (covered by the running-app check above).
 - User confirmed built-in rule conditions **cannot** do numeric comparisons → Usage Guide corrected; new condition #22 *Contact number field compare* added to 3.4 (library must solve this). Option tooltips don't render in `DropDownComponent` → removed; Add/Subtract/Set descriptions moved into the Operation `ExplanationText` (3 resx keys + test cases removed; suite 238 passed).
 
+### Decision (2026-10-05): disabled library conditions → No
+
+History: Yes (Slice 2) → texts said "No (A)" while code returned `true` (Yes) → final **No** for all library conditions (`return false`). Changed several times; don't revisit without the user.
+
+Reasons (pros/cons reviewed with user): fails closed (gated emails/notifications/syncs don't run), matches Xperience condition error/timeout → No, single rule to document. Accepted downsides: failure-path conditions (*Previous step succeeded*) send everyone to the failure branch; Random split sends everyone to B. Possible later: appsettings `DisabledConditionBranch` override if a real case needs it.
+
+Applied: `PreviousStepSucceeded`, `RandomSplit`, `WithinTimeWindow` return `false` + log "sends all contacts through the No branch"; resx/Usage Guide say "No" ("No (B)" for Random split); disabled-branch tests assert `false` with skip set to Yes to prove precedence. 238 tests passed.
+
 ### Open items (remaining)
 
 1. In-app *7 days before* scheduled-task firing for contact 9 (birthday 10-11) remains unverified; the offset calculation is covered by unit tests.
@@ -558,7 +566,7 @@ Existing anniversary/Random split work preserved; no commit.
 
 ### 8.3 Post-implementation work completed
 
-1. **Disabled condition routing fix**: Changed default Yes (A) → No (A) per Xperience error-handling docs.
+1. **Disabled condition routing fix**: texts changed to No per Xperience error-handling docs (code still returned `true` until 2026-10-05 fix – see decision below).
    - Updated: Usage-Guide.md (4 sections), AutomationExtensionsResources.resx (4 strings), LocalizationResourceTests.cs (2 test cases).
    - Applies to: PreviousStepSucceeded, RandomSplit, WithinTimeWindow conditions.
 
@@ -599,7 +607,7 @@ Existing anniversary/Random split work preserved; no commit.
 4. **Equal start/end times**: Treated as 24-hour window.
 5. **Date limits**: Optional, both inclusive; applied to window start date.
 6. **DST handling**: Convert UTC to local; both occurrences of repeated fall-back hours match.
-7. **Disabled routing**: No (A) branch.
+7. **Disabled routing**: No branch (Random split: No (B)).
 8. **UI component**: Built-in date picker and custom styled React Aria time picker.
 
 ### 8.6 Documentation

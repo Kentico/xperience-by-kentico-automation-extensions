@@ -295,7 +295,7 @@ public class StepRegistryPageTests
             Assert.That(split["Name"], Is.EqualTo("Random split (A/B)"));
             Assert.That(split["Kind"], Is.EqualTo("Condition"));
             Assert.That(split["Status"], Is.EqualTo("Disabled"));
-            Assert.That(split["Description"], Is.EqualTo("Assigns each contact to a stable Yes (A) or No (B) branch. Requires administrator enablement; when disabled by application configuration, all contacts follow No (A), regardless of skip settings."));
+            Assert.That(split["Description"], Is.EqualTo("Assigns each contact to a stable Yes (A) or No (B) branch. Requires administrator enablement; when disabled by application configuration, all contacts follow No (B), regardless of skip settings."));
             Assert.That(defaultRow["Status"], Is.EqualTo("Enabled"));
             Assert.That(defaultRow["Description"], Is.EqualTo("Writes a message to the Event log for every contact reaching this step. Use to check which path contacts take. Usually enabled only during testing."));
             Assert.That(other["Name"], Is.EqualTo("Custom step"));

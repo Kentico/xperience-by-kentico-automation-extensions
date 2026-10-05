@@ -89,7 +89,7 @@
     <value>Contacts move on without this step running.&lt;br&gt;Use when you can't delete the step because the process already has contact history.&lt;br&gt;Tip: start the step name with "[Skipped]" (or ⏭️) so it's visible in the builder.</value>
   </data>
   <data name="labs.automationextensions.skipstep.condition.explanation" xml:space="preserve">
-    <value>The condition isn't checked and all contacts follow the branch selected below.&lt;br&gt;This applies only when the component is enabled by your administrator.&lt;br&gt;If disabled by application configuration, all library conditions follow No (A), regardless of this setting.&lt;br&gt;Use when you can't delete the step because the process already has contact history.&lt;br&gt;Tip: start the step name with "[Skipped → Yes]" or "[Skipped → No]" so it's visible in the builder.&lt;br&gt;If you turn skipping off later, make sure both branches lead to further steps.</value>
+    <value>The condition isn't checked and all contacts follow the branch selected below.&lt;br&gt;This applies only when the component is enabled by your administrator.&lt;br&gt;If disabled by application configuration, all library conditions follow No, regardless of this setting.&lt;br&gt;Use when you can't delete the step because the process already has contact history.&lt;br&gt;Tip: start the step name with "[Skipped → Yes]" or "[Skipped → No]" so it's visible in the builder.&lt;br&gt;If you turn skipping off later, make sure both branches lead to further steps.</value>
   </data>
   <data name="labs.automationextensions.skippedbranch.label" xml:space="preserve">
     <value>Always follow</value>
@@ -187,13 +187,13 @@
     <value>Random split (A/B)</value>
   </data>
   <data name="labs.automationextensions.randomsplit.description" xml:space="preserve">
-    <value>Assigns each contact to a stable Yes (A) or No (B) branch. Requires administrator enablement; when disabled by application configuration, all contacts follow No (A), regardless of skip settings.</value>
+    <value>Assigns each contact to a stable Yes (A) or No (B) branch. Requires administrator enablement; when disabled by application configuration, all contacts follow No (B), regardless of skip settings.</value>
   </data>
   <data name="labs.automationextensions.randomsplit.percentage.label" xml:space="preserve">
     <value>Yes branch percentage</value>
   </data>
   <data name="labs.automationextensions.randomsplit.percentage.explanation" xml:space="preserve">
-    <value>When enabled by your administrator, this percentage (0–100) of contacts follows Yes (A); the rest follow No (B).&lt;br&gt;Allocation is approximate, not an exact count.&lt;br&gt;When disabled by application configuration, all contacts follow No (A), regardless of this percentage or skip settings.&lt;br&gt;Ask your administrator to confirm whether this component is enabled.</value>
+    <value>When enabled by your administrator, this percentage (0–100) of contacts follows Yes (A); the rest follow No (B).&lt;br&gt;Allocation is approximate, not an exact count.&lt;br&gt;When disabled by application configuration, all contacts follow No (B), regardless of this percentage or skip settings.&lt;br&gt;Ask your administrator to confirm whether this component is enabled.</value>
   </data>
   <data name="labs.automationextensions.randomsplit.percentage.minimum" xml:space="preserve">
     <value>Enter a percentage from 0 to 100.</value>
