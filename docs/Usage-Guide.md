@@ -24,7 +24,7 @@ Removing a registered component would break any process that uses it, so compone
 | State | Trigger | Condition | Action |
 | --- | --- | --- | --- |
 | Enabled | Starts processes | Evaluates normally | Runs normally |
-| Disabled | Never starts processes (its scheduled task fires nothing) | All contacts follow **Yes (A)**; condition isn't evaluated and disablement overrides skip settings | Does nothing, the contact moves to the next step |
+| Disabled | Never starts processes (its scheduled task fires nothing) | All contacts follow **No (A)**; condition isn't evaluated and disablement overrides skip settings | Does nothing, the contact moves to the next step |
 
 Disabled components used in a process log a warning (at most once per hour per process).
 At application start, the library logs which components are enabled and warns about unknown component names in configuration.
@@ -101,7 +101,7 @@ Builder steps such as Wait and Finish. Configuration values, endpoint secrets, a
 step-property values are not listed.
 
 The top callouts explain scope and disablement: all disabled library conditions follow
-**Yes (A)** without evaluation; administrator disablement overrides marketer skip settings;
+**No (A)** without evaluation; administrator disablement overrides marketer skip settings;
 disabled actions no-op; disabled triggers cannot start processes.
 
 No database object or custom frontend is required. The package's discoverable assembly
@@ -119,6 +119,7 @@ verify signatures, tab order, and routing when upgrading Xperience.
 | Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExtensions.ContactDateAnniversary` |
 | Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` |
 | Condition – Random split (A/B) | `RandomSplit` | `Labs.AutomationExtensions.RandomSplit` |
+| Condition – Within time window | `WithinTimeWindow` | `Labs.AutomationExtensions.WithinTimeWindow` |
 | Action – Send webhook | `SendWebhook` | `Labs.AutomationExtensions.SendWebhook` |
 | Action – Write to log | `WriteToLog` | `Labs.AutomationExtensions.WriteToLog` |
 
@@ -265,7 +266,7 @@ Marketer properties:
 - **Result number** – the number selected on the earlier step (*Result 1–5*).
 
 **Works with:** *Send webhook* (or a registered custom step) with **Record result for later steps** turned on and the same **Result number**.
-If no earlier step saved that result (missing step, different number, or the earlier step was disabled), an enabled condition follows **No** and logs a warning. If this condition itself is disabled, all contacts follow **Yes (A)** without reading the saved result.
+If no earlier step saved that result (missing step, different number, or the earlier step was disabled), an enabled condition follows **No** and logs a warning. If this condition itself is disabled, all contacts follow **No (A)** without reading the saved result.
 
 Each step type has its own numbered results, so different step types never overwrite each other. Within a process, give each step of the same type a different number. Steps can't detect which other steps exist in a process, so the step and number must be matched manually.
 
@@ -282,11 +283,70 @@ The allocation is approximate, not an exact count or guaranteed 50/50 distributi
 
 The split key is used exactly as entered: matching is case-sensitive and whitespace in a nonblank key is significant. Changing the key or percentage can change branch outcomes. Increasing the percentage never moves a contact from **Yes** to **No**.
 
-When the component is disabled globally, all contacts follow **Yes (A)** without evaluating the condition. This takes precedence over **Skip this step** for every library condition. For Random split (A/B), this also means no contact is read and no bucket is calculated. The disabled-component warning records this branch behavior. When enabled, **Skip this step** follows the selected skip branch without reading the contact.
+When the component is disabled globally, all contacts follow **No (A)** without evaluating the condition. This takes precedence over **Skip this step** for every library condition. For Random split (A/B), this also means no contact is read and no bucket is calculated. The disabled-component warning records this branch behavior. When enabled, **Skip this step** follows the selected skip branch without reading the contact.
 
 The Builder's step description and percentage help explain this disabled behavior. This is static guidance, not a live enabled/disabled indicator; ask your administrator to confirm the current configuration. Marketers can choose the skip branch per step only while the component is enabled.
 
 To compose a simple A/B test, add **Random split (A/B)** after the process trigger. Connect **Yes** to a built-in **Send email** step with variant A and **No** to a second **Send email** step with variant B. No new assignment is made on a later run; use a new split key when an independent assignment is wanted.
+
+### Condition – Within time window
+
+Evaluates whether the current time (when the condition runs) falls within a configured business hours window. Useful for routing contacts to marketing activities that only run during business hours, without needing a **Wait** step.
+
+This condition checks the time when the step is evaluated, not when the contact was added to the process or joined a **Wait** step. If you need to delay execution until a specific time, use the built-in **Wait** step.
+
+**Time zone behavior:**
+
+- Configured time zone ID is saved and must exist on the deployment host. If the time zone disappears (e.g., due to OS update or configuration change), the condition logs an error and contacts follow the **No** branch.
+- Time is converted from UTC to the configured local time zone before evaluation.
+- Daylight Saving Time (DST) transitions are handled automatically: both occurrences of repeated hours (fall back) are included; skipped hours (spring forward) never match.
+- Default is UTC; time zone is required and must be selected from the host-supported list.
+
+**Marketer properties:**
+
+- **Weekdays** – at least one day must be selected (Monday–Sunday). Checked days determine which days the window is active. For overnight windows (e.g., 22:00–06:00), the start day is the anchor: if Monday is selected and the window is 22:00–06:00, the window includes Monday 22:00 through Tuesday 06:00.
+- **Start time** – required, HH:mm format (e.g., 09:00 for 9 AM). Boundary is inclusive (≥).
+- **End time** – required, HH:mm format. Boundary is exclusive (<). A time equal to start time creates a 24-hour window (e.g., 14:00–14:00 includes all times from 14:00 today through 13:59:59 tomorrow).
+- **Time zone** – required, selected from host-supported time zones. Controls local time conversion for window boundary and DST handling.
+- **Start date (optional)** – yyyy-MM-dd format. If set, the contact must reach this condition on or after the specified date (inclusive). Validation: if both start and end date are set, start date must be ≤ end date.
+- **End date (optional)** – yyyy-MM-dd format. If set, the contact must reach this condition on or before the specified date (inclusive). Validation: if both start and end date are set, end date must be ≥ start date.
+
+**Example: Business hours (9 AM–5 PM, Mon–Fri, any date):**
+- Weekdays: Monday, Tuesday, Wednesday, Thursday, Friday
+- Start time: 09:00
+- End time: 17:00
+- Time zone: Your local zone (e.g., Eastern Time)
+- Start date: (leave empty)
+- End date: (leave empty)
+
+When enabled and a contact reaches this step at 3 PM on a Tuesday, the condition is **Yes**. At 6 PM or on a Saturday, the condition is **No**.
+
+**Example: Overnight shift (10 PM–6 AM, Monday–Friday):**
+- Weekdays: Monday, Tuesday, Wednesday, Thursday, Friday
+- Start time: 22:00
+- End time: 06:00
+- Time zone: Your local zone
+- Start date: (leave empty)
+- End date: (leave empty)
+
+When a contact reaches this step on Wednesday at 3 AM, the condition is **Yes** (because Wednesday 22:00–Thursday 06:00 includes Wednesday night). When reached on Wednesday at 11 AM, the condition is **No**.
+
+**Disabled component behavior:**
+
+When the component is disabled globally, all contacts follow the **No** branch without evaluating the condition or reading the time zone. This takes precedence over **Skip this step**. The disabled-component warning records this behavior. When enabled, **Skip this step** follows the selected skip branch without evaluating the condition.
+
+**Configuration example:**
+
+```json
+{
+  "AutomationExtensions": {
+    "EnabledByDefault": false,
+    "Components": {
+      "WithinTimeWindow": true
+    }
+  }
+}
+```
 
 ## Skip steps
 
