@@ -94,7 +94,7 @@ public class StepRegistryPageTests
             Assert.That(configuration.Callouts.Select(callout => callout.Content), Is.All.Contains("<br>"));
             Assert.That(configuration.Callouts[0].Content, Does.Contain("whole application").And.Contain("not just this process"));
             Assert.That(configuration.ColumnConfigurations.Single(column => column.Name == "Status").Sorting.DefaultDirection, Is.EqualTo(SortTypeEnum.Asc));
-            Assert.That(configuration.Callouts[1].Content, Does.Contain("all contacts follow the \"Yes\" path without evaluating the condition")
+            Assert.That(configuration.Callouts[1].Content, Does.Contain("all contacts follow the \"No\" path without evaluating the condition")
                 .And.Contain("overrides marketer skip settings")
                 .And.Contain("actions do nothing").And.Contain("triggers cannot start"));
         });
@@ -151,10 +151,10 @@ public class StepRegistryPageTests
 
 
     [TestCase("trigger", null, new[] { "ContactDateAnniversary", "Acme.Trigger" })]
-    [TestCase("condition", null, new[] { "PreviousStepSucceeded", "RandomSplit" })]
+    [TestCase("condition", null, new[] { "PreviousStepSucceeded", "RandomSplit", "WithinTimeWindow" })]
     [TestCase("action", null, new[] { "SendWebhook", "WriteToLog", "Acme.Action" })]
     [TestCase("unknown", null, new[] { "Typo" })]
-    [TestCase(null, "enabled", new[] { "ContactDateAnniversary", "PreviousStepSucceeded", "SendWebhook" })]
+    [TestCase(null, "enabled", new[] { "ContactDateAnniversary", "PreviousStepSucceeded", "SendWebhook", "WithinTimeWindow" })]
     [TestCase(null, "disabled", new[] { "RandomSplit" })]
     [TestCase(null, "notmanaged", new[] { "Acme.Action", "Acme.Trigger" })]
     [TestCase(null, "notapplicable", new[] { "WriteToLog", "Typo" })]
@@ -233,7 +233,7 @@ public class StepRegistryPageTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(reset.TotalCount, Is.EqualTo(8));
+            Assert.That(reset.TotalCount, Is.EqualTo(9));
             Assert.That(reset.DataContainers.Select(row => row["RowId"]),
                 Is.EqualTo(before.DataContainers.Select(row => row["RowId"])));
             Assert.That(searched.TotalCount, Is.EqualTo(2));
@@ -293,7 +293,7 @@ public class StepRegistryPageTests
             Assert.That(split["Name"], Is.EqualTo("Random split (A/B)"));
             Assert.That(split["Kind"], Is.EqualTo("Condition"));
             Assert.That(split["Status"], Is.EqualTo("Disabled"));
-            Assert.That(split["Description"], Is.EqualTo("Assigns each contact to a stable Yes (A) or No (B) branch. Requires administrator enablement; when disabled by application configuration, all contacts follow Yes (A), regardless of skip settings."));
+            Assert.That(split["Description"], Is.EqualTo("Assigns each contact to a stable Yes (A) or No (B) branch. Requires administrator enablement; when disabled by application configuration, all contacts follow No (A), regardless of skip settings."));
             Assert.That(defaultRow["Status"], Is.EqualTo("Enabled"));
             Assert.That(defaultRow["Description"], Is.EqualTo("Writes a message to the Event log for every contact reaching this step. Use to check which path contacts take. Usually enabled only during testing."));
             Assert.That(other["Name"], Is.EqualTo("Custom step"));
@@ -335,16 +335,16 @@ public class StepRegistryPageTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(data.TotalCount, Is.EqualTo(2));
+            Assert.That(data.TotalCount, Is.EqualTo(3));
             Assert.That(data.DataContainers.Count(), Is.EqualTo(1));
-            Assert.That(data.DataContainers.Single()["Name"], Is.EqualTo("Random split (A/B)"));
+            Assert.That(data.DataContainers.Single()["Name"], Is.EqualTo("Within time window"));
         });
 
         var second = await LoadListing(page,
             new ListingDataSettings(new LoadDataSettings(1, 1, "Name", SortTypeEnum.Desc, "condition"), page.PageConfiguration.ColumnConfigurations),
             CancellationToken.None);
 
-        Assert.That(second.DataContainers.Single()["Name"], Is.EqualTo("Previous step succeeded"));
+        Assert.That(second.DataContainers.Single()["Name"], Is.EqualTo("Random split (A/B)"));
     }
 
 
@@ -381,14 +381,14 @@ public class StepRegistryPageTests
             CancellationToken.None);
 
         Assert.That(data.DataContainers.Select(row => row["Status"]),
-            Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Enabled", "Disabled", "Not managed", "Not applicable" }));
+            Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Disabled", "Not managed", "Not applicable" }));
 
         var second = await LoadListing(page,
             new ListingDataSettings(new LoadDataSettings(4, 1, "Status", SortTypeEnum.Asc, ""), page.PageConfiguration.ColumnConfigurations),
             CancellationToken.None);
         Assert.That(second.DataContainers.Select(row => row["Status"]),
-            Is.EqualTo(new[] { "Disabled", "Not managed", "Not applicable" }));
-        Assert.That(second.TotalCount, Is.EqualTo(7));
+            Is.EqualTo(new[] { "Enabled", "Disabled", "Not managed", "Not applicable" }));
+        Assert.That(second.TotalCount, Is.EqualTo(8));
     }
 
 
