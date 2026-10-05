@@ -5,6 +5,24 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Triggers;
 public class AnniversaryCalendarTests
 {
     [Test]
+    public void GetAnniversaryDate_SevenDaysBefore_ReturnsFullTargetDate()
+    {
+        var anniversaryDate = AnniversaryCalendar.GetAnniversaryDate(new DateOnly(2026, 10, 4), 7);
+
+        Assert.That(anniversaryDate, Is.EqualTo(new DateOnly(2026, 10, 11)));
+    }
+
+
+    [Test]
+    public void GetAnniversaryDate_ZeroDaysBefore_ReturnsRunDate()
+    {
+        var runDate = new DateOnly(2026, 10, 4);
+
+        Assert.That(AnniversaryCalendar.GetAnniversaryDate(runDate, 0), Is.EqualTo(runDate));
+    }
+
+
+    [Test]
     public void GetMatchingMonthDays_RegularDate_ReturnsSameMonthDay()
     {
         var monthDays = AnniversaryCalendar.GetMatchingMonthDays(new DateOnly(2026, 10, 4));

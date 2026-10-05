@@ -74,7 +74,7 @@ internal sealed class AnniversaryTask(
         {
             foreach (int daysBefore in anniversaryOptions.GetDaysBefore())
             {
-                var anniversaryDate = today.AddDays(daysBefore);
+                var anniversaryDate = AnniversaryCalendar.GetAnniversaryDate(today, daysBefore);
                 foreach (var (month, day) in AnniversaryCalendar.GetMatchingMonthDays(anniversaryDate))
                 {
                     firedCount += await FireForMonthDay(field.Name, month, day, daysBefore, anniversaryDate, batchSize, cancellationToken);

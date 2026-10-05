@@ -6,6 +6,12 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnnive
 public static class AnniversaryCalendar
 {
     /// <summary>
+    /// Returns the anniversary date targeted by a task running on <paramref name="runDate"/> with the given day offset.
+    /// </summary>
+    public static DateOnly GetAnniversaryDate(DateOnly runDate, int daysBefore) => runDate.AddDays(daysBefore);
+
+
+    /// <summary>
     /// Returns the month/day pairs whose anniversary falls on <paramref name="targetDate"/>.
     /// February 29 dates are matched on February 28 in non-leap years.
     /// </summary>
