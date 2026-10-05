@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root"
     xmlns=""
@@ -86,10 +86,10 @@
     <value>Skip this step</value>
   </data>
   <data name="labs.automationextensions.skipstep.action.explanation" xml:space="preserve">
-    <value>Contacts move on without this step running. Use when you can't delete the step because the process already has contact history. Tip: start the step name with "[Skipped]" (or ⏭️) so it's visible in the builder.</value>
+    <value>Contacts move on without this step running.&lt;br&gt;Use when you can't delete the step because the process already has contact history.&lt;br&gt;Tip: start the step name with "[Skipped]" (or ⏭️) so it's visible in the builder.</value>
   </data>
   <data name="labs.automationextensions.skipstep.condition.explanation" xml:space="preserve">
-    <value>The condition isn't checked and all contacts follow the branch selected below. This applies only when the component is enabled by your administrator. If disabled by application configuration, all library conditions follow No (A), regardless of this setting. Use when you can't delete the step because the process already has contact history. Tip: start the step name with "[Skipped → Yes]" or "[Skipped → No]" so it's visible in the builder. If you turn skipping off later, make sure both branches lead to further steps.</value>
+    <value>The condition isn't checked and all contacts follow the branch selected below.&lt;br&gt;This applies only when the component is enabled by your administrator.&lt;br&gt;If disabled by application configuration, all library conditions follow No (A), regardless of this setting.&lt;br&gt;Use when you can't delete the step because the process already has contact history.&lt;br&gt;Tip: start the step name with "[Skipped → Yes]" or "[Skipped → No]" so it's visible in the builder.&lt;br&gt;If you turn skipping off later, make sure both branches lead to further steps.</value>
   </data>
   <data name="labs.automationextensions.skippedbranch.label" xml:space="preserve">
     <value>Always follow</value>
@@ -115,7 +115,7 @@
     <value>Destination</value>
   </data>
   <data name="labs.automationextensions.sendwebhook.endpoint.explanation" xml:space="preserve">
-    <value>System that receives the contact. Missing a destination? Ask your developers to add it to the application configuration.</value>
+    <value>System that receives the contact.&lt;br&gt;Missing a destination?&lt;br&gt;Ask your developers to add it to the application configuration.</value>
   </data>
   <data name="labs.automationextensions.sendwebhook.eventname.label" xml:space="preserve">
     <value>Event name</value>
@@ -127,7 +127,7 @@
     <value>Include contact details</value>
   </data>
   <data name="labs.automationextensions.sendwebhook.includecontactdetails.explanation" xml:space="preserve">
-    <value>Adds email, first name, last name, and company name. Leave off to send only an anonymous contact ID. Only enable when the destination is allowed to receive personal data.</value>
+    <value>Adds email, first name, last name, and company name.&lt;br&gt;Leave off to send only an anonymous contact ID.&lt;br&gt;Only enable when the destination is allowed to receive personal data.</value>
   </data>
 
   <!-- Write to log -->
@@ -144,7 +144,7 @@
     <value>Message</value>
   </data>
   <data name="labs.automationextensions.writetolog.message.explanation" xml:space="preserve">
-    <value>Text written to the log. You can use {processName}, {contactId}, {contactGuid}, and {triggerIdentifier}. Don't include personal data.</value>
+    <value>Text written to the log.&lt;br&gt;You can use {processName}, {contactId}, {contactGuid}, and {triggerIdentifier}.&lt;br&gt;Don't include personal data.</value>
   </data>
   <data name="labs.automationextensions.writetolog.level.label" xml:space="preserve">
     <value>Level</value>
@@ -193,7 +193,7 @@
     <value>Yes branch percentage</value>
   </data>
   <data name="labs.automationextensions.randomsplit.percentage.explanation" xml:space="preserve">
-    <value>When enabled by your administrator, this percentage (0–100) of contacts follows Yes (A); the rest follow No (B). Allocation is approximate, not an exact count. When disabled by application configuration, all contacts follow No (A), regardless of this percentage or skip settings. Ask your administrator to confirm whether this component is enabled.</value>
+    <value>When enabled by your administrator, this percentage (0–100) of contacts follows Yes (A); the rest follow No (B).&lt;br&gt;Allocation is approximate, not an exact count.&lt;br&gt;When disabled by application configuration, all contacts follow No (A), regardless of this percentage or skip settings.&lt;br&gt;Ask your administrator to confirm whether this component is enabled.</value>
   </data>
   <data name="labs.automationextensions.randomsplit.percentage.minimum" xml:space="preserve">
     <value>Enter a percentage from 0 to 100.</value>
@@ -205,7 +205,7 @@
     <value>Split key</value>
   </data>
   <data name="labs.automationextensions.randomsplit.splitkey.explanation" xml:space="preserve">
-    <value>Stable name for this split, default "default". Same contact and key always get the same bucket, even after a process is renamed. Keys are case-sensitive; spaces matter.</value>
+    <value>Stable name for this split, default "default".&lt;br&gt;Same contact and key always get the same bucket, even after a process is renamed.&lt;br&gt;Keys are case-sensitive; spaces matter.</value>
   </data>
   <data name="labs.automationextensions.randomsplit.splitkey.required" xml:space="preserve">
     <value>Enter a split key containing at least one non-space character.</value>
@@ -222,7 +222,7 @@
     <value>Contact date</value>
   </data>
   <data name="labs.automationextensions.contactdateanniversary.datefield.explanation" xml:space="preserve">
-    <value>Only the month and day are used, so the process starts every year. Missing a field? Ask your developers to add it to the application configuration.</value>
+    <value>Only the month and day are used, so the process starts every year.&lt;br&gt;Missing a field?&lt;br&gt;Ask your developers to add it to the application configuration.</value>
   </data>
   <data name="labs.automationextensions.contactdateanniversary.daysbefore.label" xml:space="preserve">
     <value>When to start</value>
@@ -288,7 +288,7 @@
     <value>Time zone</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.timezone.explanation" xml:space="preserve">
-    <value>The host's local time zone. UTC is the default. The time zone ID is saved and must exist on any deployment host. Zones not available on deployment hosts cause an error – contact your administrator.</value>
+    <value>The host's local time zone.&lt;br&gt;UTC is the default.&lt;br&gt;The time zone ID is saved and must exist on any deployment host.&lt;br&gt;Zones not available on deployment hosts cause an error – contact your administrator.</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.timezone.required" xml:space="preserve">
     <value>Select a time zone.</value>
@@ -303,7 +303,7 @@
     <value>End date (optional)</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.enddate.explanation" xml:space="preserve">
-    <value>Limits the time window to dates on or before this date, inclusive. Leave blank for no limit. Must be on or after the start date.</value>
+    <value>Limits the time window to dates on or before this date, inclusive.&lt;br&gt;Leave blank for no limit.&lt;br&gt;Must be on or after the start date.</value>
   </data>
 
   <!-- Step registry -->
@@ -357,5 +357,70 @@
   </data>
   <data name="labs.automationextensions.stepregistry.notapplicable" xml:space="preserve">
     <value>Not applicable</value>
+  </data>
+
+  <!-- Adjust contact score -->
+  <data name="labs.automationextensions.adjustcontactscore.displayname" xml:space="preserve">
+    <value>Adjust contact score</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.description" xml:space="preserve">
+    <value>Changes a number field of the contact (add, subtract, or set), with an optional minimum and maximum. Requires an integer custom contact field.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.category.limits" xml:space="preserve">
+    <value>Limits</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.field.label" xml:space="preserve">
+    <value>Score field</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.field.explanation" xml:space="preserve">
+    <value>Contact field that stores the score.&lt;br&gt;Lists custom contact fields of the integer type; ask your developer to add one if the list is empty.&lt;br&gt;Empty values count as 0.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.field.required" xml:space="preserve">
+    <value>Select a score field.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.label" xml:space="preserve">
+    <value>Operation</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.explanation" xml:space="preserve">
+    <value>Add: increases the current score by the amount.&lt;br&gt;Subtract: decreases the current score by the amount.&lt;br&gt;Set: replaces the current score with the amount.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.required" xml:space="preserve">
+    <value>Select an operation.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.subtract" xml:space="preserve">
+    <value>Subtract</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.set" xml:space="preserve">
+    <value>Set</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.amount.label" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.amount.explanation" xml:space="preserve">
+    <value>Points to add or subtract, or the new score for Set. Use 0 or more; the operation sets the direction.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.amount.minimum" xml:space="preserve">
+    <value>Enter 0 or more.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.limitrange.label" xml:space="preserve">
+    <value>Limit score to a range</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.limitrange.explanation" xml:space="preserve">
+    <value>Keeps the new score between the minimum and maximum (both included). Applies to all operations.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.minimum.label" xml:space="preserve">
+    <value>Minimum</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.minimum.explanation" xml:space="preserve">
+    <value>Lowest allowed score. Must not be greater than the maximum, otherwise the step does nothing.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.maximum.label" xml:space="preserve">
+    <value>Maximum</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.maximum.explanation" xml:space="preserve">
+    <value>Highest allowed score.</value>
   </data>
 </root>

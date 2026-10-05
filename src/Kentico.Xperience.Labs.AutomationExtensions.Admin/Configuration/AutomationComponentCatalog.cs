@@ -1,3 +1,4 @@
+using Kentico.Xperience.Labs.AutomationExtensions.Actions.AdjustContactScore;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.WriteToLog;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.PreviousStepSucceeded;
@@ -22,6 +23,7 @@ public static class AutomationComponentCatalog
     public static readonly AutomationComponentDescriptor PreviousStepSucceeded = new(PreviousStepSucceededCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor RandomSplit = new(RandomSplitCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor WithinTimeWindow = new(WithinTimeWindowCondition.NAME, AutomationComponentKind.Condition);
+    public static readonly AutomationComponentDescriptor AdjustContactScore = new(AdjustContactScoreAction.NAME, AutomationComponentKind.Action);
     public static readonly AutomationComponentDescriptor SendWebhook = new(SendWebhookAction.NAME, AutomationComponentKind.Action);
     public static readonly AutomationComponentDescriptor WriteToLog = new(WriteToLogAction.NAME, AutomationComponentKind.Action);
 
@@ -35,6 +37,7 @@ public static class AutomationComponentCatalog
         PreviousStepSucceeded,
         RandomSplit,
         WithinTimeWindow,
+        AdjustContactScore,
         SendWebhook,
         WriteToLog
     ];

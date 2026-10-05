@@ -14,6 +14,7 @@ public sealed class RandomSplitConditionProperties : SkippableConditionPropertie
     [NumberInputComponent(
         Label = "{$labs.automationextensions.randomsplit.percentage.label$}",
         ExplanationText = "{$labs.automationextensions.randomsplit.percentage.explanation$}",
+        ExplanationTextAsHtml = true,
         Order = 10)]
     [MinimumIntegerValueValidationRule(0, ErrorMessage = "{$labs.automationextensions.randomsplit.percentage.minimum$}")]
     [MaximumIntegerValueValidationRule(100, ErrorMessage = "{$labs.automationextensions.randomsplit.percentage.maximum$}")]
@@ -26,6 +27,7 @@ public sealed class RandomSplitConditionProperties : SkippableConditionPropertie
     [TextInputComponent(
         Label = "{$labs.automationextensions.randomsplit.splitkey.label$}",
         ExplanationText = "{$labs.automationextensions.randomsplit.splitkey.explanation$}",
+        ExplanationTextAsHtml = true,
         Order = 20)]
     [RequiredValidationRule(ErrorMessage = "{$labs.automationextensions.randomsplit.splitkey.required$}")]
     public string SplitKey { get; set; } = "default";

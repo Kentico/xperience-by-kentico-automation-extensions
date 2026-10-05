@@ -15,6 +15,7 @@ public sealed class ContactDateAnniversaryTriggerProperties : IAutomationTrigger
     [DropDownComponent(
         Label = "{$labs.automationextensions.contactdateanniversary.datefield.label$}",
         ExplanationText = "{$labs.automationextensions.contactdateanniversary.datefield.explanation$}",
+        ExplanationTextAsHtml = true,
         DataProviderType = typeof(ContactDateFieldOptionsProvider),
         Order = 10)]
     [RequiredValidationRule]

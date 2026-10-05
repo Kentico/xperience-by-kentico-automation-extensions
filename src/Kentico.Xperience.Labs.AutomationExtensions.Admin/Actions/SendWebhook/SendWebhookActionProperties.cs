@@ -16,6 +16,7 @@ public sealed class SendWebhookActionProperties : SkippableActionProperties
     [DropDownComponent(
         Label = "{$labs.automationextensions.sendwebhook.endpoint.label$}",
         ExplanationText = "{$labs.automationextensions.sendwebhook.endpoint.explanation$}",
+        ExplanationTextAsHtml = true,
         DataProviderType = typeof(WebhookEndpointOptionsProvider),
         Order = 110)]
     [RequiredValidationRule]
@@ -40,6 +41,7 @@ public sealed class SendWebhookActionProperties : SkippableActionProperties
     [CheckBoxComponent(
         Label = "{$labs.automationextensions.sendwebhook.includecontactdetails.label$}",
         ExplanationText = "{$labs.automationextensions.sendwebhook.includecontactdetails.explanation$}",
+        ExplanationTextAsHtml = true,
         Order = 130)]
     public bool IncludeContactDetails { get; set; }
 

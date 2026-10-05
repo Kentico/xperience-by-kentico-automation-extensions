@@ -21,6 +21,7 @@ public abstract class SkippableConditionProperties : IAutomationConditionPropert
     [CheckBoxComponent(
         Label = "{$labs.automationextensions.skipstep.label$}",
         ExplanationText = "{$labs.automationextensions.skipstep.condition.explanation$}",
+        ExplanationTextAsHtml = true,
         Order = SkippableStep.CATEGORY_ORDER + 10)]
     public bool SkipStep { get; set; }
 

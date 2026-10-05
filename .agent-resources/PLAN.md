@@ -186,6 +186,7 @@ Legend: **T** trigger, **C** condition, **A** action. "Showcases" = XbyK automat
 
 | # | Name | Kind | Scenario | Logic | Marketer properties | Showcases |
 | --- | --- | --- | --- | --- | --- | --- |
+| 22 | **Contact number field compare** | C | Branch on lead score (#16) or any integer contact field, e.g. "score ≥ 50" → sales path | Read integer custom contact field (reuse `ContactScoreFieldResolver`), empty = 0 (or option), compare with operator | Field (dropdown), operator (=, ≠, >, ≥, <, ≤), value | **built-in Rule-based condition can't compare numbers (user confirmed 2026-10-05)** – pairs with #16 |
 | 21 | **Write to log** | A | Debug which branch contacts take; lightweight troubleshooting trail | `ILogger` entry (event `AutomationLog`) with process, contact GUID, message, saved step results, trigger details; no PII | Message with placeholders (pre-filled default), level, include step results, include trigger details | step data + trigger data inspection, enablement for dev-only use |
 
 ### 3.5 Example compositions (for README / demo processes)
@@ -259,7 +260,8 @@ Steps are used by marketers, not developers. For every trigger/condition/action:
 - **Names**: plain-language, action-oriented (`Send webhook`, `Has consent agreement`, `Contact inactive for N days`). No technical jargon or class-like names.
 - **Description** (tooltip in step selector): one sentence on what it does + key requirement (e.g. "Requires a scheduled task configuration.").
 - **Properties**: `Label`, `ExplanationText`, sensible defaults, `Order` (10 / 100 increments), `FormCategory` groups (e.g. *General*, *Advanced* collapsed).
-- **Tooltips** on dropdown options (`DropDownOptionItem.Tooltip`) for non-obvious choices.
+- ~~**Tooltips** on dropdown options~~ – `DropDownComponent` doesn't render `DropDownOptionItem.Tooltip` (user confirmed 2026-10-05; other components, e.g. object selector, might). Explain options in the property's `ExplanationText` instead – one line per option separated by `<br>` (encoded `&lt;br&gt;` in `.resx`) with `ExplanationTextAsHtml = true`.
+- **Long explanation texts (≥ 3 sentences)**: one sentence per line, separated by `<br>` (`&lt;br&gt;` in `.resx`), with `ExplanationTextAsHtml = true` on the attribute. Applied 2026-10-05 to skip-step (action + condition base classes), Send webhook endpoint/contact details, Write to log message, Random split percentage/key, anniversary date field, time window time zone/end date, score field. Not used for registration `Description` (step selector tooltip).
 - **Visibility conditions** (`VisibleIfTrue`, `VisibleIfEqualTo`, …) to hide options that don't apply (e.g. date range fields only when "Limit to date range" is checked).
 - **Validation rules** with clear messages (required, min/max, email format).
 - Don't override `StepDisplayName` – it replaces the builder's pre-filled step name and the value isn't passed to the step's properties.
@@ -496,6 +498,32 @@ Existing anniversary/Random split work preserved; no commit.
   Scoped changed-file formatting and `git diff --check` passed. Live rendering remains
   unverified; running app stays untouched.
 
+### Slice 4 (2026-10-05) – Adjust contact score, implemented and validated in DancingGoat
+
+**Selection:** #16 lowest remaining complexity: one contact read + one field write, no task, external service, or prerequisite step. #7 *Has consent agreement* dropped – user confirmed built-in *Rule-based condition* already has "Contact has agreed with consent".
+
+**Spec:** `.agent-resources/implementation-spec-adjust-contact-score.md`. Implemented by subagent, reviewed by caller.
+
+**Implementation**
+
+- `Actions/AdjustContactScore`: identifier `Labs.AutomationExtensions.AdjustContactScore`, config key `AdjustContactScore`, icon `Icons.Graph`.
+- Properties: Field (dropdown), Operation (Add/Subtract/Set, tooltips), Amount (int ≥ 0, default 10), Limits category: Limit range + Minimum/Maximum (visible if checked). Inherits `SkippableActionProperties`.
+- Field choice (user decision): dropdown of contact class fields that are Integer, not PK, not `System`, no `ReferenceToObjectType`, not dummy. Built-in contact fields are all `system="true"` (incl. `ContactOwnerUserID`, `ContactCountryID` etc. without reference metadata), so `FormFieldInfo.System` is the separator. `ContactScoreFieldResolver` (public, DI singleton) re-validates the field at runtime → column name safe.
+- Runtime: disabled → no-op + `DisabledComponentLog`; skipped → no-op; invalid config (missing/ineligible field, unknown op, negative amount, min > max) → warning `InvalidContactScoreConfiguration` (41041, once/hour per process+field), no write. Empty value = 0; `long` math saturated to int range, then clamp. No write when unchanged and value not empty. Save via `IInfoProvider<ContactInfo>.SetAsync`; last write wins under concurrency. Info log `ContactScoreAdjusted` (41040): process, contact ID, field, old → new (no PII).
+- No step result recording. Min ≤ max only checked at runtime (no cross-field validation attribute).
+- Usage Guide: component entry, enablement, tables, how to add an integer custom contact field. DancingGoat Development config enables the component.
+
+**Validation**
+
+- Full NUnit suite: **241 passed**, 0 failed/skipped (82 new: calculator, resolver filtering, gating, invalid config, cancellation, localization). Step registry counts updated.
+- Library build and DancingGoat `-t:Compile`: 0 warnings/errors. Scoped format (unrelated formatter changes reverted) and `git diff --check` passed.
+- Running app: added integer column `ContactScore` to `OM.Contact` via Management MCP. **User confirmed field appears in the step's Field dropdown.** Field (caption "Score") then added via MCP to all four contact UI forms: Contact edit, Profile overview (NumberInput), Personal details - read only (NumberWithLabel; TextWithLabel rejected for integer), Set contact field value automation step (also enables built-in step).
+- **Execution verified (2026-10-05):** form submission → *Newsletter sign up* process → step wrote score; user screenshot shows contact 3 Score = 10 in Personal details. App log: `ContactScoreAdjusted` [41040] "contact 3: field 'ContactScore' changed from (empty) to 10" and contact 4 (empty) → 25.
+- User confirmed: Event log entry for contact 4 (empty) → 25 (Xperience Event log, not only console), and Limit range clamp works in running app.
+- CI repository not enabled in DancingGoat → `ContactScore` column/UI form fields exist only in the local DB (recreate per environment; not shipped).
+- Unit tests can't reach the write path without the Xperience container (covered by the running-app check above).
+- User confirmed built-in rule conditions **cannot** do numeric comparisons → Usage Guide corrected; new condition #22 *Contact number field compare* added to 3.4 (library must solve this). Option tooltips don't render in `DropDownComponent` → removed; Add/Subtract/Set descriptions moved into the Operation `ExplanationText` (3 resx keys + test cases removed; suite 238 passed).
+
 ### Open items (remaining)
 
 1. In-app *7 days before* scheduled-task firing for contact 9 (birthday 10-11) remains unverified; the offset calculation is covered by unit tests.
@@ -504,7 +532,7 @@ Existing anniversary/Random split work preserved; no commit.
 4. Same-day re-run protection for the anniversary task (deferred; option: store last processed date).
 5. Local test data cleanup: contacts 8 and 9, *Contact Anniversary* process, Email queue.
 6. Global Step registry tab implemented (Slice 3). Process-usage/dependency checks and a separate admin app (2.4) remain future scope.
-7. Remaining components (15 of the original 20). Random split implemented; running-app Builder/branch verification remains open.
+7. Remaining components (13 of the original 20; #7 dropped as built-in). Random split implemented; running-app Builder/branch verification remains open. Adjust contact score (Slice 4): execution + clamp verified. Next candidate: #22 numeric compare condition (completes scoring).
 8. README still template placeholder; nothing committed yet.
 
 ---

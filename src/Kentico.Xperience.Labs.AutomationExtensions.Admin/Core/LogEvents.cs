@@ -17,4 +17,6 @@ public static class LogEvents
     public static readonly EventId StepResultMissing = new(41020, nameof(StepResultMissing));
     public static readonly EventId InvalidDateField = new(41030, nameof(InvalidDateField));
     public static readonly EventId AnniversaryTaskCompleted = new(41031, nameof(AnniversaryTaskCompleted));
+    public static readonly EventId ContactScoreAdjusted = new(41040, nameof(ContactScoreAdjusted));
+    public static readonly EventId InvalidContactScoreConfiguration = new(41041, nameof(InvalidContactScoreConfiguration));
 }

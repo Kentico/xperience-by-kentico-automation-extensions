@@ -83,6 +83,7 @@ public sealed class WithinTimeWindowProperties : SkippableConditionProperties
     [DropDownComponent(
         Label = "{$labs.automationextensions.withintimewindow.timezone.label$}",
         ExplanationText = "{$labs.automationextensions.withintimewindow.timezone.explanation$}",
+        ExplanationTextAsHtml = true,
         DataProviderType = typeof(TimeZoneOptionsProvider),
         Order = 40)]
     [RequiredValidationRule(ErrorMessage = "{$labs.automationextensions.withintimewindow.timezone.required$}")]
@@ -105,6 +106,7 @@ public sealed class WithinTimeWindowProperties : SkippableConditionProperties
     [DateInputComponent(
         Label = "{$labs.automationextensions.withintimewindow.enddate.label$}",
         ExplanationText = "{$labs.automationextensions.withintimewindow.enddate.explanation$}",
+        ExplanationTextAsHtml = true,
         Order = 60)]
     public DateTime? EndDate { get; set; }
 

@@ -41,6 +41,7 @@ At application start, the library logs which components are enabled and warns ab
   "AutomationExtensions": {
     "EnabledByDefault": false,
     "Components": {
+      "AdjustContactScore": true,
       "ContactDateAnniversary": true,
       "PreviousStepSucceeded": true,
       "RandomSplit": true,
@@ -125,6 +126,7 @@ verify signatures, tab order, and routing when upgrading Xperience.
 | Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` |
 | Condition – Random split (A/B) | `RandomSplit` | `Labs.AutomationExtensions.RandomSplit` |
 | Condition – Within time window | `WithinTimeWindow` | `Labs.AutomationExtensions.WithinTimeWindow` |
+| Action – Adjust contact score | `AdjustContactScore` | `Labs.AutomationExtensions.AdjustContactScore` |
 | Action – Send webhook | `SendWebhook` | `Labs.AutomationExtensions.SendWebhook` |
 | Action – Write to log | `WriteToLog` | `Labs.AutomationExtensions.WriteToLog` |
 
@@ -175,6 +177,30 @@ Recommended process recurrence: **If not already running**. Avoid **Only once** 
 
 > **Load:** each task run fires one trigger per matching contact into Xperience's shared in-memory trigger queue (also used by the *Form* trigger).
 > For very large contact bases, run the task off-peak and consider increasing the `CMSAutomationTriggerQueueCapacity` application setting.
+
+### Action – Adjust contact score
+
+Adds points to, subtracts points from, or sets a number field of the contact. Use it for lightweight lead scoring (Xperience has no built-in lead scoring): for example, add 10 points after a form submission and 5 after a webinar registration, then branch on the score.
+
+**Requires:** an integer custom contact field. Developers add it in **Modules → Contact management → Classes → Contact management - Contact → Database columns** with **Data type** *Integer number* (for example `AcmeContactScore`, field caption *Lead score*). See [Add custom fields to contacts](https://docs.kentico.com/documentation/developers-and-admins/digital-marketing-setup/contact-configuration#add-custom-fields-to-contacts). To show the score in the contact's admin pages, also add the field to the contact UI forms described there.
+
+Marketer properties:
+
+- **Score field** – lists custom contact fields of the *Integer number* type, sorted by caption. Built-in contact fields (including IDs such as owner, status, country, state), primary key, references to other objects, and other number types (long integer, decimal, floating-point) are never listed. The list is empty until a developer adds a field.
+- **Operation** – *Add* (default), *Subtract*, or *Set*. *Set* replaces the current score with the amount and ignores the current value.
+- **Amount** – default 10. Must be 0 or more; the operation sets the direction. For *Set* it is the new score.
+- **Limit score to a range** (*Limits* section, off by default) / **Minimum** (default 0) / **Maximum** (default 100) – the new score is clamped to the range (both ends included), for all operations. For example, *Add 20* to 90 with maximum 100 gives 100; *Set 500* gives 100. When the minimum is greater than the maximum, the step does nothing (the Builder can't check this, see below).
+
+Behavior:
+
+- An empty field counts as 0. An empty field is always written, even when the result is 0; an unchanged value is not saved again.
+- Results beyond the integer range (about ±2.1 billion) stop at the range end instead of failing.
+- The contact is read, changed, and saved without locking. When several processes adjust the same field of the same contact at the same moment, the last save wins and one change can be lost.
+- Each change logs an Information entry (`ContactScoreAdjusted`, event ID `41040`) with process name, contact ID, field name, and old → new value – no email or name.
+- Invalid settings (field deleted or changed to another type, unknown operation, negative amount, minimum above maximum) log an `InvalidContactScoreConfiguration` warning (event ID `41041`, at most once per hour per process and field). Nothing is saved and the contact moves to the next step.
+- Disabled component: does nothing, warning logged (see [Enable components](#enable-components)). **Skip this step**: does nothing.
+
+**Works with:** branching on the score needs a numeric comparison (for example *score ≥ 50*). The built-in *Rule-based condition* can't compare numbers, and this library doesn't provide such a condition yet (planned).
 
 ### Action – Send webhook
 
@@ -400,6 +426,7 @@ Keep your own property and category `Order` values below `SkippableStep.CATEGORY
 
 | Component | Depends on | If missing |
 | --- | --- | --- |
+| Adjust contact score | Integer custom contact field | Field list empty; invalid step does nothing, warning logged |
 | Contact date anniversary | Scheduled task configuration | Trigger never fires |
 | Previous step succeeded | Earlier step of the selected type saving the same result number | Follows **No** branch, warning logged |
 | Random split (A/B) | None | No additional setup required |
@@ -485,6 +512,8 @@ All library log entries use named event IDs, shown in the **Code** column of the
 | 41020 | `StepResultMissing` | Warning | *Previous step succeeded* found no saved result (once per hour per process) |
 | 41030 | `InvalidDateField` | Warning | Configured anniversary date field is missing or not a date |
 | 41031 | `AnniversaryTaskCompleted` | Information | Anniversary scheduled task run summary |
+| 41040 | `ContactScoreAdjusted` | Information | *Adjust contact score* changed a contact's score |
+| 41041 | `InvalidContactScoreConfiguration` | Warning | *Adjust contact score* settings can't be applied (once per hour per process and field) |
 
 ## Localization
 

@@ -1,3 +1,4 @@
+using Kentico.Xperience.Labs.AutomationExtensions.Actions.AdjustContactScore;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
 using Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 using Kentico.Xperience.Labs.AutomationExtensions.Core;
@@ -32,6 +33,7 @@ public static class AutomationExtensionsServiceCollectionExtensions
         services.TryAddSingleton<IWebhookSender, WebhookSender>();
 
         services.TryAddSingleton<DateFieldResolver>();
+        services.TryAddSingleton<ContactScoreFieldResolver>();
 
         services.AddStepResultSource(StepResultKeys.SendWebhook);
 

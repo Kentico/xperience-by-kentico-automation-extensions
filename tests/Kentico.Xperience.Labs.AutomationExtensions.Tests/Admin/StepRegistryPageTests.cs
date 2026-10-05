@@ -152,9 +152,9 @@ public class StepRegistryPageTests
 
     [TestCase("trigger", null, new[] { "ContactDateAnniversary", "Acme.Trigger" })]
     [TestCase("condition", null, new[] { "PreviousStepSucceeded", "RandomSplit", "WithinTimeWindow" })]
-    [TestCase("action", null, new[] { "SendWebhook", "WriteToLog", "Acme.Action" })]
+    [TestCase("action", null, new[] { "AdjustContactScore", "SendWebhook", "WriteToLog", "Acme.Action" })]
     [TestCase("unknown", null, new[] { "Typo" })]
-    [TestCase(null, "enabled", new[] { "ContactDateAnniversary", "PreviousStepSucceeded", "SendWebhook", "WithinTimeWindow" })]
+    [TestCase(null, "enabled", new[] { "AdjustContactScore", "ContactDateAnniversary", "PreviousStepSucceeded", "SendWebhook", "WithinTimeWindow" })]
     [TestCase(null, "disabled", new[] { "RandomSplit" })]
     [TestCase(null, "notmanaged", new[] { "Acme.Action", "Acme.Trigger" })]
     [TestCase(null, "notapplicable", new[] { "WriteToLog", "Typo" })]
@@ -201,14 +201,16 @@ public class StepRegistryPageTests
         var first = await LoadFilteredListing(page, pageSize: 1);
         var second = await LoadFilteredListing(page, pageSize: 1, selectedPage: 1);
         var third = await LoadFilteredListing(page, pageSize: 1, selectedPage: 2);
-        var pastEnd = await LoadFilteredListing(page, pageSize: 1, selectedPage: 3);
+        var fourth = await LoadFilteredListing(page, pageSize: 1, selectedPage: 3);
+        var pastEnd = await LoadFilteredListing(page, pageSize: 1, selectedPage: 4);
 
         Assert.Multiple(() =>
         {
-            Assert.That(new[] { first.TotalCount, second.TotalCount, third.TotalCount, pastEnd.TotalCount }, Is.All.EqualTo(3));
+            Assert.That(new[] { first.TotalCount, second.TotalCount, third.TotalCount, fourth.TotalCount, pastEnd.TotalCount }, Is.All.EqualTo(4));
             Assert.That(first.DataContainers.Single()["Identifier"], Is.EqualTo(AutomationComponentCatalog.WriteToLog.Identifier));
             Assert.That(second.DataContainers.Single()["Identifier"], Is.EqualTo(AutomationComponentCatalog.SendWebhook.Identifier));
             Assert.That(third.DataContainers.Single()["Identifier"], Is.EqualTo("Acme.Action"));
+            Assert.That(fourth.DataContainers.Single()["Identifier"], Is.EqualTo(AutomationComponentCatalog.AdjustContactScore.Identifier));
             Assert.That(pastEnd.DataContainers, Is.Empty);
         });
     }
@@ -233,7 +235,7 @@ public class StepRegistryPageTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(reset.TotalCount, Is.EqualTo(9));
+            Assert.That(reset.TotalCount, Is.EqualTo(10));
             Assert.That(reset.DataContainers.Select(row => row["RowId"]),
                 Is.EqualTo(before.DataContainers.Select(row => row["RowId"])));
             Assert.That(searched.TotalCount, Is.EqualTo(2));
@@ -381,14 +383,14 @@ public class StepRegistryPageTests
             CancellationToken.None);
 
         Assert.That(data.DataContainers.Select(row => row["Status"]),
-            Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Disabled", "Not managed", "Not applicable" }));
+            Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Disabled", "Not managed", "Not applicable" }));
 
         var second = await LoadListing(page,
             new ListingDataSettings(new LoadDataSettings(4, 1, "Status", SortTypeEnum.Asc, ""), page.PageConfiguration.ColumnConfigurations),
             CancellationToken.None);
         Assert.That(second.DataContainers.Select(row => row["Status"]),
-            Is.EqualTo(new[] { "Enabled", "Disabled", "Not managed", "Not applicable" }));
-        Assert.That(second.TotalCount, Is.EqualTo(8));
+            Is.EqualTo(new[] { "Enabled", "Enabled", "Disabled", "Not managed" }));
+        Assert.That(second.TotalCount, Is.EqualTo(9));
     }
 
 

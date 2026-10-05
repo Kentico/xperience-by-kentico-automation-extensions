@@ -24,6 +24,7 @@ public sealed class WriteToLogActionProperties : SkippableActionProperties
     [TextAreaComponent(
         Label = "{$labs.automationextensions.writetolog.message.label$}",
         ExplanationText = "{$labs.automationextensions.writetolog.message.explanation$}",
+        ExplanationTextAsHtml = true,
         Order = 110)]
     [RequiredValidationRule]
     [MaxLengthValidationRule(1000)]

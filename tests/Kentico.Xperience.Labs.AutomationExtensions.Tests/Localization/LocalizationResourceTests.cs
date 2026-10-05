@@ -101,6 +101,9 @@ public partial class LocalizationResourceTests
     [TestCase("labs.automationextensions.stepresult.number.text")]
     [TestCase("labs.automationextensions.contactdateanniversary.daysbefore.ontheday")]
     [TestCase("labs.automationextensions.contactdateanniversary.daysbefore.format")]
+    [TestCase("labs.automationextensions.adjustcontactscore.operation.add")]
+    [TestCase("labs.automationextensions.adjustcontactscore.operation.subtract")]
+    [TestCase("labs.automationextensions.adjustcontactscore.operation.set")]
     public void CodeKeys_Exist(string key) => AssertKeysExist([key]);
 
 
