@@ -75,10 +75,7 @@ public partial class LocalizationResourceTests
 
 
     [Test]
-    public void LibraryStepResultSources_DisplayNameKeysExist()
-    {
-        AssertKeysExist([StepResultKeys.SendWebhook.DisplayName]);
-    }
+    public void LibraryStepResultSources_DisplayNameKeysExist() => AssertKeysExist([StepResultKeys.SendWebhook.DisplayName]);
 
 
     [TestCase("labs.automationextensions.randomsplit.description")]
@@ -87,12 +84,12 @@ public partial class LocalizationResourceTests
     {
         string? text = resourceManager.GetString(key, CultureInfo.InvariantCulture);
 
-        Assert.That(text, Does.Contain("all contacts follow Yes (A)").And.Contain("regardless of").And.Contain("skip settings"));
+        Assert.That(text, Does.Contain("all contacts follow No (A)").And.Contain("regardless of").And.Contain("skip settings"));
     }
 
 
-    [TestCase("labs.automationextensions.skipstep.condition.explanation", "Yes (A)")]
-    [TestCase("labs.automationextensions.stepregistry.disabled.content", "\"Yes\" path")]
+    [TestCase("labs.automationextensions.skipstep.condition.explanation", "No (A)")]
+    [TestCase("labs.automationextensions.stepregistry.disabled.content", "\"No\" path")]
     public void DisabledConditionHelp_ExplainsYesBranchForAllLibraryConditions(string key, string branchText)
     {
         string? text = resourceManager.GetString(key, CultureInfo.InvariantCulture);
