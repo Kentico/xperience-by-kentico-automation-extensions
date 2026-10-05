@@ -117,13 +117,13 @@ internal static class TimeWindowCalculator
 
         // Validate dates
         if (!string.IsNullOrWhiteSpace(startDate)
-            && !DateOnly.TryParse(startDate, out _))
+            && !DateOnly.TryParse(startDate, CultureInfo.InvariantCulture, out _))
         {
             throw new ArgumentException($"Invalid start date format: {startDate}. Use yyyy-MM-dd format.", nameof(startDate));
         }
 
         if (!string.IsNullOrWhiteSpace(endDate)
-            && !DateOnly.TryParse(endDate, out _))
+            && !DateOnly.TryParse(endDate, CultureInfo.InvariantCulture, out _))
         {
             throw new ArgumentException($"Invalid end date format: {endDate}. Use yyyy-MM-dd format.", nameof(endDate));
         }
