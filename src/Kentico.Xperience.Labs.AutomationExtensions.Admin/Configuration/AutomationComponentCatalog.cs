@@ -1,6 +1,7 @@
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.AdjustContactScore;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.WriteToLog;
+using Kentico.Xperience.Labs.AutomationExtensions.Conditions.ContactNumberFieldCompare;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.PreviousStepSucceeded;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.RandomSplit;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.WithinTimeWindow;
@@ -20,6 +21,7 @@ public static class AutomationComponentCatalog
 
 
     public static readonly AutomationComponentDescriptor ContactDateAnniversary = new(ContactDateAnniversaryTrigger.NAME, AutomationComponentKind.Trigger);
+    public static readonly AutomationComponentDescriptor ContactNumberFieldCompare = new(ContactNumberFieldCompareCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor PreviousStepSucceeded = new(PreviousStepSucceededCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor RandomSplit = new(RandomSplitCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor WithinTimeWindow = new(WithinTimeWindowCondition.NAME, AutomationComponentKind.Condition);
@@ -34,6 +36,7 @@ public static class AutomationComponentCatalog
     public static IReadOnlyList<AutomationComponentDescriptor> All { get; } =
     [
         ContactDateAnniversary,
+        ContactNumberFieldCompare,
         PreviousStepSucceeded,
         RandomSplit,
         WithinTimeWindow,

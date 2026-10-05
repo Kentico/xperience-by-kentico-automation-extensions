@@ -14,9 +14,7 @@ internal static class DisabledComponentLog
     private static readonly TimeSpan logInterval = TimeSpan.FromHours(1);
 
 
-    public static void Write(ILogger logger, AutomationComponentDescriptor component, string processName, string disabledBehavior = "does nothing")
-    {
-        logger.LogWithIntervalPolicy(
+    public static void Write(ILogger logger, AutomationComponentDescriptor component, string processName, string disabledBehavior = "does nothing") => logger.LogWithIntervalPolicy(
             LoggingIntervalPolicy.OncePerPeriod($"{component.Identifier}|Disabled|{processName}", logInterval),
             l => l.LogWarning(
                 LogEvents.ComponentDisabled,
@@ -25,5 +23,4 @@ internal static class DisabledComponentLog
                 processName,
                 disabledBehavior,
                 component.ConfigurationPath));
-    }
 }

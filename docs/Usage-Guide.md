@@ -43,6 +43,7 @@ At application start, the library logs which components are enabled and warns ab
     "Components": {
       "AdjustContactScore": true,
       "ContactDateAnniversary": true,
+      "ContactNumberFieldCompare": true,
       "PreviousStepSucceeded": true,
       "RandomSplit": true,
       "SendWebhook": true,
@@ -123,6 +124,7 @@ verify signatures, tab order, and routing when upgrading Xperience.
 | Component | Name (configuration key) | Identifier |
 | --- | --- | --- |
 | Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExtensions.ContactDateAnniversary` |
+| Condition – Compare contact number field | `ContactNumberFieldCompare` | `Labs.AutomationExtensions.ContactNumberFieldCompare` |
 | Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` |
 | Condition – Random split (A/B) | `RandomSplit` | `Labs.AutomationExtensions.RandomSplit` |
 | Condition – Within time window | `WithinTimeWindow` | `Labs.AutomationExtensions.WithinTimeWindow` |
@@ -200,7 +202,7 @@ Behavior:
 - Invalid settings (field deleted or changed to another type, unknown operation, negative amount, minimum above maximum) log an `InvalidContactScoreConfiguration` warning (event ID `41041`, at most once per hour per process and field). Nothing is saved and the contact moves to the next step.
 - Disabled component: does nothing, warning logged (see [Enable components](#enable-components)). **Skip this step**: does nothing.
 
-**Works with:** branching on the score needs a numeric comparison (for example *score ≥ 50*). The built-in *Rule-based condition* can't compare numbers, and this library doesn't provide such a condition yet (planned).
+**Works with:** [*Compare contact number field*](#condition--compare-contact-number-field) to branch on the score (for example *score ≥ 50*). The built-in *Rule-based condition* can't compare numbers.
 
 ### Action – Send webhook
 
@@ -286,6 +288,34 @@ Only the contact ID/GUID is logged – never email or name. Keep personal data o
 > **Volume:** the step logs once per contact. Enable it in development or for short troubleshooting periods (`"WriteToLog": true` in `appsettings.Development.json`) and keep it disabled in production. Disabled steps do nothing.
 >
 > **Auditing:** the Event log is trimmed over time and isn't tamper-proof. For a per-contact audit trail use the built-in *Log custom activity* step (visible in the contact's activities); for long-term retention route the `AutomationLog` category to a dedicated logging provider.
+
+### Condition – Compare contact number field
+
+Follows the **Yes** branch when an integer custom contact field matches a comparison (for example *score ≥ 50*), otherwise **No**. Use it to branch on a lead score kept by [*Adjust contact score*](#action--adjust-contact-score) or on any other integer custom contact field. The built-in *Rule-based condition* can't compare numbers.
+
+**Requires:** an integer custom contact field – the same fields as *Adjust contact score* (see its **Requires** section for how developers add one).
+
+Marketer properties:
+
+- **Number field** – lists custom contact fields of the *Integer number* type, sorted by caption (same list as the *Score field* of *Adjust contact score*). Built-in contact fields, primary key, references to other objects, and other number types (long integer, decimal, floating-point) are never listed. The list is empty until a developer adds a field.
+- **Operator** – *is equal to*, *is not equal to*, *is greater than*, *is greater than or equal to* (default), *is less than*, *is less than or equal to*.
+- **Value** – whole number to compare with, default 50. Negative numbers are allowed.
+
+Behavior:
+
+- An empty field counts as 0 (same as *Adjust contact score*). For example, *is less than 10* follows **Yes** for a contact without a score.
+- Read-only: the contact is never changed.
+- Invalid settings (no field, field deleted or changed to another type, unknown operator) follow **No** and log an `InvalidNumberCompareConfiguration` warning (event ID `41050`, at most once per hour per process and field). The contact isn't read.
+- Each evaluation logs a Debug entry (`ContactNumberFieldCompared`, event ID `41051`) with process name, contact ID, field name, value, operator, and result – no email or name.
+- Disabled component: all contacts follow **No** without evaluating the condition, regardless of skip settings (see [Enable components](#enable-components)). When enabled, **Skip this step** follows the selected skip branch without reading the contact.
+
+**Works with:** *Adjust contact score* – example lead scoring process:
+
+1. Trigger: *Form* (contact form submitted).
+2. *Adjust contact score* (*Score field*: Lead score, *Add* 10).
+3. *Compare contact number field* (*Number field*: Lead score, *is greater than or equal to* 50) → **Yes**: notify sales (for example *Send webhook* to the CRM or a built-in internal notification email); **No**: *Finish*.
+
+Add more processes that adjust the same field (for example +5 for a webinar registration); every process can end with the same comparison.
 
 ### Condition – Previous step succeeded
 
@@ -427,6 +457,7 @@ Keep your own property and category `Order` values below `SkippableStep.CATEGORY
 | Component | Depends on | If missing |
 | --- | --- | --- |
 | Adjust contact score | Integer custom contact field | Field list empty; invalid step does nothing, warning logged |
+| Compare contact number field | Integer custom contact field (usually kept by *Adjust contact score*) | Field list empty; invalid step follows **No** branch, warning logged |
 | Contact date anniversary | Scheduled task configuration | Trigger never fires |
 | Previous step succeeded | Earlier step of the selected type saving the same result number | Follows **No** branch, warning logged |
 | Random split (A/B) | None | No additional setup required |
@@ -514,6 +545,8 @@ All library log entries use named event IDs, shown in the **Code** column of the
 | 41031 | `AnniversaryTaskCompleted` | Information | Anniversary scheduled task run summary |
 | 41040 | `ContactScoreAdjusted` | Information | *Adjust contact score* changed a contact's score |
 | 41041 | `InvalidContactScoreConfiguration` | Warning | *Adjust contact score* settings can't be applied (once per hour per process and field) |
+| 41050 | `InvalidNumberCompareConfiguration` | Warning | *Compare contact number field* settings can't be evaluated, contacts follow **No** (once per hour per process and field) |
+| 41051 | `ContactNumberFieldCompared` | Debug | *Compare contact number field* result for a contact |
 
 ## Localization
 

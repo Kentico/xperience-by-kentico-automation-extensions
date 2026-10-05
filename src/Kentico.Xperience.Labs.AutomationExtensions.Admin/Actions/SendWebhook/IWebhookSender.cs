@@ -8,5 +8,5 @@ public interface IWebhookSender
     /// <summary>
     /// Posts the payload to the named endpoint. Never throws for HTTP or timeout failures – returns a failed result instead.
     /// </summary>
-    Task<WebhookSendResult> Send(string endpointName, WebhookPayload payload, CancellationToken cancellationToken);
+    public Task<WebhookSendResult> Send(string endpointName, WebhookPayload payload, CancellationToken cancellationToken);
 }

@@ -524,6 +524,27 @@ Existing anniversary/Random split work preserved; no commit.
 - Unit tests can't reach the write path without the Xperience container (covered by the running-app check above).
 - User confirmed built-in rule conditions **cannot** do numeric comparisons → Usage Guide corrected; new condition #22 *Contact number field compare* added to 3.4 (library must solve this). Option tooltips don't render in `DropDownComponent` → removed; Add/Subtract/Set descriptions moved into the Operation `ExplanationText` (3 resx keys + test cases removed; suite 238 passed).
 
+### Slice 5 (2026-10-05) – Compare contact number field, implemented and unit-validated
+
+**Selection:** #22 lowest remaining complexity: one contact read + int compare, no task/external service/prerequisite. Reuses #16 field resolver; completes scoring (built-in rules can't compare numbers).
+
+**Spec:** `.agent-resources/implementation-spec-contact-number-field-compare.md`. Implemented by subagent, reviewed by caller.
+
+**User decisions:** empty field = 0 (no option); Field dropdown = same fields as *Adjust contact score* (custom `Integer` only, no LongInteger/Decimal).
+
+**Implementation**
+
+- `Conditions/ContactNumberFieldCompare`: identifier `Labs.AutomationExtensions.ContactNumberFieldCompare`, config key `ContactNumberFieldCompare`, display name "Compare contact number field", icon `Icons.Gauge` (verified in 31.9.1).
+- Properties (no category, order 10/20/30): Field (reuses `ContactScoreFieldOptionsProvider`), Operator (enum `NumberComparisonOperator` persisted by name: Equal, NotEqual, GreaterThan, GreaterThanOrEqual (default), LessThan, LessThanOrEqual; localized texts, no tooltips), Value (int, default 50, negatives allowed). Inherits `SkippableConditionProperties`.
+- Runtime: disabled → No; skipped → selected branch; invalid field/operator → No + warning `InvalidNumberCompareConfiguration` (41050, once/hour per process+field), no contact read; else read contact, empty = 0 (reuses `ContactScoreCalculator.GetStoredValue`), pure `NumberComparison.Compare`. Debug log `ContactNumberFieldCompared` (41051, no PII). Read-only.
+- Usage Guide: component section, enablement/component/dependency/log tables, scoring example (+10 → ≥ 50 → sales path); removed "planned" note in Adjust contact score. DancingGoat Development config enables it.
+
+**Validation**
+
+- Full NUnit suite: **310 passed**, 0 failed/skipped (72 new: all operators, int bounds, negatives, operator parsing, config validation, empty = 0, gating incl. disabled → No with skip = Yes, invalid config returns before contact read, cancellation, option providers). Step registry counts +1. Re-run by caller: 310 passed.
+- DancingGoat `-t:Compile`: 0 warnings/errors. Scoped format (11 unrelated formatter changes reverted) and `git diff --check` passed.
+- Contact read path not reachable in unit tests (no Xperience container). **Running-app check open:** Field dropdown shows `ContactScore`, Yes/No per operator for scored + unscored contact, 41050 warning in Event log.
+
 ### Decision (2026-10-05): disabled library conditions → No
 
 History: Yes (Slice 2) → texts said "No (A)" while code returned `true` (Yes) → final **No** for all library conditions (`return false`). Changed several times; don't revisit without the user.
@@ -540,7 +561,7 @@ Applied: `PreviousStepSucceeded`, `RandomSplit`, `WithinTimeWindow` return `fals
 4. Same-day re-run protection for the anniversary task (deferred; option: store last processed date).
 5. Local test data cleanup: contacts 8 and 9, *Contact Anniversary* process, Email queue.
 6. Global Step registry tab implemented (Slice 3). Process-usage/dependency checks and a separate admin app (2.4) remain future scope.
-7. Remaining components (13 of the original 20; #7 dropped as built-in). Random split implemented; running-app Builder/branch verification remains open. Adjust contact score (Slice 4): execution + clamp verified. Next candidate: #22 numeric compare condition (completes scoring).
+7. Remaining components (13 of the original 20; #7 dropped as built-in). Random split implemented; running-app Builder/branch verification remains open. Adjust contact score (Slice 4): execution + clamp verified. #22 Compare contact number field (Slice 5): unit-validated; running-app check open.
 8. README still template placeholder; nothing committed yet.
 
 ---

@@ -19,4 +19,6 @@ public static class LogEvents
     public static readonly EventId AnniversaryTaskCompleted = new(41031, nameof(AnniversaryTaskCompleted));
     public static readonly EventId ContactScoreAdjusted = new(41040, nameof(ContactScoreAdjusted));
     public static readonly EventId InvalidContactScoreConfiguration = new(41041, nameof(InvalidContactScoreConfiguration));
+    public static readonly EventId InvalidNumberCompareConfiguration = new(41050, nameof(InvalidNumberCompareConfiguration));
+    public static readonly EventId ContactNumberFieldCompared = new(41051, nameof(ContactNumberFieldCompared));
 }

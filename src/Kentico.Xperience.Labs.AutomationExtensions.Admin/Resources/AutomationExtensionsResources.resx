@@ -423,4 +423,52 @@
   <data name="labs.automationextensions.adjustcontactscore.maximum.explanation" xml:space="preserve">
     <value>Highest allowed score.</value>
   </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.displayname" xml:space="preserve">
+    <value>Compare contact number field</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.description" xml:space="preserve">
+    <value>Checks whether an integer custom contact field (for example a score set by "Adjust contact score") is equal to, greater than, or less than a value; empty fields count as 0.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.field.label" xml:space="preserve">
+    <value>Number field</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.field.explanation" xml:space="preserve">
+    <value>Contact field to compare, for example the score field of "Adjust contact score".&lt;br&gt;Lists custom contact fields of the integer type; ask your developer to add one if the list is empty.&lt;br&gt;Empty values count as 0.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.field.required" xml:space="preserve">
+    <value>Select a number field.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.label" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.explanation" xml:space="preserve">
+    <value>Contacts whose field value matches follow Yes; all others follow No.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.required" xml:space="preserve">
+    <value>Select an operator.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.equal" xml:space="preserve">
+    <value>is equal to</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.notequal" xml:space="preserve">
+    <value>is not equal to</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.greaterthan" xml:space="preserve">
+    <value>is greater than</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.greaterthanorequal" xml:space="preserve">
+    <value>is greater than or equal to</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.lessthan" xml:space="preserve">
+    <value>is less than</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.lessthanorequal" xml:space="preserve">
+    <value>is less than or equal to</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.value.label" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.value.explanation" xml:space="preserve">
+    <value>Whole number the field value is compared with. Negative numbers are allowed.</value>
+  </data>
 </root>

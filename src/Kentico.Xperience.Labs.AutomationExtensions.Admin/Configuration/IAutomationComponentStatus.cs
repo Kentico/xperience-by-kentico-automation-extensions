@@ -12,5 +12,5 @@ public interface IAutomationComponentStatus
     /// <summary>
     /// Returns <c>true</c> when the component is enabled.
     /// </summary>
-    bool IsEnabled(AutomationComponentDescriptor component);
+    public bool IsEnabled(AutomationComponentDescriptor component);
 }

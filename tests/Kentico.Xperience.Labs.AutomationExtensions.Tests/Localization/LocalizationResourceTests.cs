@@ -104,6 +104,12 @@ public partial class LocalizationResourceTests
     [TestCase("labs.automationextensions.adjustcontactscore.operation.add")]
     [TestCase("labs.automationextensions.adjustcontactscore.operation.subtract")]
     [TestCase("labs.automationextensions.adjustcontactscore.operation.set")]
+    [TestCase("labs.automationextensions.contactnumberfieldcompare.operator.equal")]
+    [TestCase("labs.automationextensions.contactnumberfieldcompare.operator.notequal")]
+    [TestCase("labs.automationextensions.contactnumberfieldcompare.operator.greaterthan")]
+    [TestCase("labs.automationextensions.contactnumberfieldcompare.operator.greaterthanorequal")]
+    [TestCase("labs.automationextensions.contactnumberfieldcompare.operator.lessthan")]
+    [TestCase("labs.automationextensions.contactnumberfieldcompare.operator.lessthanorequal")]
     public void CodeKeys_Exist(string key) => AssertKeysExist([key]);
 
 
