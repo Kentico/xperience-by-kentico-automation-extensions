@@ -19,7 +19,7 @@ public sealed class TimeInputComponentAttribute : FormComponentAttribute
 
 
 /// <summary>
-/// HTML5 time input. Stores the value as "HH:mm" (24-hour).
+/// Segmented time input with a styled dropdown. Stores the value as "HH:mm" (24-hour).
 /// </summary>
 [ComponentAttribute(typeof(TimeInputComponentAttribute))]
 public sealed class TimeInputComponent : FormComponent<FormComponentProperties, TimeInputClientProperties, string>

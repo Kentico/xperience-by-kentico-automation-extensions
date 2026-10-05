@@ -11,7 +11,8 @@ public sealed class TimeZoneOptionsProvider : IDropDownOptionsProvider
     {
         var zones = TimeZoneInfo.GetSystemTimeZones();
         var items = zones
-            .OrderBy(z => z.StandardName)
+            .OrderBy(z => z.BaseUtcOffset)
+            .ThenBy(z => z.StandardName)
             .Select(zone => new DropDownOptionItem
             {
                 Value = zone.Id,
@@ -22,5 +23,4 @@ public sealed class TimeZoneOptionsProvider : IDropDownOptionsProvider
         return await Task.FromResult(items);
     }
 }
-
 

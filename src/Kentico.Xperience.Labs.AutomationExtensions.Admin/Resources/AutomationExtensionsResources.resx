@@ -270,7 +270,7 @@
     <value>Start time</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.starttime.explanation" xml:space="preserve">
-    <value>Window opens at this time, inclusive (e.g., 14:00 matches 14:00:00). For overnight windows (e.g., 22:00–02:00), the selected weekday refers to the day the window starts.</value>
+    <value>Window opens at this time, inclusive (e.g., 2:00 PM / 14:00 is included). For overnight windows (e.g., 10:00 PM–2:00 AM / 22:00–02:00), the selected weekday refers to the day the window starts.</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.starttime.required" xml:space="preserve">
     <value>Select a start time.</value>
@@ -279,7 +279,7 @@
     <value>End time</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.endtime.explanation" xml:space="preserve">
-    <value>Window closes at this time, exclusive (e.g., 16:00 matches up to 15:59:59). Can be earlier than start time for overnight windows (e.g., 22:00–02:00).</value>
+    <value>Window closes at this time, exclusive (e.g., 4:00 PM / 16:00 is not included). Can be earlier than start time for overnight windows (e.g., 10:00 PM–2:00 AM / 22:00–02:00).</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.endtime.required" xml:space="preserve">
     <value>Select an end time.</value>

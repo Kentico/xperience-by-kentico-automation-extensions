@@ -82,7 +82,9 @@ Run `npm run typecheck` to check TypeScript.
 
 ### Adding client extensions
 
-`Client/src` starts with only an empty `entry.tsx` and CSS module declarations.
+`Client/src/form-components/TimeInputFormComponent.tsx` adapts the admin design
+reference's React Aria time field and dropdown. It preserves `HH:mm` values and
+uses scoped CSS with admin design tokens.
 Add React page templates or form components there and export them from `entry.tsx`.
 Register the corresponding C# extension using client module
 `@kentico/xperience-admin-labs-automation-extensions` and its exported component name.

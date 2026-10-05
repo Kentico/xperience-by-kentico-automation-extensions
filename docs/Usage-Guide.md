@@ -312,9 +312,11 @@ This condition checks the time when the step is evaluated, not when the contact 
 - **Weekdays** – at least one day must be selected (Monday–Sunday). Checked days determine which days the window is active. For overnight windows (e.g., 22:00–06:00), the start day is the anchor: if Monday is selected and the window is 22:00–06:00, the window includes Monday 22:00 through Tuesday 06:00.
 - **Start time** – required, chosen with a time picker (e.g., 09:00). Boundary is inclusive (≥).
 - **End time** – required, chosen with a time picker. Boundary is exclusive (<). A time equal to start time creates a 24-hour window (e.g., 14:00–14:00 includes all times from 14:00 today through 13:59:59 tomorrow).
-- **Time zone** – required, selected from host-supported time zones. Controls local time conversion for window boundary and DST handling.
+- **Time zone** – required, selected from host-supported time zones, sorted by standard UTC offset (lowest first), then name. Controls local time conversion for window boundary and DST handling.
 - **Start date (optional)** – chosen with the date picker. If set, the contact must reach this condition on or after the specified date (inclusive). Validation: if both start and end date are set, start date must be ≤ end date.
 - **End date (optional)** – chosen with the date picker. If set, the contact must reach this condition on or before the specified date (inclusive). Validation: if both start and end date are set, end date must be ≥ start date.
+
+The time picker offers a styled dropdown of 15-minute suggestions. Edit the hour/minute segments for any minute; saved values between suggestions remain selectable. Display follows the admin locale, while values are stored as `HH:mm` and interpreted in the selected time zone, not the browser time zone.
 
 **Example: Business hours (9 AM–5 PM, Mon–Fri, any date):**
 - Weekdays: Monday, Tuesday, Wednesday, Thursday, Friday

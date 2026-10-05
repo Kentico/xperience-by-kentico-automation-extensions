@@ -548,14 +548,19 @@ Existing anniversary/Random split work preserved; no commit.
 
 5. **Form component improvements**: Replaced basic text inputs with Xperience built-in visual components.
    - Start/End date: `DateTime?` + `DateInputComponent` (docs: component requires `DateTime?`; condition formats to `yyyy-MM-dd` for the calculator).
-   - Start/End time: custom `TimeInputComponent` (HTML5 `<input type="time">`, React `TimeInputFormComponent` in `Client/src/form-components`, values stored as `HH:mm`, any minute). No time-only built-in component; `DateTimeInputComponent` rejected because it shows browser-local time and conflicts with the selected time zone.
+   - Start/End time: custom `TimeInputComponent` (React `TimeInputFormComponent` in `Client/src/form-components`, adapted from the admin design reference's `DateTimeInput/components/TimeInput`). React Aria segmented input and styled dropdown replace the unstyleable native HTML5 popup. Values remain `HH:mm`, with no browser-time-zone conversion.
+   - Dropdown offers 15-minute suggestions plus the current value when between suggestions; segment editing supports any minute. `useGlobalization().uiLocale` supplies React Aria's locale. Disabled mode prevents editing/opening; read-only mode uses admin `TextWithLabel`.
+   - Scoped styles follow the reference's `InputBase`, `TimeInput`, and `ListPopover`: full-width pill, admin spacing/typography, purple selected options, and focus/invalid/disabled states. Admin `Paper` and `Icon` components render the popup and trigger.
+   - Verified in an isolated Chrome fixture using the actual React component and admin package: mouse/keyboard selection, arbitrary-minute editing and persistence, Escape/outside dismissal, disabled/read-only/invalid states, empty values, locale switching, and popup width/selection color. Client typecheck/production build and Admin library build pass; webpack reports bundle-size advisories after adding React Aria.
+   - Time zone dropdown sorts by `BaseUtcOffset` ascending, then standard name for equal offsets.
    - Previously saved dates (string) are not migrated; feature is unreleased.
    - Not verified in a running admin UI.
 
 ### 8.4 Test and build results
 
-- **Tests**: 159/159 passing ✅
-- **Build**: 0 errors, 0 warnings ✅
+- **Tests**: 160/160 passing; 17 isolated browser checks passing ✅
+- **.NET build**: Admin library builds with 0 errors, 0 warnings ✅
+- **Client build**: Typecheck and production build pass; webpack reports size advisories for the 261 KiB React Aria bundle.
 - **Format validation**: Passed ✅
 
 ### 8.5 Decisions made (with user approval)
@@ -567,7 +572,7 @@ Existing anniversary/Random split work preserved; no commit.
 5. **Date limits**: Optional, both inclusive; applied to window start date.
 6. **DST handling**: Convert UTC to local; both occurrences of repeated fall-back hours match.
 7. **Disabled routing**: No (A) branch.
-8. **UI component**: Visual datetime picker (deferred – future enhancement).
+8. **UI component**: Built-in date picker and custom styled React Aria time picker.
 
 ### 8.6 Documentation
 
@@ -586,4 +591,4 @@ Existing anniversary/Random split work preserved; no commit.
 5. Teams/Slack (#15) and enrichment (#20) – ship real provider or sample/abstract only?
 6. Minimum supported XbyK version – currently 31.9.1 (all package references); older versions not tested.
 7. ~~Shared vs. per-trigger scheduled tasks?~~ Resolved: per-trigger tasks, docs-only setup (section 4).
-8. **Datetime picker UX** (noted by user) – consider for next iteration (currently manual time text input).
+8. ~~Datetime picker UX~~ Resolved: built-in date picker and custom styled time picker (section 8.3).
