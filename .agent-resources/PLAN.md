@@ -548,8 +548,8 @@ Existing anniversary/Random split work preserved; no commit.
 
 5. **Form component improvements**: Replaced basic text inputs with Xperience built-in visual components.
    - Start/End date: `DateTime?` + `DateInputComponent` (docs: component requires `DateTime?`; condition formats to `yyyy-MM-dd` for the calculator).
-   - Start/End time: `DropDownComponent` + `TimeOfDayOptionsProvider` (15-minute steps, values stored as `HH:mm`). No time-only built-in component; `DateTimeInputComponent` rejected because it shows browser-local time and conflicts with the selected time zone.
-   - Previously saved dates (string) are not migrated; feature is unreleased. Times not on a 15-minute step won't preselect.
+   - Start/End time: custom `TimeInputComponent` (HTML5 `<input type="time">`, React `TimeInputFormComponent` in `Client/src/form-components`, values stored as `HH:mm`, any minute). No time-only built-in component; `DateTimeInputComponent` rejected because it shows browser-local time and conflicts with the selected time zone.
+   - Previously saved dates (string) are not migrated; feature is unreleased.
    - Not verified in a running admin UI.
 
 ### 8.4 Test and build results

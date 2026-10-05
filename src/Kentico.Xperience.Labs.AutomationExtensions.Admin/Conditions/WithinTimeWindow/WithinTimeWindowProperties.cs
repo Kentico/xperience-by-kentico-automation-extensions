@@ -1,6 +1,7 @@
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Labs.AutomationExtensions.Core;
+using Kentico.Xperience.Labs.AutomationExtensions.FormComponents;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Conditions.WithinTimeWindow;
 
@@ -57,10 +58,9 @@ public sealed class WithinTimeWindowProperties : SkippableConditionProperties
     /// <summary>
     /// Window start time in HH:mm format (e.g., "09:00").
     /// </summary>
-    [DropDownComponent(
+    [TimeInputComponent(
         Label = "{$labs.automationextensions.withintimewindow.starttime.label$}",
         ExplanationText = "{$labs.automationextensions.withintimewindow.starttime.explanation$}",
-        DataProviderType = typeof(TimeOfDayOptionsProvider),
         Order = 20)]
     [RequiredValidationRule(ErrorMessage = "{$labs.automationextensions.withintimewindow.starttime.required$}")]
     public string StartTime { get; set; } = "00:00";
@@ -69,10 +69,9 @@ public sealed class WithinTimeWindowProperties : SkippableConditionProperties
     /// <summary>
     /// Window end time in HH:mm format (e.g., "17:00").
     /// </summary>
-    [DropDownComponent(
+    [TimeInputComponent(
         Label = "{$labs.automationextensions.withintimewindow.endtime.label$}",
         ExplanationText = "{$labs.automationextensions.withintimewindow.endtime.explanation$}",
-        DataProviderType = typeof(TimeOfDayOptionsProvider),
         Order = 30)]
     [RequiredValidationRule(ErrorMessage = "{$labs.automationextensions.withintimewindow.endtime.required$}")]
     public string EndTime { get; set; } = "00:00";
