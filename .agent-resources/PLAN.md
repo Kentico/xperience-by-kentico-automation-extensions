@@ -547,10 +547,10 @@ Existing anniversary/Random split work preserved; no commit.
    - WithinTimeWindow: `Icons.Clock` (time icon – represents temporal logic).
 
 5. **Form component improvements**: Replaced basic text inputs with Xperience built-in visual components.
-   - Start/End date fields: Replaced `TextInputComponent` with `DateInputComponent` (visual date pickers).
-   - Start/End time fields: Added `WatermarkText` showing format examples (HH:mm).
-   - Improved UX: visual date selection reduces typos and validation errors.
-   - Maintains backward compatibility: properties remain string type (yyyy-MM-dd, HH:mm).
+   - Start/End date: `DateTime?` + `DateInputComponent` (docs: component requires `DateTime?`; condition formats to `yyyy-MM-dd` for the calculator).
+   - Start/End time: `DropDownComponent` + `TimeOfDayOptionsProvider` (15-minute steps, values stored as `HH:mm`). No time-only built-in component; `DateTimeInputComponent` rejected because it shows browser-local time and conflicts with the selected time zone.
+   - Previously saved dates (string) are not migrated; feature is unreleased. Times not on a 15-minute step won't preselect.
+   - Not verified in a running admin UI.
 
 ### 8.4 Test and build results
 

@@ -57,11 +57,11 @@ public sealed class WithinTimeWindowProperties : SkippableConditionProperties
     /// <summary>
     /// Window start time in HH:mm format (e.g., "09:00").
     /// </summary>
-    [TextInputComponent(
+    [DropDownComponent(
         Label = "{$labs.automationextensions.withintimewindow.starttime.label$}",
         ExplanationText = "{$labs.automationextensions.withintimewindow.starttime.explanation$}",
-        Order = 20,
-        WatermarkText = "HH:mm (e.g., 09:00)")]
+        DataProviderType = typeof(TimeOfDayOptionsProvider),
+        Order = 20)]
     [RequiredValidationRule(ErrorMessage = "{$labs.automationextensions.withintimewindow.starttime.required$}")]
     public string StartTime { get; set; } = "00:00";
 
@@ -69,11 +69,11 @@ public sealed class WithinTimeWindowProperties : SkippableConditionProperties
     /// <summary>
     /// Window end time in HH:mm format (e.g., "17:00").
     /// </summary>
-    [TextInputComponent(
+    [DropDownComponent(
         Label = "{$labs.automationextensions.withintimewindow.endtime.label$}",
         ExplanationText = "{$labs.automationextensions.withintimewindow.endtime.explanation$}",
-        Order = 30,
-        WatermarkText = "HH:mm (e.g., 17:00)")]
+        DataProviderType = typeof(TimeOfDayOptionsProvider),
+        Order = 30)]
     [RequiredValidationRule(ErrorMessage = "{$labs.automationextensions.withintimewindow.endtime.required$}")]
     public string EndTime { get; set; } = "00:00";
 
@@ -91,23 +91,23 @@ public sealed class WithinTimeWindowProperties : SkippableConditionProperties
 
 
     /// <summary>
-    /// Optional inclusive start date in yyyy-MM-dd format.
+    /// Optional inclusive start date.
     /// </summary>
     [DateInputComponent(
         Label = "{$labs.automationextensions.withintimewindow.startdate.label$}",
         ExplanationText = "{$labs.automationextensions.withintimewindow.startdate.explanation$}",
         Order = 50)]
-    public string StartDate { get; set; } = string.Empty;
+    public DateTime? StartDate { get; set; }
 
 
     /// <summary>
-    /// Optional inclusive end date in yyyy-MM-dd format.
+    /// Optional inclusive end date.
     /// </summary>
     [DateInputComponent(
         Label = "{$labs.automationextensions.withintimewindow.enddate.label$}",
         ExplanationText = "{$labs.automationextensions.withintimewindow.enddate.explanation$}",
         Order = 60)]
-    public string EndDate { get; set; } = string.Empty;
+    public DateTime? EndDate { get; set; }
 
 
     /// <summary>

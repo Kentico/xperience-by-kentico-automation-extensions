@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <xsd:schema id="root"
     xmlns=""
@@ -267,22 +267,22 @@
     <value>Saturday</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.starttime.label" xml:space="preserve">
-    <value>Start time (HH:mm)</value>
+    <value>Start time</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.starttime.explanation" xml:space="preserve">
     <value>Window opens at this time, inclusive (e.g., 14:00 matches 14:00:00). For overnight windows (e.g., 22:00–02:00), the selected weekday refers to the day the window starts.</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.starttime.required" xml:space="preserve">
-    <value>Enter start time in HH:mm format.</value>
+    <value>Select a start time.</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.endtime.label" xml:space="preserve">
-    <value>End time (HH:mm)</value>
+    <value>End time</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.endtime.explanation" xml:space="preserve">
     <value>Window closes at this time, exclusive (e.g., 16:00 matches up to 15:59:59). Can be earlier than start time for overnight windows (e.g., 22:00–02:00).</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.endtime.required" xml:space="preserve">
-    <value>Enter end time in HH:mm format.</value>
+    <value>Select an end time.</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.timezone.label" xml:space="preserve">
     <value>Time zone</value>
@@ -294,16 +294,16 @@
     <value>Select a time zone.</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.startdate.label" xml:space="preserve">
-    <value>Start date (optional, yyyy-MM-dd)</value>
+    <value>Start date (optional)</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.startdate.explanation" xml:space="preserve">
-    <value>Limits the time window to dates on or after this date, inclusive (e.g., 2025-01-01 includes that date). Leave blank for no limit.</value>
+    <value>Limits the time window to dates on or after this date, inclusive. Leave blank for no limit.</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.enddate.label" xml:space="preserve">
-    <value>End date (optional, yyyy-MM-dd)</value>
+    <value>End date (optional)</value>
   </data>
   <data name="labs.automationextensions.withintimewindow.enddate.explanation" xml:space="preserve">
-    <value>Limits the time window to dates on or before this date, inclusive (e.g., 2025-03-15 includes that date). Leave blank for no limit. Must be on or after the start date.</value>
+    <value>Limits the time window to dates on or before this date, inclusive. Leave blank for no limit. Must be on or after the start date.</value>
   </data>
 
   <!-- Step registry -->

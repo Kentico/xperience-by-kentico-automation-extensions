@@ -65,8 +65,8 @@ public sealed class WithinTimeWindowCondition(
                 properties.StartTime,
                 properties.EndTime,
                 properties.TimeZoneId,
-                properties.StartDate,
-                properties.EndDate);
+                FormatDate(properties.StartDate),
+                FormatDate(properties.EndDate));
 
             if (isWithin)
             {
@@ -93,4 +93,8 @@ public sealed class WithinTimeWindowCondition(
             return false;
         }
     }
+
+
+    private static string FormatDate(DateTime? date) =>
+        date?.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) ?? string.Empty;
 }
