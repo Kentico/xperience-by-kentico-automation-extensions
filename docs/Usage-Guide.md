@@ -24,7 +24,7 @@ Removing a registered component would break any process that uses it, so compone
 | State | Trigger | Condition | Action |
 | --- | --- | --- | --- |
 | Enabled | Starts processes | Evaluates normally | Runs normally |
-| Disabled | Never starts processes (its scheduled task fires nothing) | Always follows the **No** branch | Does nothing, the contact moves to the next step |
+| Disabled | Never starts processes (its scheduled task fires nothing) | All contacts follow **Yes (A)**; condition isn't evaluated and disablement overrides skip settings | Does nothing, the contact moves to the next step |
 
 Disabled components used in a process log a warning (at most once per hour per process).
 At application start, the library logs which components are enabled and warns about unknown component names in configuration.
@@ -38,6 +38,7 @@ At application start, the library logs which components are enabled and warns ab
     "Components": {
       "ContactDateAnniversary": true,
       "PreviousStepSucceeded": true,
+      "RandomSplit": true,
       "SendWebhook": true,
       "WriteToLog": true
     }
@@ -60,12 +61,64 @@ At application start, the library logs which components are enabled and warns ab
 
 Component names are case-insensitive. Restart the application after changing these settings. (The library reads them via `IOptionsMonitor`, so changes may also apply on configuration reload, but this hasn't been verified.)
 
+### Step registry tab
+
+Open **Automation → a process → Step registry**, immediately after **Contacts**.
+The tab is read-only and **global**: every process shows the same application registry,
+not the steps used by that process. No process-specific usage or dependency check is performed.
+
+The built-in listing supports search, sorting, paging, and two optional filters:
+
+- **Kind:** Trigger, Condition, Action, or Unknown (unknown configuration entries).
+- **Status:** Enabled, Disabled, Not managed, or Not applicable.
+
+Both default to **All**. Applied filters combine with each other and the search term;
+sorting, page totals, and paging use the matching rows. For example, **Condition** +
+**Disabled** shows only disabled library conditions. Clear an applied filter or reset
+the listing filters to return to **All**; the search term still applies.
+**Not applicable** includes missing library registrations and unknown configuration
+entries, while **Not managed** includes registered application/third-party definitions.
+
+The listing combines registered trigger/action/condition definitions with the library
+catalog and current `AutomationExtensionsOptions`. Columns are **Name**, **Kind**,
+**Identifier**, **Status**, and **Description**. Descriptions come from each
+registration definition; resource keys are localized, plain text is shown as provided,
+and missing descriptions are blank.
+
+- **Library components:** effective **Enabled**/**Disabled** comes from `IAutomationComponentStatus`.
+  The default is disabled unless application configuration enables components.
+- **Other registrations:** **Not managed**. This library neither controls nor infers
+  their runtime state. This includes steps from the application or third-party packages;
+  their own runtime gates may still apply.
+- **Unknown component keys:** appear as **Unknown** rows with **Not applicable** status.
+  Their configured values are not shown and do not control third-party registrations,
+  even if a key matches that registration's identifier/name.
+- **Missing library registration:** the catalog entry remains visible with **Not applicable**
+  status; no effective runtime status is claimed.
+
+The registry covers definitions exposed by Xperience's injected custom automation providers, not structural
+Builder steps such as Wait and Finish. Configuration values, endpoint secrets, and
+step-property values are not listed.
+
+The top callouts explain scope and disablement: all disabled library conditions follow
+**Yes (A)** without evaluation; administrator disablement overrides marketer skip settings;
+disabled actions no-op; disabled triggers cannot start processes.
+
+No database object or custom frontend is required. The package's discoverable assembly
+registers `StepRegistryPage` under `AutomationProcessEditSection` with the built-in listing
+template, slug `step-registry`, order **1000**, after all stock tabs (Contacts is **300**
+in Xperience **31.9.1**). Other custom tabs with higher orders can still appear after it.
+Routing inherits the selected process's edit-section path/ID. Parent pages and registration
+providers are public APIs in `Internal` namespaces: this integration is version-coupled;
+verify signatures, tab order, and routing when upgrading Xperience.
+
 ## Components
 
 | Component | Name (configuration key) | Identifier |
 | --- | --- | --- |
 | Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExtensions.ContactDateAnniversary` |
 | Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` |
+| Condition – Random split (A/B) | `RandomSplit` | `Labs.AutomationExtensions.RandomSplit` |
 | Action – Send webhook | `SendWebhook` | `Labs.AutomationExtensions.SendWebhook` |
 | Action – Write to log | `WriteToLog` | `Labs.AutomationExtensions.WriteToLog` |
 
@@ -212,9 +265,28 @@ Marketer properties:
 - **Result number** – the number selected on the earlier step (*Result 1–5*).
 
 **Works with:** *Send webhook* (or a registered custom step) with **Record result for later steps** turned on and the same **Result number**.
-If no earlier step saved that result (missing step, different number, step disabled), the condition follows **No** and logs a warning.
+If no earlier step saved that result (missing step, different number, or the earlier step was disabled), an enabled condition follows **No** and logs a warning. If this condition itself is disabled, all contacts follow **Yes (A)** without reading the saved result.
 
 Each step type has its own numbered results, so different step types never overwrite each other. Within a process, give each step of the same type a different number. Steps can't detect which other steps exist in a process, so the step and number must be matched manually.
+
+### Condition – Random split (A/B)
+
+Splits contacts between the **Yes** and **No** branches using a stable bucket calculated from each contact GUID and a split key. It needs no additional setup, database query, or external service.
+
+Marketer properties:
+
+- **Yes branch percentage** – integer from 0 to 100, default 50. A contact follows **Yes** when its bucket is below this percentage. `0` always follows **No**; `100` always follows **Yes**.
+- **Split key** – required, default `default`. Use a different key for an independent split.
+
+The allocation is approximate, not an exact count or guaranteed 50/50 distribution. A contact keeps the same branch across process runs and across processes when its GUID and split key are the same. The process display name is not part of the identity, so renaming a process does not move contacts between branches. There is no automatic per-step identity.
+
+The split key is used exactly as entered: matching is case-sensitive and whitespace in a nonblank key is significant. Changing the key or percentage can change branch outcomes. Increasing the percentage never moves a contact from **Yes** to **No**.
+
+When the component is disabled globally, all contacts follow **Yes (A)** without evaluating the condition. This takes precedence over **Skip this step** for every library condition. For Random split (A/B), this also means no contact is read and no bucket is calculated. The disabled-component warning records this branch behavior. When enabled, **Skip this step** follows the selected skip branch without reading the contact.
+
+The Builder's step description and percentage help explain this disabled behavior. This is static guidance, not a live enabled/disabled indicator; ask your administrator to confirm the current configuration. Marketers can choose the skip branch per step only while the component is enabled.
+
+To compose a simple A/B test, add **Random split (A/B)** after the process trigger. Connect **Yes** to a built-in **Send email** step with variant A and **No** to a second **Send email** step with variant B. No new assignment is made on a later run; use a new split key when an independent assignment is wanted.
 
 ## Skip steps
 
@@ -263,6 +335,7 @@ Keep your own property and category `Order` values below `SkippableStep.CATEGORY
 | --- | --- | --- |
 | Contact date anniversary | Scheduled task configuration | Trigger never fires |
 | Previous step succeeded | Earlier step of the selected type saving the same result number | Follows **No** branch, warning logged |
+| Random split (A/B) | None | No additional setup required |
 | Send webhook | Endpoint in configuration | Does nothing, warning logged |
 | Write to log | Logging configuration routing `Kentico*` categories at the selected level | Nothing visible in the Event log |
 

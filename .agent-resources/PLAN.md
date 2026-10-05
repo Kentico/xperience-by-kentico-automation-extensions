@@ -121,7 +121,7 @@ Key rules:
 | Kind | Behavior | Why |
 | --- | --- | --- |
 | Action | `Execute` no-op, log warning (component + process name) | contact continues, nothing external happens |
-| Condition | return `false` | false = documented safe default |
+| Condition | return `true` (Yes/A) without evaluating | Disabled library conditions send everyone to variant A; administrator disablement overrides marketer skip settings |
 | Trigger | firing code (handler, scheduled task, webhook endpoint) skips dispatch; `Evaluate` returns `false` as backstop | avoids filling shared trigger queue |
 | Scheduled task / endpoint | task returns early; endpoint returns 404 | no hidden work |
 
@@ -343,7 +343,7 @@ examples/DancingGoat/  wire-up + appsettings + demo processes (CI/CD repository 
 - Localization: all marketer-facing text in `AutomationExtensionsResources.resx`, registered for `Server` and `Builder`.
 - Library assembly discoverable via `<AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />` in the `.csproj` (without it no `Register*` attribute is processed).
 
-**Tests:** 82 unit tests (status, catalog vs. registrations, resx keys, discovery attribute, webhook sender/signature, step result keys/sources, skippable steps, anniversary math, options binding, log categories/event names ≤ 100 chars).
+**Tests:** 84 unit tests (status, catalog vs. registrations, resx keys, discovery attribute, webhook sender/signature, step result keys/sources, skippable steps, anniversary math including the 7-day offset calculation, options binding, log categories/event names ≤ 100 chars).
 
 **DancingGoat:** references the library; own `Directory.Build.props`, package versions from root `Directory.Packages.props` (all Kentico packages 31.9.1); Development config enables all components + `local-test` / `local-test-failing` webhook endpoints; dev-only receiver `/automation-extensions/webhook-test`; demo action `CoffeeClubEnrollmentAutomationAction` opting in to *Previous step succeeded*; *Example automation* uses the form submission trigger (CI repository).
 
@@ -363,15 +363,148 @@ examples/DancingGoat/  wire-up + appsettings + demo processes (CI/CD repository 
 - "If not already running" lets finished contacts restart → extra same-day anniversary task runs re-fire. Documented "run once per day".
 - Recommended anniversary recurrence is "If not already running" only ("Only once" = first year only).
 
-### Open items
+### Slice 2 (2026-10-04) – Random split (A/B), implemented and unit-validated
 
-1. *7 days before* timing not tested (contact 9, birthday 10-11, ready).
+**Selection:** #10 Random split (A/B) is the lowest-complexity remaining component: pure deterministic branching, no scheduled task, database query, external service, or prerequisite component. #9 needs time-zone/range semantics; #11 needs trigger/field comparison decisions; #16 needs contact field discovery and writes.
+
+**Spec:** `.agent-resources/implementation-spec-random-split.md`. Implementation delegated to a subagent, reviewed and validated by the caller.
+
+**Implementation**
+
+- `Conditions/RandomSplit`: registered `RandomSplitCondition`, localized properties, and internal `RandomSplitBucket` helper; identifier `Labs.AutomationExtensions.RandomSplit`, config key `RandomSplit`.
+- Existing catalog, disabled-component logging, skip controls, registration, localization, and log-length guard patterns reused. All disabled library conditions follow Yes (A) without evaluation; administrator disablement overrides marketer skip settings. When enabled, skipped conditions follow the selected branch before active evaluation.
+- Integer Yes percentage 0–100 (default 50), required split key (default `default`). Runtime rejects invalid percentages, blank keys, and empty contact GUIDs; cancellation propagated.
+- User-confirmed identity: contact GUID + split key, not process display name. Public process metadata exposes only `DisplayName`, not a stable process/step ID. Same key shares assignments across processes; different keys allow independent splits; renaming a process preserves assignments.
+- Stable algorithm: UTF-8 of lowercase GUID `D` format + `:` + exact case-sensitive key → SHA-256 → first four bytes as unsigned big-endian integer modulo 100. Yes when bucket < percentage; 0 always No, 100 always Yes. Allocation approximate, not an exact population count.
+- `docs/Usage-Guide.md` updated with enablement, component entry, properties, identity/change semantics, dependencies, and A/B email composition.
+
+**Validation**
+
+- `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Tests\Kentico.Xperience.Labs.AutomationExtensions.Tests.csproj --no-restore`: **108 passed, 0 failed/skipped** (24 new cases).
+- Fixed hash vectors including UTF-8, case sensitivity, repeatability, exact thresholds, 0/100, monotonic percentages, invalid configuration/GUID, deterministic 10,000-contact allocation within 45–55%, disabled/skip precedence, and cancellation covered.
+- `dotnet build .\examples\DancingGoat\DancingGoat.csproj --no-restore`: **0 warnings/errors**. Subagent's scoped formatting verification passed; caller's `git diff --check` passed.
+- **Running-app feedback:** user reached the disabled condition in DancingGoat's *Sample requests* process and observed No (B). Requested disabled behavior is Yes (A); corrected the return value, warning text, docs, and regression coverage. Enabled split/contact retrieval remains unverified in the running app. Isolated tests construct the nonpublic platform context for gating, but reading `ContactGUID` needs an initialized Xperience container. Production evaluation calls the tested bucket helper; no duplicate calculation.
+- **Disabled-branch correction validation:** 110 unit tests passed, including disabled behavior with skip off/Yes/No and invalid properties. DancingGoat `dotnet build --no-restore -t:Compile` passed; full build could not replace the DLL locked by the running app. Stop, rebuild, and restart DancingGoat to load the correction. `git diff --check` passed.
+- **Marketer clarity:** localized Builder description and percentage help explain disabled Yes (A) routing regardless of percentage/skip settings. Shared condition skip help explains that administrator disablement takes precedence. These describe static rules, not live configuration status; marketers are directed to their administrator for current status. No configuration-dependent localization hook assumed (see 2.4).
+- **Clarity validation:** 112 unit tests passed, including two Builder-help regression cases; DancingGoat compile target passed with 0 warnings/errors; whitespace check passed. Rendering of the updated help in the running Builder remains unverified.
+- Existing anniversary work and other worktree changes preserved; no commit.
+
+### Slice 3 (2026-10-04) – Step registry tab, implemented and unit-validated
+
+**Spec:** `.agent-resources/implementation-spec-step-registry.md`.
+
+**Research:** Kentico docs MCP was unavailable to the implementing session. Used official
+web docs for UI pages/registration/routing, listing configuration, and callouts; fetched
+the community-portal `ContentTypeGeneralExtender` example. `dotnet-inspect` skill and
+installed 31.9.1 DLL inspection verified the real APIs (citations in the spec).
+
+**Initial implementation (historical; display superseded 2026-10-04)**
+
+- `Admin/StepRegistryPage`: discoverable assembly-level `UIPage`, parent
+  `Kentico.Xperience.Admin.DigitalMarketing.UIPages.Internal.AutomationProcessEditSection`,
+  slug `step-registry`, localized caption, built-in `TemplateNames.LISTING`.
+- Installed registration metadata: Builder order 100, Statistics 200, Contacts 300.
+  Registry order **1000** per user request, after all stock tabs including Contacts
+  (other custom tabs with higher orders may follow). Its route inherits the selected
+  process edit-section path/ID; content is explicitly **global**, not process usage.
+- `DataContainerListingPage` supplies in-memory rows with built-in search/sort/paging.
+  No custom database object or React module. Two localized `PageConfiguration.Callouts`
+  above the table explain global/config scope and all disabled/skip precedence rules.
+- Injected `ICustomAutomationTriggerProvider`, `ICustomAutomationActionProvider`, and
+  `ICustomAutomationConditionProvider` supply definitions through `GetAll()`, replacing
+  direct singleton definition-store access. Trigger definitions are
+  `AutomationTriggerDefinition`; action/condition providers return their respective
+  custom definition types. Metadata includes identifier, display name, and description.
+- Join registered definitions to catalog by case-insensitive identifier and kind.
+  Library status uses existing `IAutomationComponentStatus`; bound current options
+  show per-component `true`/`false` overrides and explicit/default source paths.
+  Default enablement remains false. Sources are options paths, not provider/file provenance.
+- Other registrations are **Not managed**, never inferred disabled. Unknown options keys
+  remain visible as **Unregistered configuration entry** rows with their values; they
+  cannot control third-party registrations. Missing catalog registrations remain visible.
+  Structural Builder steps outside the registration stores are not listed.
+- Existing Server localization registration and resources reused; Usage Guide explains
+  scope, status rules, navigation, configuration, and public-`Internal` version coupling.
+- No process-usage/dependency inspection or configuration editing implemented.
+
+**Initial validation (historical; original table UI)**
+
+- Full NUnit suite: **136 passed, 0 failed/skipped** (24 new registry/page cases).
+  Covers all three kinds, default-disabled/default-enabled, case-insensitive explicit
+  overrides and identifier matching, custom status-service reuse, third-party isolation,
+  unknown keys/values, missing registrations, current-option reads, localized row shape,
+  assembly discovery, real stock tab order, and callout content.
+- Built-in data-container listing tested through its protected platform load method:
+  localized search, sorting, paging/counts, cancellation and store-error propagation.
+  Tests inject registration definitions; user-supplied DancingGoat screenshot subsequently confirms live registration rows render.
+- Library `dotnet build --no-restore`: **0 warnings/errors**.
+- DancingGoat `dotnet build --no-restore -t:Compile`: **0 warnings/errors**.
+  No full output-copy build attempted for this tab because the running app's DLL lock
+  was reported by the caller.
+- Scoped `dotnet format --no-restore --verify-no-changes` and `git diff --check` passed.
+- Order changed to 1000 on user request; updated stock-tab ordering regression passed
+  (1/1), library/test projects rebuilt successfully, whitespace check passed.
+
+**User-supplied running-app evidence (2026-10-04; original table UI):** DancingGoat *Sample requests*
+shows Step registry after Contacts, with the clipboard-checklist icon, localized callouts,
+column headings, and eight registration rows. Random split displays Disabled / Not set /
+Default: `AutomationExtensions:EnabledByDefault`; explicitly enabled library components
+and Not managed DancingGoat registrations display correctly. Screenshot confirms
+rendering and live store integration, not interactive search/paging or automation execution.
+Existing anniversary/Random split work preserved; no commit.
+
+**Filter follow-up (2026-10-04; original table UI):**
+
+- Added localized **Kind** (Trigger/Condition/Action/Unknown) and **Library status**
+  (Enabled/Disabled/Not managed/Not applicable) dropdowns, both defaulting to **All**.
+  Both filters AND together and with search; filtered totals, sorting, and paging
+  retain the built-in behavior. No column/registration/order/icon changes.
+- Official `filter-listing-data.md` and installed 31.9.1 DLL inspection verified
+  `ListingConfiguration.FilterConfiguration.FormModel`, `DropDownComponent`,
+  `FilterCondition`, and `IWhereConditionBuilder.Build(string, object)`.
+  The docs' `FilterFormModel` alias is obsolete. The stock data-container executor
+  ignores SQL filter conditions, so the page filters the stock-bound typed model
+  in `LoadDataContainers` before built-in search/sort/count/paging. A no-op condition
+  builder preserves standard filter metadata without generating unused SQL.
+  Filter predicates share displayed kind/status keys, including third-party and
+  missing/unknown rows; no duplicated status rules.
+- Targeted Admin/localization tests **51 passed**; full suite **154 passed**
+  (18 new filter cases), 0 failed/skipped. Exact matching rows, all kinds/statuses,
+  combined filters/search, null/empty All/reset, localization, filtered sorting,
+  page counts/pages, third-party, unknown, and missing registration covered.
+- DancingGoat `dotnet build --no-restore -t:Compile`: **0 warnings/errors**.
+  Scoped formatting and `git diff --check` passed; existing dirty work preserved.
+- Screenshot evidence above remains valid for the original rendered registry.
+  It predates filters: live filter UI, apply/reset interactions, and form-command
+  binding remain unverified. Running app untouched; no commit.
+
+**Display revision (2026-10-04; current UI):**
+
+- Current columns are **Name**, **Kind**, **Identifier**, **Status**, **Description**.
+  Removed Registration, Configured component value, and Configuration source.
+  The filter is labeled **Status**; Kind choices/behavior are unchanged.
+- Kentico 31.9.1's shared `CustomAutomationStepDefinition` exposes `Description` for
+  trigger/action/condition definitions, verified with `dotnet-inspect`. Description
+  resource keys are localized; plain descriptions remain plain; null descriptions are
+  empty. Description is last and is not searchable.
+- Effective library state still comes from `IAutomationComponentStatus`. Third-party
+  registrations show **Not managed**; unknown configuration rows and unregistered
+  catalog entries show **Not applicable**. Configuration values/source are not displayed.
+- Historical screenshot and test evidence above cover the original UI only. Current
+  targeted Admin/localization tests passed (**52**), full NUnit suite passed (**157**),
+  and DancingGoat `--no-restore -t:Compile` succeeded with **0 warnings/errors**.
+  Scoped changed-file formatting and `git diff --check` passed. Live rendering remains
+  unverified; running app stays untouched.
+
+### Open items (remaining)
+
+1. In-app *7 days before* scheduled-task firing for contact 9 (birthday 10-11) remains unverified; the offset calculation is covered by unit tests.
 2. Localization: keep `Server` + `Builder` registration or drop `Server`.
 3. Trigger display name issue: submit report; decide plain-text trigger names vs. keys + known-issue note.
 4. Same-day re-run protection for the anniversary task (deferred; option: store last processed date).
 5. Local test data cleanup: contacts 8 and 9, *Contact Anniversary* process, Email queue.
-6. Admin UI app (2.4) – needs the [verify] items checked first.
-7. Remaining components (16 of the original 20).
+6. Global Step registry tab implemented (Slice 3). Process-usage/dependency checks and a separate admin app (2.4) remain future scope.
+7. Remaining components (15 of the original 20). Random split implemented; running-app Builder/branch verification remains open.
 8. README still template placeholder; nothing committed yet.
 
 ---
@@ -380,7 +513,7 @@ examples/DancingGoat/  wire-up + appsettings + demo processes (CI/CD repository 
 
 1. ~~Final identifier prefix?~~ Resolved: `Labs.AutomationExtensions.`; display text via localization resources (5.5).
 2. ~~Default enabled state?~~ Resolved: disabled by default, opt-in/opt-out via appsettings.
-3. Admin UI: read-only status page enough, or also DB-stored overrides editable in admin?
+3. Admin UI: read-only global Step registry requested and implemented; no DB-stored overrides. Process-usage inspection remains future scope.
 4. Commerce components (#6, #13) – include in core package or separate `.Commerce` package?
 5. Teams/Slack (#15) and enrichment (#20) – ship real provider or sample/abstract only?
 6. Minimum supported XbyK version – currently 31.9.1 (all package references); older versions not tested.
