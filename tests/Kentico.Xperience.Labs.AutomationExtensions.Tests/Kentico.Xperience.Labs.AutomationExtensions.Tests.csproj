@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Kentico.Xperience.Labs.AutomationExtensions\Kentico.Xperience.Labs.AutomationExtensions.csproj" />
+    <ProjectReference Include="..\..\src\Kentico.Xperience.Labs.AutomationExtensions.Admin\Kentico.Xperience.Labs.AutomationExtensions.Admin.csproj" />
   </ItemGroup>
 
 </Project>

@@ -42,10 +42,7 @@ public class LogCategoryLengthTests
 
 
     [Test]
-    public void For_BuildsCategoryFromComponentName()
-    {
-        Assert.That(LogCategories.For(AutomationComponentCatalog.SendWebhook), Is.EqualTo("Kentico.Xperience.Labs.AutomationExtensions.SendWebhook"));
-    }
+    public void For_BuildsCategoryFromComponentName() => Assert.That(LogCategories.For(AutomationComponentCatalog.SendWebhook), Is.EqualTo("Kentico.Xperience.Labs.AutomationExtensions.SendWebhook"));
 
 
     [Test]

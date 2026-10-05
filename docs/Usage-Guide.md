@@ -5,7 +5,7 @@
 1. Add the package to your Xperience by Kentico application:
 
    ```powershell
-   dotnet add package Kentico.Xperience.Labs.AutomationExtensions
+   dotnet add package Kentico.Xperience.Labs.AutomationExtensions.Admin
    ```
 
 2. Register the services in `Program.cs` (after `AddKentico`):
@@ -15,6 +15,11 @@
    ```
 
 3. Enable the components you want to use (all are **disabled by default**) – see [Enable components](#enable-components).
+
+The `.Admin` package includes the automation components and admin UI client module.
+Existing C# namespaces remain under `Kentico.Xperience.Labs.AutomationExtensions`;
+service registration and component identifiers are unchanged. Client assets are embedded
+in the package, so consuming applications do not need Node.js.
 
 ## Enable components
 

@@ -6,7 +6,6 @@ using CMS.ContactManagement;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.PreviousStepSucceeded;
 using Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Conditions;

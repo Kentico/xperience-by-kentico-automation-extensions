@@ -1,9 +1,5 @@
 # Contributing Setup
 
----This documents the steps a maintainer or developer would follow to work on the library in their development environment---
-
----Update the details for this project, replacing "repotemplate" and anything else that needs changed---
-
 ## Required Software
 
 The requirements to setup, develop, and build this project are listed below.
@@ -17,9 +13,9 @@ The requirements to setup, develop, and build this project are listed below.
 
 ### Node.js Runtime
 
-- [Node.js](https://nodejs.org/en/download) LTS or newer
+- [Node.js](https://nodejs.org/en/download) 24 or newer
 - [NVM for Windows](https://github.com/coreybutler/nvm-windows) or [NVM for macOS](https://github.com/nvm-sh/nvm) to manage multiple installed versions of Node.js
-- See `engines` in the solution `package.json` for specific version requirements
+- See `engines` in `src/Kentico.Xperience.Labs.AutomationExtensions.Admin/Client/package.json` for specific version requirements
 
 ### C# Editor
 
@@ -49,16 +45,49 @@ documentation on [creating a new database](https://docs.kentico.com/documentatio
 
 ### Admin Customization
 
-To run the Sample app Admin customization in development mode, add the following to your [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-10.0&tabs=windows#secret-manager) for the application.
+The library project is `src/Kentico.Xperience.Labs.AutomationExtensions.Admin`.
+The repository and solutions keep the Automation Extensions name so additional
+projects can be added later. Existing C# namespaces are unchanged.
+
+The sample's `appsettings.Development.json` already enables the HTTPS client proxy:
 
 ```json
 "CMSAdminClientModuleSettings": {
-  "kentico-xperience-integrations-repotemplate": {
+  "kentico-xperience-admin-labs-automation-extensions": {
     "Mode": "Proxy",
-    "Port": 3009
+    "Port": 3009,
+    "UseSSL": true
   }
 }
 ```
+
+Run these commands from the repository root:
+
+```powershell
+Set-Location src\Kentico.Xperience.Labs.AutomationExtensions.Admin\Client
+npm ci
+npm start
+```
+
+In another terminal, run `dotnet run --project examples\DancingGoat`.
+The client dev server exports a .NET HTTPS development certificate automatically;
+trust it with `dotnet dev-certs https --trust` if needed. The proxy and webpack
+must use the same module name and port.
+
+For development without the proxy, override the module's `Mode` to `Embedded`
+in user secrets and run `npm run build:dev` before building .NET in Debug.
+Debug builds embed existing `Client/dist` assets but do not run npm.
+Release builds run `npm ci` and `npm run build` automatically and embed the output.
+Run `npm run typecheck` to check TypeScript.
+
+### Adding client extensions
+
+`Client/src` starts with only an empty `entry.tsx` and CSS module declarations.
+Add React page templates or form components there and export them from `entry.tsx`.
+Register the corresponding C# extension using client module
+`@kentico/xperience-admin-labs-automation-extensions` and its exported component name.
+`AutomationExtensionsAdminModule` registers the module; webpack and the project's
+`AdminClientPath` package its assets under the same organization and project name.
 
 ## Development Workflow
 
@@ -67,7 +96,7 @@ To run the Sample app Admin customization in development mode, add the following
    - `refactor/` - for restructuring of existing features
    - `fix/` - for bugfixes
 
-1. Run `dotnet format` against the `Kentico.Xperience.Labs.AutomationExtensions` solution
+1. Run `dotnet format Kentico.Xperience.Labs.AutomationExtensions.slnx --no-restore --exclude ./examples/**`
 
    > use `dotnet: format` VS Code task.
 

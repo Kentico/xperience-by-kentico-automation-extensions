@@ -9,10 +9,7 @@ public class StepResultRecorderTests
 
 
     [Test]
-    public void Find_NoData_ReturnsNull()
-    {
-        Assert.That(StepResultRecorder.Find(null, webhookResult1), Is.Null);
-    }
+    public void Find_NoData_ReturnsNull() => Assert.That(StepResultRecorder.Find(null, webhookResult1), Is.Null);
 
 
     [Test]

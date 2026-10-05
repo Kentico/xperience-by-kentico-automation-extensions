@@ -6,14 +6,11 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Actions;
 public class StepResultSummaryTests
 {
     [Test]
-    public void Format_NoData_ReturnsNone()
-    {
-        Assert.Multiple(() =>
-        {
-            Assert.That(StepResultSummary.Format(null), Is.EqualTo(StepResultSummary.NO_RESULTS));
-            Assert.That(StepResultSummary.Format(new StepResultData()), Is.EqualTo(StepResultSummary.NO_RESULTS));
-        });
-    }
+    public void Format_NoData_ReturnsNone() => Assert.Multiple(() =>
+                                                    {
+                                                        Assert.That(StepResultSummary.Format(null), Is.EqualTo(StepResultSummary.NO_RESULTS));
+                                                        Assert.That(StepResultSummary.Format(new StepResultData()), Is.EqualTo(StepResultSummary.NO_RESULTS));
+                                                    });
 
 
     [Test]

@@ -13,7 +13,7 @@
 
 ---Package Name – use "Xperience by Kentico: \<Project Name\>"
 
-# ---Package Name---
+# Xperience by Kentico: Automation Extensions
 
 ---Select the correct badge for the support policy and update the GitHub Action pipeline badge to point to this repository (replace `repo-template`)---
 
@@ -33,13 +33,13 @@
 
 | Xperience Version | Library Version |
 | ----------------- | --------------- |
-| >= 31.2.0         | 1.0.0           |
+| >= 31.9.1         | 1.0.0           |
 
 ### Dependencies
 
 ---These are all the dependencies required to use (not build) the library---
 
-- [ASP.NET Core 8.0](https://dotnet.microsoft.com/en-us/download)
+- [ASP.NET Core 10.0](https://dotnet.microsoft.com/en-us/download)
 - [Xperience by Kentico](https://docs.kentico.com)
 
 ### Other requirements
@@ -53,8 +53,12 @@
 Add the package to your application using the .NET CLI
 
 ```powershell
-dotnet add package <repo-template>
+dotnet add package Kentico.Xperience.Labs.AutomationExtensions.Admin
 ```
+
+The `.Admin` package contains automation components and admin UI client extensibility.
+Client assets are embedded; Node.js is required only when developing this library.
+The repository remains `xperience-by-kentico-automation-extensions` for future projects.
 
 ## Quick Start
 

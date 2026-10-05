@@ -31,10 +31,7 @@ public class SkippableStepTests
 
 
     [Test]
-    public void SkippedBranch_DefaultsToNo()
-    {
-        Assert.That(new PreviousStepSucceededConditionProperties().SkippedBranch, Is.EqualTo(SkippableStep.BRANCH_NO));
-    }
+    public void SkippedBranch_DefaultsToNo() => Assert.That(new PreviousStepSucceededConditionProperties().SkippedBranch, Is.EqualTo(SkippableStep.BRANCH_NO));
 
 
     [Test]

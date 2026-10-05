@@ -998,7 +998,7 @@
           "System.IO.Hashing": "8.0.0"
         }
       },
-      "Kentico.Xperience.Labs.AutomationExtensions": {
+      "kentico.xperience.labs.automationextensions.admin": {
         "type": "Project",
         "dependencies": {
           "Kentico.Xperience.Admin": "[31.9.1, )",

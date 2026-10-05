@@ -21,17 +21,11 @@ public class LogMessageFormatterTests
 
 
     [Test]
-    public void Format_PlaceholderDifferentCase_Replaced()
-    {
-        Assert.That(LogMessageFormatter.Format("{PROCESSNAME}", values), Is.EqualTo("Lead nurture"));
-    }
+    public void Format_PlaceholderDifferentCase_Replaced() => Assert.That(LogMessageFormatter.Format("{PROCESSNAME}", values), Is.EqualTo("Lead nurture"));
 
 
     [Test]
-    public void Format_UnknownPlaceholder_KeptUnchanged()
-    {
-        Assert.That(LogMessageFormatter.Format("{contactEmail} {processName}", values), Is.EqualTo("{contactEmail} Lead nurture"));
-    }
+    public void Format_UnknownPlaceholder_KeptUnchanged() => Assert.That(LogMessageFormatter.Format("{contactEmail} {processName}", values), Is.EqualTo("{contactEmail} Lead nurture"));
 
 
     [Test]
@@ -52,8 +46,5 @@ public class LogMessageFormatterTests
 
 
     [Test]
-    public void Format_Empty_ReturnsEmpty()
-    {
-        Assert.That(LogMessageFormatter.Format(string.Empty, values), Is.Empty);
-    }
+    public void Format_Empty_ReturnsEmpty() => Assert.That(LogMessageFormatter.Format(string.Empty, values), Is.Empty);
 }

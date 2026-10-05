@@ -2,6 +2,8 @@ using System.Reflection;
 
 using CMS;
 
+using Kentico.Xperience.Admin.Base;
+using Kentico.Xperience.Labs.AutomationExtensions.Admin;
 using Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Configuration;
@@ -17,5 +19,20 @@ public class AssemblyDiscoveryTests
         var attribute = typeof(AutomationComponentCatalog).Assembly.GetCustomAttribute<AssemblyDiscoverableAttribute>();
 
         Assert.That(attribute, Is.Not.Null);
+    }
+
+
+    [Test]
+    public void Assembly_RegistersAdminModule()
+    {
+        var assembly = typeof(AutomationComponentCatalog).Assembly;
+        var modules = assembly.GetCustomAttributes<RegisterModuleAttribute>();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(assembly.GetName().Name, Is.EqualTo("Kentico.Xperience.Labs.AutomationExtensions.Admin"));
+            Assert.That(modules.Select(module => module.Type), Does.Contain(typeof(AutomationExtensionsAdminModule)));
+            Assert.That(typeof(AutomationExtensionsAdminModule).IsSubclassOf(typeof(AdminModule)), Is.True);
+        });
     }
 }

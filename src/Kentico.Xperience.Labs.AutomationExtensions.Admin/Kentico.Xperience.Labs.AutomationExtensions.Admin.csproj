@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>Kentico.Xperience.Labs.AutomationExtensions.Admin</PackageId>
+    <Title>Xperience by Kentico: Automation Extensions</Title>
+    <Description>Library of automation triggers, conditions, and actions for Xperience by Kentico.</Description>
+    <PackageTags>$(PackageTags);automation;marketing</PackageTags>
+    <AdminOrgName>kentico</AdminOrgName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Build the client before a Debug .NET build to embed assets without the development proxy. -->
+    <AdminClientPath Include="Client\dist\**" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+      <ProjectName>xperience-admin-labs-automation-extensions</ProjectName>
+    </AdminClientPath>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Client\node_modules\**" />
+    <EmbeddedResource Remove="Client\node_modules\**" />
+    <None Remove="Client\node_modules\**" />
+  </ItemGroup>
+
+  <Target Name="NpmInstall" BeforeTargets="NpmBuildClient" Condition=" '$(Configuration)|$(Platform)' != 'Debug|AnyCPU' ">
+    <Exec Command="npm ci --no-audit --no-fund" WorkingDirectory="$(MSBuildProjectDirectory)\Client" />
+  </Target>
+
+  <Target Name="NpmBuildClient" BeforeTargets="BeforeBuild" Condition=" '$(Configuration)|$(Platform)' != 'Debug|AnyCPU' ">
+    <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)\Client" />
+
+    <ItemGroup>
+      <AdminClientPath Include="Client\dist\**">
+        <ProjectName>xperience-admin-labs-automation-extensions</ProjectName>
+      </AdminClientPath>
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Kentico.Xperience.Admin" />
+    <PackageReference Include="Kentico.Xperience.WebApp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Required for Xperience to process the assembly's registration attributes (automation steps, triggers, scheduled tasks, localization resources) -->
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+    <InternalsVisibleTo Include="Kentico.Xperience.Labs.AutomationExtensions.Tests" />
+  </ItemGroup>
+
+</Project>

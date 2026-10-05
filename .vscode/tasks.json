@@ -23,6 +23,7 @@
       "args": [
         "format",
         "Kentico.Xperience.Labs.AutomationExtensions.slnx",
+        "--no-restore",
         "--exclude",
         "./examples/**"
       ],
