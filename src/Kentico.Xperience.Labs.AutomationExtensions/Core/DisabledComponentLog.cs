@@ -14,15 +14,16 @@ internal static class DisabledComponentLog
     private static readonly TimeSpan logInterval = TimeSpan.FromHours(1);
 
 
-    public static void Write(ILogger logger, AutomationComponentDescriptor component, string processName)
+    public static void Write(ILogger logger, AutomationComponentDescriptor component, string processName, string disabledBehavior = "does nothing")
     {
         logger.LogWithIntervalPolicy(
             LoggingIntervalPolicy.OncePerPeriod($"{component.Identifier}|Disabled|{processName}", logInterval),
             l => l.LogWarning(
                 LogEvents.ComponentDisabled,
-                "Automation component '{ComponentName}' used in process '{ProcessName}' is disabled and does nothing. Enable it with '{ConfigurationPath}': true.",
+                "Automation component '{ComponentName}' used in process '{ProcessName}' is disabled and {DisabledBehavior}. Enable it with '{ConfigurationPath}': true.",
                 component.Name,
                 processName,
+                disabledBehavior,
                 component.ConfigurationPath));
     }
 }

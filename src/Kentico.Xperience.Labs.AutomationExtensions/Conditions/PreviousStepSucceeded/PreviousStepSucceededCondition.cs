@@ -18,7 +18,7 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Conditions.PreviousStepSuc
 
 /// <summary>
 /// Branches on the outcome a preceding library action (e.g. "Send webhook") recorded under the selected result key.
-/// Follows the false branch when no result was recorded or the component is disabled.
+/// Follows the false branch when enabled and no result was recorded; a disabled component follows the Yes branch.
 /// </summary>
 public sealed class PreviousStepSucceededCondition(
     IAutomationComponentStatus componentStatus,
@@ -40,8 +40,12 @@ public sealed class PreviousStepSucceededCondition(
     {
         if (!componentStatus.IsEnabled(AutomationComponentCatalog.PreviousStepSucceeded))
         {
-            DisabledComponentLog.Write(logger, AutomationComponentCatalog.PreviousStepSucceeded, context.Process.DisplayName);
-            return false;
+            DisabledComponentLog.Write(
+                logger,
+                AutomationComponentCatalog.PreviousStepSucceeded,
+                context.Process.DisplayName,
+                "sends all contacts through the Yes (A) branch");
+            return true;
         }
 
         if (SkippableStep.TryGetSkippedResult(properties, out bool skippedResult))

@@ -81,6 +81,26 @@ public partial class LocalizationResourceTests
     }
 
 
+    [TestCase("labs.automationextensions.randomsplit.description")]
+    [TestCase("labs.automationextensions.randomsplit.percentage.explanation")]
+    public void RandomSplit_BuilderHelpExplainsDisabledBranchAndSkipPrecedence(string key)
+    {
+        string? text = resourceManager.GetString(key, CultureInfo.InvariantCulture);
+
+        Assert.That(text, Does.Contain("all contacts follow Yes (A)").And.Contain("regardless of").And.Contain("skip settings"));
+    }
+
+
+    [TestCase("labs.automationextensions.skipstep.condition.explanation", "Yes (A)")]
+    [TestCase("labs.automationextensions.stepregistry.disabled.content", "\"Yes\" path")]
+    public void DisabledConditionHelp_ExplainsYesBranchForAllLibraryConditions(string key, string branchText)
+    {
+        string? text = resourceManager.GetString(key, CultureInfo.InvariantCulture);
+
+        Assert.That(text, Does.Contain(branchText).And.Contain("disabled"));
+    }
+
+
     [TestCase("labs.automationextensions.stepresult.number.text")]
     [TestCase("labs.automationextensions.contactdateanniversary.daysbefore.ontheday")]
     [TestCase("labs.automationextensions.contactdateanniversary.daysbefore.format")]

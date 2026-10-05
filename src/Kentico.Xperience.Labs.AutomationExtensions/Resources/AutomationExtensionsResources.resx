@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema id="root"
+    xmlns=""
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -86,7 +89,7 @@
     <value>Contacts move on without this step running. Use when you can't delete the step because the process already has contact history. Tip: start the step name with "[Skipped]" (or ⏭️) so it's visible in the builder.</value>
   </data>
   <data name="labs.automationextensions.skipstep.condition.explanation" xml:space="preserve">
-    <value>The condition isn't checked and all contacts follow the branch selected below. Use when you can't delete the step because the process already has contact history. Tip: start the step name with "[Skipped → Yes]" or "[Skipped → No]" so it's visible in the builder. If you turn skipping off later, make sure both branches lead to further steps.</value>
+    <value>The condition isn't checked and all contacts follow the branch selected below. This applies only when the component is enabled by your administrator. If disabled by application configuration, all library conditions follow Yes (A), regardless of this setting. Use when you can't delete the step because the process already has contact history. Tip: start the step name with "[Skipped → Yes]" or "[Skipped → No]" so it's visible in the builder. If you turn skipping off later, make sure both branches lead to further steps.</value>
   </data>
   <data name="labs.automationextensions.skippedbranch.label" xml:space="preserve">
     <value>Always follow</value>
@@ -179,6 +182,35 @@
     <value>Checks whether an earlier step (for example "Send webhook") succeeded. Use after a step with "Record result for later steps" turned on.</value>
   </data>
 
+  <!-- Random split -->
+  <data name="labs.automationextensions.randomsplit.displayname" xml:space="preserve">
+    <value>Random split (A/B)</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.description" xml:space="preserve">
+    <value>Assigns each contact to a stable Yes (A) or No (B) branch. Requires administrator enablement; when disabled by application configuration, all contacts follow Yes (A), regardless of skip settings.</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.percentage.label" xml:space="preserve">
+    <value>Yes branch percentage</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.percentage.explanation" xml:space="preserve">
+    <value>When enabled by your administrator, this percentage (0–100) of contacts follows Yes (A); the rest follow No (B). Allocation is approximate, not an exact count. When disabled by application configuration, all contacts follow Yes (A), regardless of this percentage or skip settings. Ask your administrator to confirm whether this component is enabled.</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.percentage.minimum" xml:space="preserve">
+    <value>Enter a percentage from 0 to 100.</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.percentage.maximum" xml:space="preserve">
+    <value>Enter a percentage from 0 to 100.</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.splitkey.label" xml:space="preserve">
+    <value>Split key</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.splitkey.explanation" xml:space="preserve">
+    <value>Stable name for this split, default "default". Same contact and key always get the same bucket, even after a process is renamed. Keys are case-sensitive; spaces matter.</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.splitkey.required" xml:space="preserve">
+    <value>Enter a split key containing at least one non-space character.</value>
+  </data>
+
   <!-- Contact date anniversary -->
   <data name="labs.automationextensions.contactdateanniversary.displayname" xml:space="preserve">
     <value>Contact date anniversary</value>
@@ -204,5 +236,56 @@
   <data name="labs.automationextensions.contactdateanniversary.daysbefore.format" xml:space="preserve">
     <value>{0} days before</value>
     <comment>{0} = number of days</comment>
+  </data>
+  <data name="labs.automationextensions.stepregistry.caption" xml:space="preserve">
+    <value>Step registry</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.kind" xml:space="preserve">
+    <value>Kind</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.identifier" xml:space="preserve">
+    <value>Identifier</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.scope.content" xml:space="preserve">
+    <value>This tab lists the registered trigger, action, and condition definitions for the whole application, not just this process. It does not inspect which steps this process uses.&lt;br&gt;&lt;br&gt;Status shows the effective state of library components; the default is disabled unless application configuration enables them.</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.disabled.content" xml:space="preserve">
+    <value>When a library condition is disabled, all contacts follow the "Yes" path without evaluating the condition. Administrator disablement overrides marketer skip settings.&lt;br&gt;Disabled library actions do nothing (contacts continue); disabled library triggers cannot start processes. All disabled steps log warnings in the Event Log when run.</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.trigger" xml:space="preserve">
+    <value>Trigger</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.condition" xml:space="preserve">
+    <value>Condition</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.notmanaged" xml:space="preserve">
+    <value>Not managed</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.notapplicable" xml:space="preserve">
+    <value>Not applicable</value>
   </data>
 </root>

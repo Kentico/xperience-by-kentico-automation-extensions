@@ -1,6 +1,7 @@
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.WriteToLog;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.PreviousStepSucceeded;
+using Kentico.Xperience.Labs.AutomationExtensions.Conditions.RandomSplit;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Configuration;
@@ -18,6 +19,7 @@ public static class AutomationComponentCatalog
 
     public static readonly AutomationComponentDescriptor ContactDateAnniversary = new(ContactDateAnniversaryTrigger.NAME, AutomationComponentKind.Trigger);
     public static readonly AutomationComponentDescriptor PreviousStepSucceeded = new(PreviousStepSucceededCondition.NAME, AutomationComponentKind.Condition);
+    public static readonly AutomationComponentDescriptor RandomSplit = new(RandomSplitCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor SendWebhook = new(SendWebhookAction.NAME, AutomationComponentKind.Action);
     public static readonly AutomationComponentDescriptor WriteToLog = new(WriteToLogAction.NAME, AutomationComponentKind.Action);
 
@@ -29,6 +31,7 @@ public static class AutomationComponentCatalog
     [
         ContactDateAnniversary,
         PreviousStepSucceeded,
+        RandomSplit,
         SendWebhook,
         WriteToLog
     ];
