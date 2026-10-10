@@ -4,6 +4,8 @@ Labs library of reusable Xperience by Kentico (XbyK) automation **triggers**, **
 
 Research date: 2026-10-04. Source: Kentico docs MCP (docs.kentico.com). Items marked **[verify]** are inferred or not confirmed by docs.
 
+**Current status, open items, and pending decisions: `STATUS.md`** (single source – don't track status here). This file holds research, design rules, the component catalog, decisions, and the historical slice log (7, 8).
+
 ---
 
 ## 1. Research summary
@@ -163,7 +165,7 @@ Legend: **T** trigger, **C** condition, **A** action. "Showcases" = XbyK automat
 | # | Name | Kind | Scenario | Logic | Marketer properties | Showcases |
 | --- | --- | --- | --- | --- | --- | --- |
 | 7 | **Has consent agreement** | C | GDPR gate before email/sync steps | `IConsentAgreementService.IsAgreed` | Consent (dropdown) | dynamic dropdown, compliance branching **[verify not already a built-in rule]** |
-| 8 | **Activity count in window** | C | "Visited pricing ≥ 3× in 7 days" → sales path | Count `ActivityInfo` by type (+ optional page/value) since now − N days | Activity type, operator, count, days | parameterized activity query, caching |
+| 8 | **Activity count in window** (reframed as *Activity frequency*: existence is covered by the built-in rule) | C | "Visited pricing ≥ 3× in 7 days" → sales path | Count `ActivityInfo` by type (+ optional page/value) since now − N days | Activity type, operator, count, days | parameterized activity query, caching |
 | 9 | **Within time window** | C | Only send/notify during business hours, weekdays, or a campaign date range; pair with Wait to retry | Compare UTC now (converted to configured time zone) | Days of week, start/end time, time zone, optional date range | process-state branching without contact data |
 | 10 | **Random split (A/B)** | C | Test two email sequences | Deterministic hash of contact GUID + step/process → bucket % | Percentage for true branch, salt | deterministic/idempotent condition design |
 | 11 | **Started by trigger / trigger data matches** | C | One process, branches per source (form vs. webhook vs. order over X) | `GetTriggerIdentifier`, `TriggeredBy…`, compare known trigger data fields | Trigger (dropdown), optional field + operator + value | trigger data access, built-in + custom trigger data |
@@ -329,7 +331,9 @@ examples/DancingGoat/  wire-up + appsettings + demo processes (CI/CD repository 
 
 ---
 
-## 7. Progress
+## 7. Progress (historical log)
+
+Append-only record of each slice as it was delivered. "Open"/"unverified" notes reflect that time – current state is in `STATUS.md`.
 
 ### Slice 1 (2026-10-04) – implemented and validated in DancingGoat
 
@@ -545,6 +549,47 @@ Existing anniversary/Random split work preserved; no commit.
 - DancingGoat `-t:Compile`: 0 warnings/errors. Scoped format (11 unrelated formatter changes reverted) and `git diff --check` passed.
 - Contact read path not reachable in unit tests (no Xperience container). **Running-app check open:** Field dropdown shows `ContactScore`, Yes/No per operator for scored + unscored contact, 41050 warning in Event log.
 
+### Slice 6 (2026-10-05) – Activity frequency (#8 reframed), implemented and unit-validated
+
+**Selection:** #8 lowest remaining complexity: read-only `COUNT` query, reuses `NumberComparisonOperator`/`NumberComparison` from #22, no task/external service/prerequisite.
+
+**Reframe (user confirmed):** built-in *Rule-based condition* already covers existence ("performed activity X with value that contains … in the last N days", "visited page", "clicked link in email"). Gap = **how often**. Description points marketers to the built-in rule for "at least once" checks.
+
+**Spec:** `.agent-resources/implementation-spec-activity-frequency.md`. Implemented by subagent, reviewed by caller.
+
+**User decisions / findings**
+
+- Single activity type (no multi-select, no "Any activity" – type-specific filters don't fit it). Rolling window 1–365 days (default 7), default ≥ 3.
+- `ActivityCreated` is **server-local time** (user: [private cloud deployment docs](https://docs.kentico.com/documentation/developers-and-admins/deployment/deploy-to-private-cloud.md#deploy-the-database); subagent: `IDateTimeNowService` → `DateTime.Now`, built-in `NewerThan` uses local now − days). Window = `TimeProvider.GetLocalNow()` − N days.
+- Detail columns per type (user-supplied): emailclick → `ActivityValue` (URL); pagevisit/landingpage → `ActivityURL` (+ `ActivityURLReferrer`); bizformsubmit → `ActivityURL`, `ActivityTitle`; memberregistration → `ActivityTitle`; others → `ActivityValue`. Built-in "value that contains" rule searches `ActivityValue` only → can't filter page visits.
+- Per-type filter properties with **conditional visibility** (user request). Referrer never searched (a /contact visit from /pricing would count as a pricing visit).
+
+**Implementation**
+
+- `Conditions/ActivityFrequency`: identifier `Labs.AutomationExtensions.ActivityFrequency`, config key `ActivityFrequency`, icon `Icons.EkgLine` (verified 31.9.1).
+- Properties: Activity type (dropdown, enabled types, localized, sorted, value = code name), Operator (reused provider), Count (≥ 0, default 3), Days (1–365, default 7), Page URL contains / Title contains / Value contains (optional, AND). Inherits `SkippableConditionProperties`.
+- `ActivityDetailFilters` = single source of truth: URL for pagevisit/landingpage/bizformsubmit; Title for bizformsubmit/memberregistration; Value for all others; case-insensitive; nothing while no type selected. Used by custom `ActivityDetailFilterVisibilityCondition` (`VisibilityConditionWithDependency`, attribute `VisibleIfActivityDetailFilter`) and runtime `GetCriteria` → hidden (stale) values ignored.
+- Platform facts: multiple visibility attributes combine with **AND** (can't express "one of" with `VisibleIfEqualTo`); custom conditions supported in automation step config, discovered via `[VisibilityConditionAttribute]`, created via DI, re-evaluated when dependency field changes ([docs](https://docs.kentico.com/documentation/developers-and-admins/customization/extend-the-administration-interface/ui-form-components/ui-form-component-visibility-conditions)).
+- Runtime: disabled → No; skipped → selected branch; invalid config (missing/unknown type, bad operator, count < 0, days out of range) → No + warning `InvalidActivityFrequencyConfiguration` (41060, once/hour per process+type), no query; else public `IActivityCounter` (internal `ActivityCounter`: parameterized `WhereContains` per criterion, `GetCountAsync`, no row load) → `NumberComparison.Compare`. Debug log `ActivityFrequencyEvaluated` (41061). Read-only, no caching.
+- Activities are queued and written every ~10 s (`CMSProcessContactActionsInterval`) → Usage Guide recommends a short *Wait* before the condition when the triggering activity must count.
+- `LocalizationResourceTests` scans declared properties only (inherited platform visibility-condition property uses a platform key); library base types still scanned.
+- Usage Guide: component section, filter-per-type table, built-in rule difference, enablement/tables, example (Page URL contains `/pricing` ≥ 3 in 7 days). DancingGoat Development config enables it.
+
+**Follow-up: ordering + text match operators (user request)**
+
+- Order: Activity type 10, `UrlOperator`/`Url` 20/30, `TitleOperator`/`Title` 40/50, `ValueOperator`/`Value` 60/70, Operator 80, Count 90, Days 100. Operator + text pairs share per-type visibility.
+- Public enum `TextMatchOperator` (persisted by name): `Contains` (default), `DoesNotContain`, `Equal`, `NotEqual`, `StartsWith`, `EndsWith` (`Equal` avoids clash with `object.Equals`, matches `NumberComparisonOperator`). Shared `TextMatchOperatorOptionsProvider`.
+- SQL: only DataEngine `WhereContains/NotContains/Equals/NotEquals/StartsWith/EndsWith` – parameterized, LIKE wildcards `[ % _` escaped; negated operators add `OR column IS NULL` (empty column counts as not matching). Where-condition shape tested without the Xperience runtime. Empty text = no filter; invalid operator on a visible filter with text → 41060 + No; hidden/empty filters ignored.
+- Stored `ActivityURL` (31.9.1 DLLs): page visit/landing page = `window.location.href` unchanged (absolute, query string + `#fragment`); form submission = HTTP Referer (absolute, query, no fragment). Matching follows DB collation (case-insensitive by default).
+- **Limitation:** home page via "is equal to `https://host/`" misses visits with query string/fragment. No path-only operator – separate user decision if needed.
+
+**Validation**
+
+- After follow-up: **446 passed** (re-run by caller), DancingGoat `-t:Compile` 0 warnings/errors, `git diff --check` clean. Running-app checks add: operator labels, *starts with* `https://<host>/pricing` ≥ 3 → Yes, *is equal to* `https://<host>/` counts `/` not `/?utm_source=x`, *does not contain* counts empty columns.
+- Full NUnit suite (before follow-up): **413 passed**, 0 failed/skipped (103 new: window, config validation, options provider, filter mapping/visibility/stale values/trim, gating, count+compare via fake counter, cancellation). Re-run by caller: 413 passed.
+- DancingGoat `-t:Compile`: 0 warnings/errors. Format (touched files only) and `git diff --check` passed.
+- Not unit-testable: SQL `COUNT`, activity type cache/localized names, Builder dialog visibility. **Running-app check open:** dropdown names; fields per type (none / URL / URL+Title / Title / Value) switch without save; Yes/No for ≥ 3 `/pricing` visits (wait > 10 s); referrer not matched; stale hidden value ignored; 41060 on invalid config; disabled → No + 41003.
+
 ### Decision (2026-10-05): disabled library conditions → No
 
 History: Yes (Slice 2) → texts said "No (A)" while code returned `true` (Yes) → final **No** for all library conditions (`return false`). Changed several times; don't revisit without the user.
@@ -553,25 +598,14 @@ Reasons (pros/cons reviewed with user): fails closed (gated emails/notifications
 
 Applied: `PreviousStepSucceeded`, `RandomSplit`, `WithinTimeWindow` return `false` + log "sends all contacts through the No branch"; resx/Usage Guide say "No" ("No (B)" for Random split); disabled-branch tests assert `false` with skip set to Yes to prove precedence. 238 tests passed.
 
-### Open items (remaining)
-
-1. In-app *7 days before* scheduled-task firing for contact 9 (birthday 10-11) remains unverified; the offset calculation is covered by unit tests.
-2. Localization: keep `Server` + `Builder` registration or drop `Server`.
-3. Trigger display name issue: submit report; decide plain-text trigger names vs. keys + known-issue note.
-4. Same-day re-run protection for the anniversary task (deferred; option: store last processed date).
-5. Local test data cleanup: contacts 8 and 9, *Contact Anniversary* process, Email queue.
-6. Global Step registry tab implemented (Slice 3). Process-usage/dependency checks and a separate admin app (2.4) remain future scope.
-7. Remaining components (13 of the original 20; #7 dropped as built-in). Random split implemented; running-app Builder/branch verification remains open. Adjust contact score (Slice 4): execution + clamp verified. #22 Compare contact number field (Slice 5): unit-validated; running-app check open.
-8. README still template placeholder; nothing committed yet.
+Open items moved to `STATUS.md` (2026-10-10).
 
 ---
 
-## 8. Implementation Complete: Within Time Window Condition
-
-**Status: ✅ Complete and verified**
+## 8. Within time window condition (historical log)
 
 ### 8.1 Completion date
-2026-11-29 (subagent + post-implementation fixes)
+2026-10-05 (subagent + post-implementation fixes; date from commit `3dbd19f`, was wrongly recorded as 2026-11-29)
 
 ### 8.2 What was built
 
@@ -639,13 +673,14 @@ Applied: `PreviousStepSucceeded`, `RandomSplit`, `WithinTimeWindow` return `fals
 
 ---
 
-## 9. Open questions
+## 9. Resolved questions
 
-1. ~~Final identifier prefix?~~ Resolved: `Labs.AutomationExtensions.`; display text via localization resources (5.5).
-2. ~~Default enabled state?~~ Resolved: disabled by default, opt-in/opt-out via appsettings.
-3. Admin UI: read-only global Step registry requested and implemented; no DB-stored overrides. Process-usage inspection remains future scope.
-4. Commerce components (#6, #13) – include in core package or separate `.Commerce` package?
-5. Teams/Slack (#15) and enrichment (#20) – ship real provider or sample/abstract only?
-6. Minimum supported XbyK version – currently 31.9.1 (all package references); older versions not tested.
-7. ~~Shared vs. per-trigger scheduled tasks?~~ Resolved: per-trigger tasks, docs-only setup (section 4).
-8. ~~Datetime picker UX~~ Resolved: built-in date picker and custom styled time picker (section 8.3).
+Unresolved questions live in `STATUS.md` (pending decisions).
+
+1. Identifier prefix: `Labs.AutomationExtensions.`; display text via localization resources (5.5).
+2. Default enabled state: disabled by default, opt-in/opt-out via appsettings.
+3. Admin UI: read-only global Step registry; no DB-stored overrides.
+4. Scheduled tasks: per-trigger tasks, docs-only setup (section 4).
+5. Datetime picker UX: built-in date picker and custom styled time picker (section 8.3).
+6. Disabled library conditions → No (section 7, decision 2026-10-05).
+7. #7 *Has consent agreement* dropped – built-in rule covers it (Slice 4).
