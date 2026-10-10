@@ -471,4 +471,97 @@
   <data name="labs.automationextensions.contactnumberfieldcompare.value.explanation" xml:space="preserve">
     <value>Whole number the field value is compared with. Negative numbers are allowed.</value>
   </data>
+  <data name="labs.automationextensions.activityfrequency.displayname" xml:space="preserve">
+    <value>Activity frequency</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.description" xml:space="preserve">
+    <value>Checks how many times the contact performed an activity type in the last N days (for example 3 or more page visits in 7 days); to check whether a contact performed an activity at all, use the built-in Rule-based condition.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.activitytype.label" xml:space="preserve">
+    <value>Activity type</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.activitytype.explanation" xml:space="preserve">
+    <value>Type of activity to count. Lists enabled activity types.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.activitytype.required" xml:space="preserve">
+    <value>Select an activity type.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.operator.label" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.operator.explanation" xml:space="preserve">
+    <value>Contacts whose number of activities matches follow Yes; all others follow No.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.operator.required" xml:space="preserve">
+    <value>Select an operator.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.count.label" xml:space="preserve">
+    <value>Number of activities</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.count.explanation" xml:space="preserve">
+    <value>Whole number the activity count is compared with, for example 3.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.count.minimum" xml:space="preserve">
+    <value>Enter 0 or more.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.days.label" xml:space="preserve">
+    <value>In the last (days)</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.days.explanation" xml:space="preserve">
+    <value>Counts activities logged in the last N × 24 hours up to now (server time). Enter 1–365.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.days.minimum" xml:space="preserve">
+    <value>Enter at least 1 day.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.days.maximum" xml:space="preserve">
+    <value>Enter at most 365 days.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.explanation" xml:space="preserve">
+    <value>How the text below is matched (not case-sensitive with the default database collation).</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.contains" xml:space="preserve">
+    <value>contains</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.doesnotcontain" xml:space="preserve">
+    <value>does not contain</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.equal" xml:space="preserve">
+    <value>is equal to</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.notequal" xml:space="preserve">
+    <value>is not equal to</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.startswith" xml:space="preserve">
+    <value>starts with</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.endswith" xml:space="preserve">
+    <value>ends with</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.urloperator.label" xml:space="preserve">
+    <value>Page URL</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.url.label" xml:space="preserve">
+    <value>Page URL text</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.url.explanation" xml:space="preserve">
+    <value>Optional; leave empty to count all activities of the type.&lt;br&gt;Page URLs are stored in full, for example https://www.example.com/pricing?utm_source=news – including query string.&lt;br&gt;The referrer URL isn't searched.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.titleoperator.label" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.title.label" xml:space="preserve">
+    <value>Title text</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.title.explanation" xml:space="preserve">
+    <value>Optional, for example the form name; leave empty to count all activities of the type.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.valueoperator.label" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.value.label" xml:space="preserve">
+    <value>Value text</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.value.explanation" xml:space="preserve">
+    <value>Optional; leave empty to count all activities of the type.&lt;br&gt;Email link click: the clicked link URL.&lt;br&gt;Custom and other activities: the value logged with the activity.</value>
+  </data>
 </root>

@@ -45,7 +45,11 @@ public partial class LocalizationResourceTests
     {
         var keys = typeof(AutomationComponentCatalog).Assembly
             .GetTypes()
-            .SelectMany(type => type.GetCustomAttributes().Concat(type.GetProperties().SelectMany(property => property.GetCustomAttributes())))
+            // Declared properties only: library types also derive from platform types (e.g. visibility condition properties)
+            // whose inherited properties use platform resource keys. Library base types are scanned on their own.
+            .SelectMany(type => type.GetCustomAttributes().Concat(type
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .SelectMany(property => property.GetCustomAttributes())))
             .SelectMany(attribute => attribute.GetType()
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(property => property.PropertyType == typeof(string) && property.GetIndexParameters().Length == 0)

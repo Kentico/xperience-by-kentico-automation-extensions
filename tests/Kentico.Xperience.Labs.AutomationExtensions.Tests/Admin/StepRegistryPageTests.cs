@@ -151,10 +151,10 @@ public class StepRegistryPageTests
 
 
     [TestCase("trigger", null, new[] { "ContactDateAnniversary", "Acme.Trigger" })]
-    [TestCase("condition", null, new[] { "ContactNumberFieldCompare", "PreviousStepSucceeded", "RandomSplit", "WithinTimeWindow" })]
+    [TestCase("condition", null, new[] { "ActivityFrequency", "ContactNumberFieldCompare", "PreviousStepSucceeded", "RandomSplit", "WithinTimeWindow" })]
     [TestCase("action", null, new[] { "AdjustContactScore", "SendWebhook", "WriteToLog", "Acme.Action" })]
     [TestCase("unknown", null, new[] { "Typo" })]
-    [TestCase(null, "enabled", new[] { "AdjustContactScore", "ContactDateAnniversary", "ContactNumberFieldCompare", "PreviousStepSucceeded", "SendWebhook", "WithinTimeWindow" })]
+    [TestCase(null, "enabled", new[] { "ActivityFrequency", "AdjustContactScore", "ContactDateAnniversary", "ContactNumberFieldCompare", "PreviousStepSucceeded", "SendWebhook", "WithinTimeWindow" })]
     [TestCase(null, "disabled", new[] { "RandomSplit" })]
     [TestCase(null, "notmanaged", new[] { "Acme.Action", "Acme.Trigger" })]
     [TestCase(null, "notapplicable", new[] { "WriteToLog", "Typo" })]
@@ -235,7 +235,7 @@ public class StepRegistryPageTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(reset.TotalCount, Is.EqualTo(11));
+            Assert.That(reset.TotalCount, Is.EqualTo(12));
             Assert.That(reset.DataContainers.Select(row => row["RowId"]),
                 Is.EqualTo(before.DataContainers.Select(row => row["RowId"])));
             Assert.That(searched.TotalCount, Is.EqualTo(2));
@@ -337,7 +337,7 @@ public class StepRegistryPageTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(data.TotalCount, Is.EqualTo(4));
+            Assert.That(data.TotalCount, Is.EqualTo(5));
             Assert.That(data.DataContainers.Count(), Is.EqualTo(1));
             Assert.That(data.DataContainers.Single()["Name"], Is.EqualTo("Within time window"));
         });
@@ -383,14 +383,14 @@ public class StepRegistryPageTests
             CancellationToken.None);
 
         Assert.That(data.DataContainers.Select(row => row["Status"]),
-            Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Disabled", "Not managed", "Not applicable" }));
+            Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Disabled", "Not managed", "Not applicable" }));
 
         var second = await LoadListing(page,
             new ListingDataSettings(new LoadDataSettings(4, 1, "Status", SortTypeEnum.Asc, ""), page.PageConfiguration.ColumnConfigurations),
             CancellationToken.None);
         Assert.That(second.DataContainers.Select(row => row["Status"]),
-            Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Disabled" }));
-        Assert.That(second.TotalCount, Is.EqualTo(10));
+            Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Enabled" }));
+        Assert.That(second.TotalCount, Is.EqualTo(11));
     }
 
 

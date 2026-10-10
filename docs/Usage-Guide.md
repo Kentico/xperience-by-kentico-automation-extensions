@@ -41,6 +41,7 @@ At application start, the library logs which components are enabled and warns ab
   "AutomationExtensions": {
     "EnabledByDefault": false,
     "Components": {
+      "ActivityFrequency": true,
       "AdjustContactScore": true,
       "ContactDateAnniversary": true,
       "ContactNumberFieldCompare": true,
@@ -124,6 +125,7 @@ verify signatures, tab order, and routing when upgrading Xperience.
 | Component | Name (configuration key) | Identifier |
 | --- | --- | --- |
 | Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExtensions.ContactDateAnniversary` |
+| Condition – Activity frequency | `ActivityFrequency` | `Labs.AutomationExtensions.ActivityFrequency` |
 | Condition – Compare contact number field | `ContactNumberFieldCompare` | `Labs.AutomationExtensions.ContactNumberFieldCompare` |
 | Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` |
 | Condition – Random split (A/B) | `RandomSplit` | `Labs.AutomationExtensions.RandomSplit` |
@@ -288,6 +290,49 @@ Only the contact ID/GUID is logged – never email or name. Keep personal data o
 > **Volume:** the step logs once per contact. Enable it in development or for short troubleshooting periods (`"WriteToLog": true` in `appsettings.Development.json`) and keep it disabled in production. Disabled steps do nothing.
 >
 > **Auditing:** the Event log is trimmed over time and isn't tamper-proof. For a per-contact audit trail use the built-in *Log custom activity* step (visible in the contact's activities); for long-term retention route the `AutomationLog` category to a dedicated logging provider.
+
+### Condition – Activity frequency
+
+Follows the **Yes** branch when the number of activities of one type the contact performed in the last N days matches a comparison (for example *3 or more page visits in 7 days*, *fewer than 2 email clicks in 30 days*, *exactly 1 form submission*), otherwise **No**.
+
+Use it for **how often**. To check whether a contact performed an activity **at all** (for example "visited page X in the last 7 days" or "performed activity with value that contains Y"), use the built-in *Rule-based condition* instead.
+
+Marketer properties:
+
+- **Activity type** – lists enabled activity types (built-in and custom), sorted by name.
+- **Detail filters** – optional; each filter is a match operator plus a text. The dialog shows only the filters that apply to the selected activity type. Empty text = no filter (whatever the operator); several filled filters must all match.
+
+  | Activity type | Filters shown | Searched column |
+  | --- | --- | --- |
+  | Page visit, Landing page | **Page URL** | `ActivityURL` |
+  | Form submission | **Page URL**, **Title** (form name) | `ActivityURL`, `ActivityTitle` |
+  | Member registration | **Title** | `ActivityTitle` |
+  | Email link click | **Value** (clicked link URL) | `ActivityValue` |
+  | Custom and all other types | **Value** | `ActivityValue` |
+
+  Match operators: *contains* (default), *does not contain*, *is equal to*, *is not equal to*, *starts with*, *ends with*. Matching follows the database collation: not case-sensitive with a case-insensitive collation (the SQL Server default); a case-sensitive collation makes matching case-sensitive. *Does not contain* and *is not equal to* also match activities where the column is empty.
+- **Operator** – same options as *Compare contact number field*: *is equal to*, *is not equal to*, *is greater than*, *is greater than or equal to* (default), *is less than*, *is less than or equal to*.
+- **Number of activities** – whole number ≥ 0 to compare the count with, default 3.
+- **In the last (days)** – 1–365, default 7.
+
+Behavior:
+
+- **Window:** rolling, from exactly N × 24 hours before the evaluation up to now – not calendar days. Xperience stores activity times in the server time zone (`DateTime.Now`, see [Deploy the database](https://docs.kentico.com/documentation/developers-and-admins/deployment/deploy-to-private-cloud#deploy-the-database)), and the window uses server local time too, like the built-in "in the last N days" rules.
+- **Detail filters:** Xperience stores the details of built-in activities in different columns – page visits and form submissions have no *Value* – so each type gets the filters that match where its data lives (table above). The referrer URL is never searched: it would count a visit of `/contact` coming from `/pricing` as a pricing visit. Unlike this step, the built-in rule's "with value that contains" searches only the *Value* column. Filters hidden for the current type are ignored, even if they still hold text from a previously selected type.
+- **Stored page URLs** are the full browser address: page visits and landing pages store `window.location.href` from the tracking script (scheme, host, path, query string, and `#fragment`); form submissions store the URL of the page the form was submitted from (scheme, host, path, query string, no fragment). Match with that in mind:
+  - Pricing pages: **Page URL** *contains* `/pricing` (also matches `/pricing-faq`), or *starts with* `https://www.example.com/pricing`.
+  - Home page: **Page URL** *is equal to* `https://www.example.com/`. Visits with a query string or fragment (for example `https://www.example.com/?utm_source=news`) don't match – there's no path-only operator. *Contains* `/` or *ends with* `/` match far more than the home page.
+- **Activity logging delay:** Xperience saves logged activities to the database in batches, every 10 seconds by default (`CMSProcessContactActionsInterval`, see [Set up activities](https://docs.kentico.com/documentation/developers-and-admins/digital-marketing-setup/set-up-activities#activity-and-contact-update-processing)). Activities logged just before the step runs may not be counted yet – for example the page visit that started the process. Add a short *Wait* step before the condition if that activity must count.
+- **Disabled activity types** stay valid: activities logged before the type was disabled still count. Disabled types aren't listed for new selections.
+- Read-only: one `COUNT` query per contact, no activities are loaded or changed.
+- Invalid settings (no activity type, activity type deleted, unknown operator or match operator of a filled filter, negative number, days outside 1–365) follow **No** and log an `InvalidActivityFrequencyConfiguration` warning (event ID `41060`, at most once per hour per process and activity type). No contact or activity is read.
+- Each evaluation logs a Debug entry (`ActivityFrequencyEvaluated`, event ID `41061`) with process name, contact ID, activity type, days, count, operator, and result – no email, name, or filter texts.
+- Disabled component: all contacts follow **No** without evaluating the condition, regardless of skip settings (see [Enable components](#enable-components)). When enabled, **Skip this step** follows the selected skip branch without counting.
+
+**Example** – notify sales about engaged leads:
+
+1. Trigger: *Form* (contact form submitted).
+2. *Activity frequency* (*Page visit*, **Page URL** *contains* `/pricing`, *is greater than or equal to* 3, last 7 days) → **Yes**: notify sales (for example *Send webhook* to the CRM or a built-in internal notification email); **No**: *Finish*.
 
 ### Condition – Compare contact number field
 
@@ -456,6 +501,7 @@ Keep your own property and category `Order` values below `SkippableStep.CATEGORY
 
 | Component | Depends on | If missing |
 | --- | --- | --- |
+| Activity frequency | Logged activities of the selected type (activity tracking enabled; custom activities logged by code) | Count is 0 |
 | Adjust contact score | Integer custom contact field | Field list empty; invalid step does nothing, warning logged |
 | Compare contact number field | Integer custom contact field (usually kept by *Adjust contact score*) | Field list empty; invalid step follows **No** branch, warning logged |
 | Contact date anniversary | Scheduled task configuration | Trigger never fires |
@@ -547,6 +593,8 @@ All library log entries use named event IDs, shown in the **Code** column of the
 | 41041 | `InvalidContactScoreConfiguration` | Warning | *Adjust contact score* settings can't be applied (once per hour per process and field) |
 | 41050 | `InvalidNumberCompareConfiguration` | Warning | *Compare contact number field* settings can't be evaluated, contacts follow **No** (once per hour per process and field) |
 | 41051 | `ContactNumberFieldCompared` | Debug | *Compare contact number field* result for a contact |
+| 41060 | `InvalidActivityFrequencyConfiguration` | Warning | *Activity frequency* settings can't be evaluated, contacts follow **No** (once per hour per process and activity type) |
+| 41061 | `ActivityFrequencyEvaluated` | Debug | *Activity frequency* count and result for a contact |
 
 ## Localization
 

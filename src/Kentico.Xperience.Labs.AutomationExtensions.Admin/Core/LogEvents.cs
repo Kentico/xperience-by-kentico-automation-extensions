@@ -21,4 +21,6 @@ public static class LogEvents
     public static readonly EventId InvalidContactScoreConfiguration = new(41041, nameof(InvalidContactScoreConfiguration));
     public static readonly EventId InvalidNumberCompareConfiguration = new(41050, nameof(InvalidNumberCompareConfiguration));
     public static readonly EventId ContactNumberFieldCompared = new(41051, nameof(ContactNumberFieldCompared));
+    public static readonly EventId InvalidActivityFrequencyConfiguration = new(41060, nameof(InvalidActivityFrequencyConfiguration));
+    public static readonly EventId ActivityFrequencyEvaluated = new(41061, nameof(ActivityFrequencyEvaluated));
 }
