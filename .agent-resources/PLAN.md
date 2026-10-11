@@ -628,6 +628,17 @@ Spec: `implementation-spec-contact-group-member.md`. Trigger `Labs.AutomationExt
 - Resolver: type-filtered lookup, then unfiltered lookup to classify recipient list / other type / missing → warnings 41091/41092. Task summary 41090 with per-group counts.
 - Icon `Users`. Trigger data added to Write to log details and `{triggerData.X}`; Write to log now also describes #3 trigger data. Tests: 1082 (+28).
 
+### Slice 11 (2026-10-11) – Started by trigger (#11), implemented and unit-validated
+
+Spec: `implementation-spec-started-by-trigger.md`. Condition `Labs.AutomationExtensions.StartedByTrigger`.
+
+- Trigger dropdown: Form submission, Member registration, Custom activity, #1/#2/#3, *Other* (identifier, ordinal ignore case). Optional trigger data check: field, operator (text/number/date/empty, own enum), value.
+- Shared registry `Core/KnownTriggers.cs`; `TriggerDataTokens` + `TriggerDetailsDescriber` refactored onto it (output unchanged).
+- Verified 31.9.1: built-in `TriggeredBy*` = exact compare with `DefaultTriggerIdentifiers`; built-in data props (Form: `BizFormId`, `BizFormItemId`; Registration: `MemberId`; Custom activity: `ActivityType`, `ActivityValue`, `ActivityItemId`, `ActivityItemDetailId`, `ActivityChannelId`); dependent dropdown via `FormComponentConfigurator<DropDownComponent>` (documented).
+- Invalid config / missing data → No + 41100/41101. Settings validated before trigger read. Icon `Flag`. Tests: 1283 (+200).
+- Note: `dotnet format` inserted `throw new NotImplementedException()` into a switch arm (broke tests; fixed). Check format diffs.
+- Revision 1 (user): trigger list = built-ins (`DefaultTriggerIdentifiers`, not in store) + `ICustomAutomationTriggerProvider.GetAll()` (internal API, accepted); value = identifier (exact match); fields from `TriggerDataType`; *Other* dropped; data properties hidden for triggers without data type. #17 tokens / Write to log unchanged (generalizing = follow-up). Tests: 1293.
+
 ### Decision (2026-10-05): disabled library conditions → No
 
 History: Yes (Slice 2) → texts said "No (A)" while code returned `true` (Yes) → final **No** for all library conditions (`return false`). Changed several times; don't revisit without the user.

@@ -34,4 +34,6 @@ public static class LogEvents
     public static readonly EventId ContactGroupMemberTaskCompleted = new(41090, nameof(ContactGroupMemberTaskCompleted));
     public static readonly EventId ContactGroupNotFound = new(41091, nameof(ContactGroupNotFound));
     public static readonly EventId ContactGroupIsRecipientList = new(41092, nameof(ContactGroupIsRecipientList));
+    public static readonly EventId InvalidStartedByTriggerConfiguration = new(41100, nameof(InvalidStartedByTriggerConfiguration));
+    public static readonly EventId StartedByTriggerDataMissing = new(41101, nameof(StartedByTriggerDataMissing));
 }

@@ -3,7 +3,7 @@
 Single source for current state. Update after every slice (and when a check or decision closes).
 Design, research, decisions with reasons, and the slice log: `PLAN.md`. Per-slice scope: `implementation-spec-*.md`.
 
-Last updated: 2026-10-11. Xperience 31.9.1. Unit tests: 1083 passed.
+Last updated: 2026-10-11. Xperience 31.9.1. Unit tests: 1293 passed.
 
 ## Components
 
@@ -26,7 +26,7 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 | 4 | Content engagement threshold | T | Not started | | |
 | 5 | Inbound webhook received | T | Not started | | |
 | 6 | Order completed | T | Not started | | |
-| 11 | Started by trigger / trigger data matches | C | Not started | | |
+| 11 | Started by trigger (trigger data matches) | C | Done | unit | Trigger list (built-ins + registered, labels), data fields hide for no-data triggers, Field narrows/clears on Trigger change + save passes, end-to-end data check (library + built-in trigger), unregistered saved identifier fails resave? |
 | 13 | Purchase history meets threshold | C | Not started | | |
 | 15 | Post to Teams / Slack | A | Not started | | |
 | 17 | Set contact field (dynamic value) | A | Done | unit | Clear field (null), system field save (email side effects), Mode visibility, Previous step succeeded pairing, `{triggerData.*}` per trigger |

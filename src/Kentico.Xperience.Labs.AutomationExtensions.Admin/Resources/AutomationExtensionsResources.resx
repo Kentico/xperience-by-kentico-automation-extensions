@@ -583,6 +583,94 @@
   <data name="labs.automationextensions.contactnumberfieldcompare.value.explanation" xml:space="preserve">
     <value>Whole number the field value is compared with. Negative numbers are allowed.</value>
   </data>
+  <!-- Started by trigger -->
+  <data name="labs.automationextensions.startedbytrigger.displayname" xml:space="preserve">
+    <value>Started by trigger</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.description" xml:space="preserve">
+    <value>Checks which trigger started the process and, optionally, a value of its trigger data.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.category.triggerdata" xml:space="preserve">
+    <value>Trigger data</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.label" xml:space="preserve">
+    <value>Trigger</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.explanation" xml:space="preserve">
+    <value>Built-in triggers and all triggers registered in the application. Contacts whose process was started by this trigger follow Yes; all others follow No.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.required" xml:space="preserve">
+    <value>Select a trigger.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.formsubmission" xml:space="preserve">
+    <value>Form submission</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.registration" xml:space="preserve">
+    <value>Member registration</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.customactivity" xml:space="preserve">
+    <value>Custom activity</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.checktriggerdata.label" xml:space="preserve">
+    <value>Also check trigger data</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.checktriggerdata.explanation" xml:space="preserve">
+    <value>Follow Yes only when a value of the trigger data also matches. Shown only for triggers that provide data.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.field.label" xml:space="preserve">
+    <value>Trigger data field</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.field.explanation" xml:space="preserve">
+    <value>Data field of the selected trigger.&lt;br&gt;Changing the trigger clears the field.&lt;br&gt;If the trigger no longer has the field, all contacts follow No.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.label" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.explanation" xml:space="preserve">
+    <value>Is equal to, is not equal to: any field (numbers and dates by value).&lt;br&gt;Contains, does not contain, starts with, ends with: the field value as text.&lt;br&gt;Greater than, less than: number and date fields only.&lt;br&gt;Is empty, is not empty: any field, no value needed.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.equal" xml:space="preserve">
+    <value>is equal to</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.notequal" xml:space="preserve">
+    <value>is not equal to</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.contains" xml:space="preserve">
+    <value>contains</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.doesnotcontain" xml:space="preserve">
+    <value>does not contain</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.startswith" xml:space="preserve">
+    <value>starts with</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.endswith" xml:space="preserve">
+    <value>ends with</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.greaterthan" xml:space="preserve">
+    <value>is greater than</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.greaterthanorequal" xml:space="preserve">
+    <value>is greater than or equal to</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.lessthan" xml:space="preserve">
+    <value>is less than</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.lessthanorequal" xml:space="preserve">
+    <value>is less than or equal to</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.isempty" xml:space="preserve">
+    <value>is empty</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.isnotempty" xml:space="preserve">
+    <value>is not empty</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.value.label" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.value.explanation" xml:space="preserve">
+    <value>Numbers with a dot as decimal separator, for example 12.5.&lt;br&gt;Dates as yyyy-MM-dd, for example 2026-10-11 (time is ignored).&lt;br&gt;Text ignores upper and lower case; yes/no values are true or false.&lt;br&gt;Don't enter personal data.</value>
+  </data>
   <data name="labs.automationextensions.activityfrequency.displayname" xml:space="preserve">
     <value>Activity frequency</value>
   </data>

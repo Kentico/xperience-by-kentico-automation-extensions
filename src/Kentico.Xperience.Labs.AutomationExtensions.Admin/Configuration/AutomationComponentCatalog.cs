@@ -6,6 +6,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Conditions.ActivityFrequency;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.ContactNumberFieldCompare;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.PreviousStepSucceeded;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.RandomSplit;
+using Kentico.Xperience.Labs.AutomationExtensions.Conditions.StartedByTrigger;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.WithinTimeWindow;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
@@ -31,6 +32,7 @@ public static class AutomationComponentCatalog
     public static readonly AutomationComponentDescriptor ContactNumberFieldCompare = new(ContactNumberFieldCompareCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor PreviousStepSucceeded = new(PreviousStepSucceededCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor RandomSplit = new(RandomSplitCondition.NAME, AutomationComponentKind.Condition);
+    public static readonly AutomationComponentDescriptor StartedByTrigger = new(StartedByTriggerCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor WithinTimeWindow = new(WithinTimeWindowCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor AdjustContactScore = new(AdjustContactScoreAction.NAME, AutomationComponentKind.Action);
     public static readonly AutomationComponentDescriptor SendWebhook = new(SendWebhookAction.NAME, AutomationComponentKind.Action);
@@ -50,6 +52,7 @@ public static class AutomationComponentCatalog
         ContactNumberFieldCompare,
         PreviousStepSucceeded,
         RandomSplit,
+        StartedByTrigger,
         WithinTimeWindow,
         AdjustContactScore,
         SendWebhook,

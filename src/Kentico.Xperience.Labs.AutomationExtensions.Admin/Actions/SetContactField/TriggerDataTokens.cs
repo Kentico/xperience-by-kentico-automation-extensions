@@ -1,10 +1,4 @@
-using System.Reflection;
-
-using CMS.Automation;
-
-using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
-using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
-using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
+using Kentico.Xperience.Labs.AutomationExtensions.Core;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 
@@ -15,24 +9,16 @@ internal static class TriggerDataTokens
 {
     /// <summary>
     /// Trigger data types whose properties can be used in tokens: built-in form submission, registration, and custom
-    /// activity triggers, and the library's date anniversary, inactivity, and contact group triggers.
+    /// activity triggers, and the library's date anniversary, inactivity, and contact group triggers (<see cref="KnownTriggers"/>).
     /// </summary>
-    public static readonly IReadOnlyList<Type> KnownTypes =
-    [
-        typeof(FormSubmissionTriggerData),
-        typeof(RegistrationTriggerData),
-        typeof(CustomActivityTriggerData),
-        typeof(ContactDateAnniversaryTriggerData),
-        typeof(ContactInactiveTriggerData),
-        typeof(ContactGroupMemberTriggerData)
-    ];
+    public static IReadOnlyList<Type> KnownTypes => KnownTriggers.DataTypes;
 
 
     /// <summary>
     /// Returns the property names available for the given trigger data type (empty for unknown types).
     /// </summary>
     public static IReadOnlyList<string> GetPropertyNames(Type triggerDataType) =>
-        GetProperties(triggerDataType).Select(property => property.Name).ToList();
+        KnownTriggers.GetDataProperties(triggerDataType).Select(property => property.Name).ToList();
 
 
     /// <summary>
@@ -48,7 +34,7 @@ internal static class TriggerDataTokens
             return false;
         }
 
-        var property = GetProperties(triggerData.GetType())
+        var property = KnownTriggers.GetDataProperties(triggerData.GetType())
             .FirstOrDefault(property => string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase));
         if (property is null)
         {
@@ -57,20 +43,5 @@ internal static class TriggerDataTokens
 
         value = ContactFieldValueConverter.Format(property.GetValue(triggerData));
         return true;
-    }
-
-
-    private static IEnumerable<PropertyInfo> GetProperties(Type triggerDataType)
-    {
-        if (!KnownTypes.Contains(triggerDataType))
-        {
-            return [];
-        }
-
-        return triggerDataType
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(property => property.CanRead
-                && property.GetIndexParameters().Length == 0
-                && property.Name != nameof(IAutomationTriggerData.Identifier));
     }
 }

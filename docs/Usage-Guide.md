@@ -51,6 +51,7 @@ At application start, the library logs which components are enabled and warns ab
       "RandomSplit": true,
       "SendWebhook": true,
       "SetContactField": true,
+      "StartedByTrigger": true,
       "WriteToLog": true
     }
   }
@@ -134,6 +135,7 @@ verify signatures, tab order, and routing when upgrading Xperience.
 | Condition – Compare contact number field | `ContactNumberFieldCompare` | `Labs.AutomationExtensions.ContactNumberFieldCompare` |
 | Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` |
 | Condition – Random split (A/B) | `RandomSplit` | `Labs.AutomationExtensions.RandomSplit` |
+| Condition – Started by trigger | `StartedByTrigger` | `Labs.AutomationExtensions.StartedByTrigger` |
 | Condition – Within time window | `WithinTimeWindow` | `Labs.AutomationExtensions.WithinTimeWindow` |
 | Action – Adjust contact score | `AdjustContactScore` | `Labs.AutomationExtensions.AdjustContactScore` |
 | Action – Send webhook | `SendWebhook` | `Labs.AutomationExtensions.SendWebhook` |
@@ -689,6 +691,52 @@ The Builder's step description and percentage help explain this disabled behavio
 
 To compose a simple A/B test, add **Random split (A/B)** after the process trigger. Connect **Yes** to a built-in **Send email** step with variant A and **No** to a second **Send email** step with variant B. No new assignment is made on a later run; use a new split key when an independent assignment is wanted.
 
+### Condition – Started by trigger
+
+Follows the **Yes** branch when the process was started by the selected trigger and, optionally, a value of its trigger data matches (for example *Form submission* with *BizFormId is equal to 3*), otherwise **No**. Use it when one process has several triggers and each start source needs its own path. Read-only.
+
+**Requires:** a process started by the selected trigger; for the data check, a trigger that provides trigger data.
+
+Marketer properties:
+
+- **Trigger** – the built-in *Form submission*, *Member registration*, and *Custom activity* triggers plus every trigger registered in the application with `RegisterAutomationTrigger` (this library's triggers, your project's custom triggers, other packages), sorted by name. The step saves the trigger identifier. If a saved trigger is no longer registered, the step still matches its identifier but the trigger isn't in the list and its data can't be checked.
+- **Also check trigger data** (default off) – in the *Trigger data* section; shown only for triggers that provide trigger data.
+- **Trigger data field** – public readable properties of the selected trigger's data type (without `Identifier`). The list changes with the trigger; changing the trigger clears the field. See the table below.
+- **Operator** – *is equal to*, *is not equal to*, *contains*, *does not contain*, *starts with*, *ends with*, *is greater than*, *is greater than or equal to*, *is less than*, *is less than or equal to*, *is empty*, *is not empty*.
+- **Value** – hidden for *is empty* / *is not empty*. Don't enter personal data.
+
+Fields of built-in and library triggers (custom triggers list the properties of their own trigger data class):
+
+| Trigger | Fields |
+| --- | --- |
+| Form submission (built-in) | `BizFormId`, `BizFormItemId` |
+| Member registration (built-in) | `MemberId` |
+| Custom activity (built-in) | `ActivityType`, `ActivityItemId`, `ActivityItemDetailId`, `ActivityValue`, `ActivityChannelId` |
+| Contact date anniversary | `FieldName`, `DaysBefore`, `AnniversaryDate`, `Years` |
+| Contact inactive for N days | `InactiveDays`, `LastActivityDate` |
+| Contact in contact group (daily) | `ContactGroupName`, `ContactGroupDisplayName` |
+
+| Field type | Operators and value format |
+| --- | --- |
+| Number (`BizFormId`, `InactiveDays`, …) | All operators. *Equal*, *not equal*, and order operators compare numbers – value with a dot as decimal separator, for example `12.5`. Text operators compare the number as text. |
+| Date (`AnniversaryDate`, `LastActivityDate`) | All operators. *Equal*, *not equal*, and order operators compare the date only (time ignored) – value `yyyy-MM-dd`, for example `2026-10-11`. Text operators compare `yyyy-MM-ddTHH:mm:ss` text. |
+| Text (`ActivityType`, `ActivityValue`, `FieldName`, `ContactGroupName`, …) | Equality and text operators, ignoring case and leading/trailing spaces of the value. Order operators aren't allowed. |
+| Any | *is empty* / *is not empty* – no value; missing values and empty or whitespace text count as empty. |
+
+Behavior:
+
+- A process started by another trigger follows **No** (the data check isn't evaluated).
+- A missing value (for example `ActivityValue` not set) is never equal to, greater than, or less than a value – *is not equal to* follows **Yes**.
+- Selected trigger without trigger data in the process (or data of another type) → **No** and a `StartedByTriggerDataMissing` warning (event ID `41101`, at most once per hour per process and trigger).
+- Invalid settings → **No** and an `InvalidStartedByTriggerConfiguration` warning (event ID `41100`, at most once per hour per process and trigger): no trigger; data check for an unregistered trigger or a trigger without data; no field or a field the trigger's data type doesn't have; unknown operator, no value, value that isn't a number or `yyyy-MM-dd` date for that field, order operator on a text field. Settings are checked before the trigger is read. Entered values are never logged.
+- Disabled component: all contacts follow **No** without evaluating the condition, regardless of skip settings (see [Enable components](#enable-components)). When enabled, **Skip this step** follows the selected skip branch.
+
+**Works with:** processes with several triggers – example nurture process:
+
+1. Triggers: *Form* (newsletter form) and *Contact inactive for N days* (90 days).
+2. *Started by trigger* (*Form submission*) → **Yes**: welcome email; **No**: next condition.
+3. *Started by trigger* (*Contact inactive for N days*, *Also check trigger data*: `InactiveDays` *is greater than or equal to* 90) → **Yes**: re-engagement email; **No**: *Finish*.
+
 ### Condition – Within time window
 
 Evaluates whether the current time (when the condition runs) falls within a configured business hours window. Useful for routing contacts to marketing activities that only run during business hours, without needing a **Wait** step.
@@ -805,6 +853,7 @@ Keep your own property and category `Order` values below `SkippableStep.CATEGORY
 | Random split (A/B) | None | No additional setup required |
 | Send webhook | Endpoint in configuration | Does nothing, warning logged |
 | Set contact field (dynamic value) | Custom contact field (recommended); trigger providing data for `{triggerData.…}` placeholders | Field list has system fields only; placeholder empty, warning logged |
+| Started by trigger | Process started by the selected trigger; trigger data of that trigger for the data check | Follows **No** branch; missing data logs a warning
 | Write to log | Logging configuration routing `Kentico*` categories at the selected level | Nothing visible in the Event log |
 
 ## Example process – CRM sync with retry
@@ -903,6 +952,8 @@ All library log entries use named event IDs, shown in the **Code** column of the
 | 41090 | `ContactGroupMemberTaskCompleted` | Information | *Contact in contact group (daily)* scheduled task run summary (total and per-group trigger counts) |
 | 41091 | `ContactGroupNotFound` | Warning | Configured contact group doesn't exist or isn't a contact group (e.g. a segment); skipped (every task run) |
 | 41092 | `ContactGroupIsRecipientList` | Warning | Configured contact group is a recipient list; skipped (every task run) |
+| 41100 | `InvalidStartedByTriggerConfiguration` | Warning | *Started by trigger* settings can't be evaluated, contacts follow **No** (once per hour per process and trigger) |
+| 41101 | `StartedByTriggerDataMissing` | Warning | *Started by trigger* found no trigger data of the selected trigger, contact follows **No** (once per hour per process and trigger) |
 
 ## Localization
 

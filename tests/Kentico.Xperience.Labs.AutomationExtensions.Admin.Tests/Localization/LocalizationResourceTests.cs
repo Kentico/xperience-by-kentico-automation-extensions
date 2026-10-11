@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Resources;
 using System.Text.RegularExpressions;
 
+using Kentico.Xperience.Labs.AutomationExtensions.Conditions.StartedByTrigger;
 using Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 using Kentico.Xperience.Labs.AutomationExtensions.Core;
 using Kentico.Xperience.Labs.AutomationExtensions.Resources;
@@ -125,6 +126,12 @@ public partial class LocalizationResourceTests
     [TestCase("labs.automationextensions.setcontactfield.operator.divide")]
     [TestCase("labs.automationextensions.setcontactfield.operator.modulo")]
     public void CodeKeys_Exist(string key) => AssertKeysExist([key]);
+
+
+    [Test]
+    public void StartedByTrigger_OptionKeysExist() => AssertKeysExist(
+        RegisteredTriggers.BuiltIn.Select(trigger => trigger.DisplayName)
+            .Concat(Enum.GetNames<TriggerDataOperator>().Select(name => $"{KEY_PREFIX}startedbytrigger.operator.{name.ToLowerInvariant()}")));
 
 
     private static void AssertKeysExist(IEnumerable<string> keys)
