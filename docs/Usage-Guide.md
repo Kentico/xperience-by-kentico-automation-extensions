@@ -300,39 +300,85 @@ Use it for **how often**. To check whether a contact performed an activity **at 
 Marketer properties:
 
 - **Activity type** – lists enabled activity types (built-in and custom), sorted by name.
-- **Detail filters** – optional; each filter is a match operator plus a text. The dialog shows only the filters that apply to the selected activity type. Empty text = no filter (whatever the operator); several filled filters must all match.
+- **Detail filters** – optional. The dialog shows only the filters that apply to the selected activity type; several filled filters must all match.
+  - **Pages** – page selector (any number of pages from a website channel's content tree; an activity on any selected page counts). Empty selection = no filter.
+  - **Language** – *Any* (default, no filter) or one content language; counts only activities on that language version of the pages.
+  - **URL rules** – up to 5 rules on parts of the URL, all must match (see [URL rules](#url-rules)). No rules = no filter.
+  - Text filters (**Title**, **Value**) – a match operator plus a text. Empty text = no filter (whatever the operator).
 
   | Activity type | Filters shown | Searched column |
   | --- | --- | --- |
-  | Page visit, Landing page | **Page URL** | `ActivityURL` |
-  | Form submission | **Page URL**, **Title** (form name) | `ActivityURL`, `ActivityTitle` |
-  | Member registration | **Title** | `ActivityTitle` |
-  | Email link click | **Value** (clicked link URL) | `ActivityValue` |
+  | Page visit, Landing page | **Pages**, **Language**, **URL rules** (page URL), **Title** (page name) | `ActivityWebPageItemGUID`, `ActivityLanguageID`, `ActivityURL`, `ActivityTitle` |
+  | Form submission | **URL rules** (page the form was submitted on), **Title** (form name) | `ActivityURL`, `ActivityTitle` |
+  | Member registration | **Title** (member name or email) | `ActivityTitle` |
+  | Email link click | **URL rules** (clicked link), **Title** (email name) | `ActivityValue`, `ActivityTitle` |
   | Custom and all other types | **Value** | `ActivityValue` |
 
-  Match operators: *contains* (default), *does not contain*, *is equal to*, *is not equal to*, *starts with*, *ends with*. Matching follows the database collation: not case-sensitive with a case-insensitive collation (the SQL Server default); a case-sensitive collation makes matching case-sensitive. *Does not contain* and *is not equal to* also match activities where the column is empty.
+  Text match operators: *contains* (default), *does not contain*, *is equal to*, *is not equal to*, *starts with*, *ends with*. Matching follows the database collation: not case-sensitive with a case-insensitive collation (the SQL Server default); a case-sensitive collation makes matching case-sensitive. *Does not contain* and *is not equal to* also match activities where the column is empty.
 - **Operator** – same options as *Compare contact number field*: *is equal to*, *is not equal to*, *is greater than*, *is greater than or equal to* (default), *is less than*, *is less than or equal to*.
 - **Number of activities** – whole number ≥ 0 to compare the count with, default 3.
 - **In the last (days)** – 1–365, default 7.
 
 Behavior:
 
-- **Window:** rolling, from exactly N × 24 hours before the evaluation up to now – not calendar days. Xperience stores activity times in the server time zone (`DateTime.Now`, see [Deploy the database](https://docs.kentico.com/documentation/developers-and-admins/deployment/deploy-to-private-cloud#deploy-the-database)), and the window uses server local time too, like the built-in "in the last N days" rules.
+- **Window:** rolling, from exactly N × 24 hours before the evaluation up to now – not calendar days. Xperience stores activity times in the server time zone (`DateTime.Now`, see [Deploy the database](https://docs.kentico.com/documentation/developers-and-admins/deployment/deploy-to-private-cloud#deploy-the-database)), and the window uses server local time too, like the built-in "in the last N days" rules. On Xperience SaaS the server time is UTC (the admin UI shows times converted to your time zone – a contact created at 15:45 server time shows as 11:45 AM EDT); self-hosted servers use their own time zone. The window length is the same either way.
+- **Pages filter:** matches the page an activity was logged on (`ActivityWebPageItemGUID`), so URL slug changes, query strings, and fragments don't matter. Only page visits and landing pages store the page, and only for pages from the content tree tracked by the activity logging script – visits of other URLs (custom routes, cross-site or headless tracking) have no page and never match; use **URL rules** for them. In real data, about 10 % of page visits had no page. The selector offers only pages with a URL (no folders). A page matches in all its language variants. Pages deleted after selection never match (no error; if all selected pages are gone the count is 0); the dialog flags them when you open the step again and asks to remove them before saving.
+- **Language filter:** matches the content language the page was visited in (`ActivityLanguageID`, stored with the page by page visits and landing pages). Combine with **Pages** for "visited the Spanish pricing page". The language is stored by code name, so the step keeps working after deployment to another environment. A language deleted after configuration makes the step invalid (see below), like a deleted activity type.
+- **Titles** are stored as text built from a template, for example `Page visit 'Home'`, `Form submitted 'Contact us'`, `Member registered as 'jane'`, `Clicked link in email 'Newsletter'`. The **Title** filter compares only the **name in quotes**: *is equal to* `Home` matches `Page visit 'Home'` but not `'Home page'` or `'My Home'`; *contains* `visit` never matches the prefix. The prefixes come from Xperience localization resources (`activity.activitytitle.*`, system culture), so they may differ in other cultures or after customization – matching relies only on the quotes (the name starts after the first apostrophe, the title ends with an apostrophe). Names may contain apostrophes (`O'Brien`); one edge case remains: *starts with* also matches after an apostrophe inside the name (*starts with* `Brien` matches `'O'Brien'`). Page titles are the page's name in the content tree (the title sent by the tracking script for pages outside the content tree).
+  > **Personal data:** member registration titles contain the member name or email. Don't copy them into exports or logs; this step never logs filter texts.
 - **Detail filters:** Xperience stores the details of built-in activities in different columns – page visits and form submissions have no *Value* – so each type gets the filters that match where its data lives (table above). The referrer URL is never searched: it would count a visit of `/contact` coming from `/pricing` as a pricing visit. Unlike this step, the built-in rule's "with value that contains" searches only the *Value* column. Filters hidden for the current type are ignored, even if they still hold text from a previously selected type.
-- **Stored page URLs** are the full browser address: page visits and landing pages store `window.location.href` from the tracking script (scheme, host, path, query string, and `#fragment`); form submissions store the URL of the page the form was submitted from (scheme, host, path, query string, no fragment). Match with that in mind:
-  - Pricing pages: **Page URL** *contains* `/pricing` (also matches `/pricing-faq`), or *starts with* `https://www.example.com/pricing`.
-  - Home page: **Page URL** *is equal to* `https://www.example.com/`. Visits with a query string or fragment (for example `https://www.example.com/?utm_source=news`) don't match – there's no path-only operator. *Contains* `/` or *ends with* `/` match far more than the home page.
+- **Stored page URLs** are the full browser address: page visits and landing pages store `window.location.href` from the tracking script (scheme, host, path, query string, and `#fragment`); form submissions store the URL of the page the form was submitted from (scheme, host, path, query string, no fragment); email link clicks store the clicked link. The same page shows up in many URL variants (query strings, fragments, trailing slashes, hosts) – **URL rules** compare normalized parts so the variants match consistently.
+- **Pages or URL rules?** Prefer **Pages** for pages from the content tree: it counts every visit regardless of URL, survives slug changes, and is the cheapest query. Use **URL rules** for URLs without a page (custom routes, other sites, form submissions, email links), groups of paths (`/blog/*`), hosts, and query parameters. Both can be combined (AND).
 - **Activity logging delay:** Xperience saves logged activities to the database in batches, every 10 seconds by default (`CMSProcessContactActionsInterval`, see [Set up activities](https://docs.kentico.com/documentation/developers-and-admins/digital-marketing-setup/set-up-activities#activity-and-contact-update-processing)). Activities logged just before the step runs may not be counted yet – for example the page visit that started the process. Add a short *Wait* step before the condition if that activity must count.
 - **Disabled activity types** stay valid: activities logged before the type was disabled still count. Disabled types aren't listed for new selections.
-- Read-only: one `COUNT` query per contact, no activities are loaded or changed.
-- Invalid settings (no activity type, activity type deleted, unknown operator or match operator of a filled filter, negative number, days outside 1–365) follow **No** and log an `InvalidActivityFrequencyConfiguration` warning (event ID `41060`, at most once per hour per process and activity type). No contact or activity is read.
-- Each evaluation logs a Debug entry (`ActivityFrequencyEvaluated`, event ID `41061`) with process name, contact ID, activity type, days, count, operator, and result – no email, name, or filter texts.
+- Read-only: one `COUNT` query per contact (with URL rules: one grouped count per distinct URL, see [URL rules](#url-rules)); no activities are changed.
+- Invalid settings (no activity type, activity type deleted, unknown operator or match operator of a filled filter, invalid URL rules, selected language deleted, negative number, days outside 1–365) follow **No** and log an `InvalidActivityFrequencyConfiguration` warning (event ID `41060`, at most once per hour per process and activity type). No contact or activity is read.
+- Each evaluation logs a Debug entry (`ActivityFrequencyEvaluated`, event ID `41061`) with process name, contact ID, activity type, days, count, operator, and result – no email, name, URLs, or filter texts.
 - Disabled component: all contacts follow **No** without evaluating the condition, regardless of skip settings (see [Enable components](#enable-components)). When enabled, **Skip this step** follows the selected skip branch without counting.
 
 **Example** – notify sales about engaged leads:
 
 1. Trigger: *Form* (contact form submitted).
-2. *Activity frequency* (*Page visit*, **Page URL** *contains* `/pricing`, *is greater than or equal to* 3, last 7 days) → **Yes**: notify sales (for example *Send webhook* to the CRM or a built-in internal notification email); **No**: *Finish*.
+2. *Activity frequency* (*Page visit*, **Pages** = *Pricing*, *is greater than or equal to* 3, last 7 days) → **Yes**: notify sales (for example *Send webhook* to the CRM or a built-in internal notification email); **No**: *Finish*.
+
+#### URL rules
+
+Each rule picks a **URL part**, an **operator**, and a **value**. All rules must match (up to 5). **Test a URL** below the rules shows, for any URL you paste, whether it matches, the result per rule, and the normalized host, path, and query parameters the step compares – checked on the server with the same logic the step uses.
+
+| URL part | Compares | Example |
+| --- | --- | --- |
+| *Full URL* | `scheme://host/path?query` (normalized, query as stored) | *starts with* `https://shop.example.com/` |
+| *Host* | host name without port | *ends with* `example.com` |
+| *Path* | path without query string | *is equal to* `/pricing` |
+| *Query parameter* | value(s) of the named parameter | `utm_campaign` *is equal to* `spring` |
+
+Operators: *is equal to*, *is not equal to*, *contains*, *does not contain*, *starts with*, *ends with*, *matches pattern* (`*` = any characters, including `/`; the whole part must match), and for query parameters also *is present* / *is not present*. No regular expressions.
+
+Normalization (applied to stored URLs and to rule values):
+
+- Not case-sensitive.
+- `#fragment` is always ignored; default ports (`:443`, `:80`) are dropped; `www.` is **not** removed (use *ends with* `example.com` or `*.example.com` for all subdomains).
+- Path: percent-decoded (`/caf%C3%A9` = `/café`), trailing slash ignored (`/pricing/` = `/pricing`), empty path = `/`. For *is equal to*, *is not equal to*, *starts with*, and *matches pattern* a missing leading `/` is added to the value. With *starts with*, a trailing slash in the value is kept: `/blog/` matches `/blog/post` but not `/blog` itself.
+- Query parameters: names not case-sensitive, values percent-decoded (`+` = space); a parameter without a value (`?preview`) is present with an empty value; a repeated parameter matches if any of its values matches.
+- *Full URL* with *is equal to* / *is not equal to*: the value is normalized like a stored URL.
+- Relative URLs (`/pricing?x=1`, rare) have a path and query but no host. Unrecognized values (empty, `mailto:` links, malformed) have no parts.
+- Negated operators (*is not equal to*, *does not contain*, *is not present*) also match when the part is missing – a URL without that parameter, without a host, or not recognized at all – like the text filters match empty columns.
+
+Examples:
+
+- Home page by URL (any host, query string, or fragment): *Path* *is equal to* `/`.
+- Pricing across hosts and query strings: *Path* *is equal to* `/pricing` (sub-pages: *Path* *starts with* `/pricing/`).
+- Blog posts: *Path* *matches pattern* `/blog/*`.
+- Campaign traffic: *Query parameter* `utm_campaign` *is equal to* `spring`.
+- Form submitted on a contact page (*Form submission*): *Path* *starts with* `/contact`.
+- Email clicks on pricing links (*Email link click*): *Path* *starts with* `/pricing`.
+- Only the main site: *Host* *is equal to* `www.example.com`.
+
+Performance: the database narrows the contact's activities (type, window, other filters) and, for rules that must find a text (not the negated ones), a parameterized text prefilter; it then returns each distinct URL once with its count, and the step matches those URLs in .NET and sums the counts – rows read are bounded by distinct URLs, not activities (in production data the heaviest contact had 764 distinct URLs in a year, about 54 ms). Safety limits:
+
+- More than 10,000 distinct URLs for one contact in the window → that contact follows **No** and an `ActivityUrlLimitExceeded` warning is logged (event ID `41062`, at most once per hour per process and activity type).
+- A *matches pattern* comparison taking longer than 100 ms counts as "no match" and logs a `UrlMatchTimeout` warning (event ID `41063`, at most once per hour per process).
+- The prefilter assumes a case-insensitive database collation (Xperience default) and URLs that don't percent-encode plain letters, digits, `-`, `.`, `_`, `~` (browsers don't).
 
 ### Condition – Compare contact number field
 
@@ -595,6 +641,8 @@ All library log entries use named event IDs, shown in the **Code** column of the
 | 41051 | `ContactNumberFieldCompared` | Debug | *Compare contact number field* result for a contact |
 | 41060 | `InvalidActivityFrequencyConfiguration` | Warning | *Activity frequency* settings can't be evaluated, contacts follow **No** (once per hour per process and activity type) |
 | 41061 | `ActivityFrequencyEvaluated` | Debug | *Activity frequency* count and result for a contact |
+| 41062 | `ActivityUrlLimitExceeded` | Warning | *Activity frequency* URL rules skipped: contact has more than 10,000 distinct URLs in the window, contact follows **No** (once per hour per process and activity type) |
+| 41063 | `UrlMatchTimeout` | Warning | A *matches pattern* URL rule took too long; affected URLs counted as not matching (once per hour per process) |
 
 ## Localization
 

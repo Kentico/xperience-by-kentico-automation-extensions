@@ -590,6 +590,16 @@ Existing anniversary/Random split work preserved; no commit.
 - DancingGoat `-t:Compile`: 0 warnings/errors. Format (touched files only) and `git diff --check` passed.
 - Not unit-testable: SQL `COUNT`, activity type cache/localized names, Builder dialog visibility. **Running-app check open:** dropdown names; fields per type (none / URL / URL+Title / Title / Value) switch without save; Yes/No for ≥ 3 `/pricing` visits (wait > 10 s); referrer not matched; stale hidden value ignored; 41060 on invalid config; disabled → No + 41003.
 
+### Slice 7 (2026-10-11) – Activity frequency: page filter (7A) + URL match component (7C), app-validated
+
+Details, user decisions, real-data checks: spec `implementation-spec-activity-frequency.md` → Slice 7, "7C as built", "Real-data check – PRODUCTION". Implemented by subagents, reviewed by caller.
+
+- **7A:** Pages filter (page picker, `ActivityWebPageItemGUID`, OR with one parameter per GUID) + Language filter (code name, "Any") for page visit/landing page; Title for page visit/landing page/email click, matches quoted name only.
+- **7B** benchmark deferred: PROD copy (298k activities) heaviest contact ≤ 70 ms per query.
+- **7C:** custom React `UrlMatchComponent` (JSON, ≤ 5 rules, AND) replaces Page URL text filter and email click Value filter. Parts Url/Host/Path/QueryParameter; matching in .NET over `GROUP BY` URL (TOP 10001, > 10,000 → No + 41062), LIKE prefilter for positive rules, wildcard timeout 100 ms (41063). `TestUrl` form component command previews match in the step dialog.
+- Regex rejected (SaaS DB compat level 160 < 170). No UTM filters (not populated by default).
+- **Validation:** 727 unit tests passed. Running app (user, 2026-10-11): URL rules, Test a URL, property visibility/ordering per type. Open: 41060 invalid config, disabled → 41003.
+
 ### Decision (2026-10-05): disabled library conditions → No
 
 History: Yes (Slice 2) → texts said "No (A)" while code returned `true` (Yes) → final **No** for all library conditions (`return false`). Changed several times; don't revisit without the user.

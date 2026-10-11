@@ -1,5 +1,9 @@
+using System.Globalization;
+using System.Resources;
+
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.ActivityFrequency;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.ContactNumberFieldCompare;
+using Kentico.Xperience.Labs.AutomationExtensions.Resources;
 using Kentico.Xperience.Labs.AutomationExtensions.Tests.Actions;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Conditions;
@@ -98,10 +102,10 @@ public class ActivityFrequencyConfigurationTests
             Assert.That(properties.Operator, Is.EqualTo(nameof(NumberComparisonOperator.GreaterThanOrEqual)));
             Assert.That(properties.Count, Is.EqualTo(3));
             Assert.That(properties.Days, Is.EqualTo(7));
-            Assert.That(properties.Url, Is.Empty);
+            Assert.That(properties.UrlRules, Is.Empty);
             Assert.That(properties.Title, Is.Empty);
             Assert.That(properties.Value, Is.Empty);
-            Assert.That(new[] { properties.UrlOperator, properties.TitleOperator, properties.ValueOperator }, Is.All.EqualTo(nameof(TextMatchOperator.Contains)));
+            Assert.That(new[] { properties.TitleOperator, properties.ValueOperator }, Is.All.EqualTo(nameof(TextMatchOperator.Contains)));
             Assert.That(properties.SkipStep, Is.False);
         });
     }
@@ -158,6 +162,82 @@ public class ActivityFrequencyConfigurationTests
             Assert.That(items.Select(item => item.Value), Is.EqualTo(new[] { "custom_calculator", "bizformsubmit", "pagevisit" }));
             Assert.That(items.Select(item => item.Text), Is.EqualTo(new[] { "custom_calculator", "Form submission", "Page visit" }));
         });
+    }
+
+
+    [Test]
+    public async Task GetLanguages_LocalizesAndSortsByDisplayName()
+    {
+        var languages = await CreateLanguageResolver(text => text.Replace("{$language.spanish$}", "Spanish")).GetLanguages(CancellationToken.None);
+
+        Assert.That(languages, Is.EqualTo(new[]
+        {
+            new ActivityLanguageDefinition("cs", "cs", 3),
+            new ActivityLanguageDefinition("en", "English", 1),
+            new ActivityLanguageDefinition("es", "Spanish", 2)
+        }));
+    }
+
+
+    [TestCase("es", ExpectedResult = 2)]
+    [TestCase("ES", ExpectedResult = 2)]
+    [TestCase("deleted", ExpectedResult = null)]
+    [TestCase("", ExpectedResult = null)]
+    [TestCase(" ", ExpectedResult = null)]
+    [TestCase(null, ExpectedResult = null)]
+    public async Task<int?> ResolveLanguageId_ReturnsIdOfExistingCodeName(string? languageName) =>
+        await CreateLanguageResolver(text => text).ResolveLanguageId(languageName, CancellationToken.None);
+
+
+    [Test]
+    public async Task ResolveLanguageId_EmptyValueDoesNotQueryLanguages()
+    {
+        var resolver = new ActivityLanguageResolver(
+            new ContactScoreFieldResolverTests.TestLocalization(text => text),
+            _ => throw new InvalidOperationException("Languages must not be read."),
+            (_, _) => throw new InvalidOperationException("Languages must not be read."));
+
+        Assert.That(await resolver.ResolveLanguageId("", CancellationToken.None), Is.Null);
+    }
+
+
+    [Test]
+    public async Task LanguageOptions_StartWithAnyThenCodeNamesWithLocalizedTexts()
+    {
+        var provider = new ActivityLanguageOptionsProvider(
+            CreateLanguageResolver(text => text.Replace("{$language.spanish$}", "Spanish")),
+            new ContactScoreFieldResolverTests.TestLocalization(text => text));
+
+        var items = (await provider.GetOptionItems()).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(items.Select(item => item.Value), Is.EqualTo(new[] { "", "cs", "en", "es" }));
+            // Test localization returns resource keys as-is.
+            Assert.That(items.Select(item => item.Text), Is.EqualTo(new[] { ActivityLanguageOptionsProvider.ANY_RESOURCE_KEY, "cs", "English", "Spanish" }));
+            Assert.That(
+                new ResourceManager(typeof(AutomationExtensionsResources)).GetString(ActivityLanguageOptionsProvider.ANY_RESOURCE_KEY, CultureInfo.InvariantCulture),
+                Is.EqualTo("Any"));
+        });
+    }
+
+
+    /// <summary>
+    /// English (plain display name), Spanish (macro display name), and Czech without display name.
+    /// </summary>
+    internal static ActivityLanguageResolver CreateLanguageResolver(Func<string, string> localize)
+    {
+        ActivityLanguageDefinition[] languages =
+        [
+            new("es", "{$language.spanish$}", 2),
+            new("en", "English", 1),
+            new("cs", "", 3)
+        ];
+
+        return new ActivityLanguageResolver(
+            new ContactScoreFieldResolverTests.TestLocalization(localize),
+            _ => Task.FromResult<IEnumerable<ActivityLanguageDefinition>>(languages),
+            (name, _) => Task.FromResult(languages.FirstOrDefault(language => string.Equals(language.Name, name, StringComparison.OrdinalIgnoreCase))));
     }
 
 

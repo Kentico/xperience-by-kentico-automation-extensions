@@ -36,6 +36,7 @@ public static class AutomationExtensionsServiceCollectionExtensions
         services.TryAddSingleton<DateFieldResolver>();
         services.TryAddSingleton<ContactScoreFieldResolver>();
         services.TryAddSingleton<ActivityTypeResolver>();
+        services.TryAddSingleton<ActivityLanguageResolver>();
         services.TryAddSingleton<IActivityCounter, ActivityCounter>();
 
         services.AddStepResultSource(StepResultKeys.SendWebhook);

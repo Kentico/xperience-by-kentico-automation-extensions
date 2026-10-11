@@ -3,7 +3,7 @@
 Single source for current state. Update after every slice (and when a check or decision closes).
 Design, research, decisions with reasons, and the slice log: `PLAN.md`. Per-slice scope: `implementation-spec-*.md`.
 
-Last updated: 2026-10-10. Xperience 31.9.1. Unit tests: 446 passed.
+Last updated: 2026-10-11. Xperience 31.9.1. Unit tests: 727 passed.
 
 ## Components
 
@@ -19,7 +19,7 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 | 9 | Within time window | C | Done | unit + isolated browser | Time picker/date fields in running Builder |
 | 16 | Adjust contact score | A | Done | app | – |
 | 22 | Compare contact number field | C | Done | unit | Field dropdown, Yes/No per operator, 41050 warning |
-| 8 | Activity frequency | C | Done | unit | See below |
+| 8 | Activity frequency | C | Done | app | Invalid config → No + 41060; disabled → No + 41003 |
 | 1 | Contact in contact group (daily) | T | Not started | | |
 | 3 | Contact inactive for N days | T | Not started | | |
 | 4 | Content engagement threshold | T | Not started | | |
@@ -49,8 +49,8 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 
 ## Activity frequency (#8) – open
 
-1. Running-app checks: dropdown names; operator + text fields per type (none / URL / URL+Title / Title / Value) switch without save; *starts with* `https://<host>/pricing` ≥ 3 → Yes (wait > 10 s); *is equal to* `https://<host>/` counts `/` not `/?utm_source=x`; *does not contain* counts empty columns; invalid config → No + 41060; disabled → No + 41003.
-2. **Decision pending:** add **Page** filter (web page selector + optional language, matches `ActivityWebPageItemGUID`) for reliable page matching; regex rejected (SQL support/perf/UX). First verify which activity types store page GUID + language.
+1. Running-app checks left: invalid config → No + 41060; disabled → No + 41003.
+2. Slice 7 (spec: `implementation-spec-activity-frequency.md` → Slice 7): **7A Page filter** done (app, 2026-10-11): Pages (page visit + landing page), Language (same types, code name, "Any" default), Title also for page visit/landing page/email click, Title operators match the quoted name only. **7C** URL match component done (app, 2026-10-11; spec "7C as built"): URL rules editor, Test a URL, property switching verified. PROD data check done (spec "Real-data check – PRODUCTION"). **7B benchmark** deferred (PROD timings sufficient). Regex rejected (SaaS compat level 160 < 170). No UTM filters (columns not populated by default).
 ## Pending decisions
 
 1. Localization: keep `Server` + `Builder` registration or drop `Server`.
@@ -64,4 +64,5 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 1. Anniversary task same-day re-run protection (deferred; option: store last processed date).
 2. Local test data cleanup: contacts 8 and 9, *Contact Anniversary* process, Email queue.
 3. `ContactScore` field exists only in local DB (CI repository off) – recreate per environment.
-4. Event log length issue reported (`kentico-issue-event-log-source-length.md`); no response tracked.
+4. Local DBs `Kentico.SaaS.Analysis` (QA env) and `Kentico.SaaS.Prod.Analysis` (PROD, 298k activities): `OM_Contact` PII, `ActivityComment`, member registration titles cleared; members/users/form/email tables **not** scrubbed. Kept for real-data checks and 7B benchmark. Local only, never share. Backup files deleted.
+5. Event log length issue reported (`kentico-issue-event-log-source-length.md`); no response tracked.

@@ -23,4 +23,6 @@ public static class LogEvents
     public static readonly EventId ContactNumberFieldCompared = new(41051, nameof(ContactNumberFieldCompared));
     public static readonly EventId InvalidActivityFrequencyConfiguration = new(41060, nameof(InvalidActivityFrequencyConfiguration));
     public static readonly EventId ActivityFrequencyEvaluated = new(41061, nameof(ActivityFrequencyEvaluated));
+    public static readonly EventId ActivityUrlLimitExceeded = new(41062, nameof(ActivityUrlLimitExceeded));
+    public static readonly EventId UrlMatchTimeout = new(41063, nameof(UrlMatchTimeout));
 }

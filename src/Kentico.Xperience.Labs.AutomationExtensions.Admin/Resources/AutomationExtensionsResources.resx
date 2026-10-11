@@ -537,14 +537,11 @@
   <data name="labs.automationextensions.activityfrequency.textoperator.endswith" xml:space="preserve">
     <value>ends with</value>
   </data>
-  <data name="labs.automationextensions.activityfrequency.urloperator.label" xml:space="preserve">
-    <value>Page URL</value>
+  <data name="labs.automationextensions.activityfrequency.urlrules.label" xml:space="preserve">
+    <value>URL rules</value>
   </data>
-  <data name="labs.automationextensions.activityfrequency.url.label" xml:space="preserve">
-    <value>Page URL text</value>
-  </data>
-  <data name="labs.automationextensions.activityfrequency.url.explanation" xml:space="preserve">
-    <value>Optional; leave empty to count all activities of the type.&lt;br&gt;Page URLs are stored in full, for example https://www.example.com/pricing?utm_source=news – including query string.&lt;br&gt;The referrer URL isn't searched.</value>
+  <data name="labs.automationextensions.activityfrequency.urlrules.explanation" xml:space="preserve">
+    <value>Optional; counts only activities whose URL matches all rules. No rules = all URLs.&lt;br&gt;Page visit, landing page, form submission: the page URL. Email link click: the clicked link.&lt;br&gt;Not case-sensitive; fragments (#…), default ports, and trailing slashes are ignored, and the path never includes the query string.&lt;br&gt;Use Test a URL to see the compared parts. The referrer URL isn't searched.</value>
   </data>
   <data name="labs.automationextensions.activityfrequency.titleoperator.label" xml:space="preserve">
     <value>Title</value>
@@ -553,7 +550,7 @@
     <value>Title text</value>
   </data>
   <data name="labs.automationextensions.activityfrequency.title.explanation" xml:space="preserve">
-    <value>Optional, for example the form name; leave empty to count all activities of the type.</value>
+    <value>Optional; leave empty to count all activities of the type.&lt;br&gt;Compares only the name in quotes of the stored title, for example Home in Page visit 'Home' – is equal to Home doesn't match Home page.&lt;br&gt;Page visit, landing page: page name.&lt;br&gt;Form submission: form name.&lt;br&gt;Member registration: member name or email.&lt;br&gt;Email link click: email name.</value>
   </data>
   <data name="labs.automationextensions.activityfrequency.valueoperator.label" xml:space="preserve">
     <value>Value</value>
@@ -562,6 +559,165 @@
     <value>Value text</value>
   </data>
   <data name="labs.automationextensions.activityfrequency.value.explanation" xml:space="preserve">
-    <value>Optional; leave empty to count all activities of the type.&lt;br&gt;Email link click: the clicked link URL.&lt;br&gt;Custom and other activities: the value logged with the activity.</value>
+    <value>Optional; leave empty to count all activities of the type.&lt;br&gt;Compares the value logged with the activity (custom and other activity types).</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.pages.label" xml:space="preserve">
+    <value>Pages</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.pages.explanation" xml:space="preserve">
+    <value>Optional; counts only activities on the selected pages (any of them). Leave empty to count all pages.&lt;br&gt;Works only for pages from the content tree tracked by Xperience – matched by page, so URL changes, query strings, and fragments don't matter.&lt;br&gt;For other URLs use URL rules.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.language.label" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.language.explanation" xml:space="preserve">
+    <value>Optional; counts only activities on this language version of the pages. Any counts all languages.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.language.any" xml:space="preserve">
+    <value>Any</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.rule" xml:space="preserve">
+    <value>Rule {0}</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.part.label" xml:space="preserve">
+    <value>URL part</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.parameter.label" xml:space="preserve">
+    <value>Parameter name</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.label" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.value.label" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.value.pattern" xml:space="preserve">
+    <value>Use * for any characters, for example /blog/*</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.addrule" xml:space="preserve">
+    <value>Add rule</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.removerule" xml:space="preserve">
+    <value>Remove rule</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.norules" xml:space="preserve">
+    <value>No rules – all URLs count.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.part.url" xml:space="preserve">
+    <value>Full URL</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.part.host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.part.path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.part.queryparameter" xml:space="preserve">
+    <value>Query parameter</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.equal" xml:space="preserve">
+    <value>is equal to</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.notequal" xml:space="preserve">
+    <value>is not equal to</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.contains" xml:space="preserve">
+    <value>contains</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.doesnotcontain" xml:space="preserve">
+    <value>does not contain</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.startswith" xml:space="preserve">
+    <value>starts with</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.endswith" xml:space="preserve">
+    <value>ends with</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.matches" xml:space="preserve">
+    <value>matches pattern</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.exists" xml:space="preserve">
+    <value>is present</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.doesnotexist" xml:space="preserve">
+    <value>is not present</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.label" xml:space="preserve">
+    <value>Test a URL</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.placeholder" xml:space="preserve">
+    <value>https://www.example.com/pricing?utm_campaign=spring</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.button" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.match" xml:space="preserve">
+    <value>Matches all rules – the activity counts.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.nomatch" xml:space="preserve">
+    <value>Doesn't match – the activity doesn't count.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.norules" xml:space="preserve">
+    <value>No rules – every URL counts.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.rulematch" xml:space="preserve">
+    <value>matches</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.rulenomatch" xml:space="preserve">
+    <value>doesn't match</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.unrecognized" xml:space="preserve">
+    <value>Not a recognized URL – it matches only "is not equal to", "does not contain", and "is not present" rules.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.timedout" xml:space="preserve">
+    <value>A pattern took too long to compare and counts as not matching. Simplify the pattern.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.failed" xml:space="preserve">
+    <value>The URL couldn't be tested. Try again.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.query" xml:space="preserve">
+    <value>Query parameters</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.none" xml:space="preserve">
+    <value>(none)</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.rule" xml:space="preserve">
+    <value>Rule {0}: {1}</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.invalidjson" xml:space="preserve">
+    <value>The saved URL rules can't be read. Remove the rules and add them again.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.unsupportedversion" xml:space="preserve">
+    <value>The saved URL rules have an unsupported format. Remove the rules and add them again.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.toomanyrules" xml:space="preserve">
+    <value>Use at most {0} rules.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.unknownpart" xml:space="preserve">
+    <value>Select a URL part.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.unknownoperator" xml:space="preserve">
+    <value>Select an operator.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.operatornotallowed" xml:space="preserve">
+    <value>The operator isn't available for this URL part.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.missingparameter" xml:space="preserve">
+    <value>Enter the query parameter name.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.missingvalue" xml:space="preserve">
+    <value>Enter a value.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.valuetoolong" xml:space="preserve">
+    <value>Enter at most {1} characters.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.parametertoolong" xml:space="preserve">
+    <value>Enter a parameter name of at most {2} characters.</value>
   </data>
 </root>

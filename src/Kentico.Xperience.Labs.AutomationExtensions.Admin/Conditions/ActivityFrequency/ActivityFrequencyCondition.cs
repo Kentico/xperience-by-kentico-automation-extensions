@@ -25,6 +25,7 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Conditions.ActivityFrequen
 public sealed class ActivityFrequencyCondition(
     IAutomationComponentStatus componentStatus,
     ActivityTypeResolver activityTypeResolver,
+    ActivityLanguageResolver languageResolver,
     IActivityCounter activityCounter,
     TimeProvider timeProvider,
     ILoggerFactory loggerFactory) : AutomationCondition<ActivityFrequencyProperties>
@@ -32,12 +33,18 @@ public sealed class ActivityFrequencyCondition(
     public const string NAME = "ActivityFrequency";
     public const string IDENTIFIER = AutomationComponentCatalog.IDENTIFIER_PREFIX + NAME;
 
+    /// <summary>
+    /// Maximum number of distinct URLs per contact and window that URL rules evaluate; more → No (fails closed).
+    /// </summary>
+    public const int MAX_DISTINCT_URLS = 10_000;
 
-    private static readonly TimeSpan invalidConfigurationLogInterval = TimeSpan.FromHours(1);
+
+    private static readonly TimeSpan warningLogInterval = TimeSpan.FromHours(1);
 
 
     private readonly IAutomationComponentStatus componentStatus = componentStatus;
     private readonly ActivityTypeResolver activityTypeResolver = activityTypeResolver;
+    private readonly ActivityLanguageResolver languageResolver = languageResolver;
     private readonly IActivityCounter activityCounter = activityCounter;
     private readonly TimeProvider timeProvider = timeProvider;
     private readonly ILogger logger = loggerFactory.CreateLogger(LogCategories.For(AutomationComponentCatalog.ActivityFrequency));
@@ -62,9 +69,13 @@ public sealed class ActivityFrequencyCondition(
         }
 
         string? activityType = await activityTypeResolver.ResolveTypeName(properties.ActivityType, cancellationToken);
-        IReadOnlyList<ActivityDetailCriterion> criteria = [];
+        // Resolved only when the language filter applies, so stale hidden languages never invalidate the step.
+        int? languageId = ActivityDetailFilters.IsLanguageApplied(activityType, properties)
+            ? await languageResolver.ResolveLanguageId(properties.Language, cancellationToken)
+            : null;
+        IReadOnlyList<ActivityCriterion> criteria = [];
         string? error = ActivityFrequencyConfiguration.GetConfigurationError(properties, activityType is not null, out var comparisonOperator)
-            ?? ActivityDetailFilters.GetCriteria(activityType!, properties, out criteria);
+            ?? ActivityDetailFilters.GetCriteria(activityType!, properties, languageId, out criteria);
         if (error is not null)
         {
             LogInvalidConfiguration(context.Process.DisplayName, properties.ActivityType, error);
@@ -86,20 +97,22 @@ public sealed class ActivityFrequencyCondition(
     internal async Task<bool> CountAndCompare(
         int contactId,
         string activityType,
-        IReadOnlyList<ActivityDetailCriterion> criteria,
+        IReadOnlyList<ActivityCriterion> criteria,
         NumberComparisonOperator comparisonOperator,
         ActivityFrequencyProperties properties,
         string processName,
         CancellationToken cancellationToken)
     {
         var since = ActivityWindow.GetSince(timeProvider.GetLocalNow().DateTime, properties.Days);
-        int count = await activityCounter.Count(
-            contactId,
-            activityType,
-            since,
-            criteria,
-            cancellationToken);
-        bool result = NumberComparison.Compare(count, comparisonOperator, properties.Count);
+        int? count = criteria.OfType<ActivityUrlMatchCriterion>().FirstOrDefault() is { } urlMatch
+            ? await CountUrlMatches(contactId, activityType, since, criteria, urlMatch, processName, cancellationToken)
+            : await activityCounter.Count(contactId, activityType, since, criteria, cancellationToken);
+        if (count is null)
+        {
+            return false;
+        }
+
+        bool result = NumberComparison.Compare(count.Value, comparisonOperator, properties.Count);
 
         logger.LogDebug(
             LogEvents.ActivityFrequencyEvaluated,
@@ -117,9 +130,57 @@ public sealed class ActivityFrequencyCondition(
     }
 
 
+    /// <summary>
+    /// Counts activities whose URL matches the rules: the database groups the filtered (and prefiltered) activities by URL,
+    /// the distinct URLs are matched here and their counts summed. Returns <c>null</c> (→ No) when the contact has more than
+    /// <see cref="MAX_DISTINCT_URLS"/> distinct URLs in the window.
+    /// </summary>
+    private async Task<int?> CountUrlMatches(
+        int contactId,
+        string activityType,
+        DateTime since,
+        IReadOnlyList<ActivityCriterion> criteria,
+        ActivityUrlMatchCriterion urlMatch,
+        string processName,
+        CancellationToken cancellationToken)
+    {
+        var groups = await activityCounter.CountByValue(contactId, activityType, since, criteria, urlMatch.Column, MAX_DISTINCT_URLS + 1, cancellationToken);
+        if (groups.Count > MAX_DISTINCT_URLS)
+        {
+            logger.LogWithIntervalPolicy(
+                LoggingIntervalPolicy.OncePerPeriod($"{IDENTIFIER}|UrlLimit|{processName}|{activityType}", warningLogInterval),
+                l => l.LogWarning(
+                    LogEvents.ActivityUrlLimitExceeded,
+                    "Step '{ComponentIdentifier}' in process '{ProcessName}': contact {ContactId} has more than {MaxUrls} distinct URLs of '{ActivityType}' activities in the window, so URL rules weren't evaluated and the contact follows the No branch.",
+                    IDENTIFIER,
+                    processName,
+                    contactId,
+                    MAX_DISTINCT_URLS,
+                    activityType));
+
+            return null;
+        }
+
+        var (count, timedOut) = ActivityUrlMatchCounting.Sum(groups, urlMatch.RuleSet);
+        if (timedOut)
+        {
+            logger.LogWithIntervalPolicy(
+                LoggingIntervalPolicy.OncePerPeriod($"{IDENTIFIER}|UrlMatchTimeout|{processName}", warningLogInterval),
+                l => l.LogWarning(
+                    LogEvents.UrlMatchTimeout,
+                    "Step '{ComponentIdentifier}' in process '{ProcessName}': a wildcard URL rule took too long for some URLs of contact {ContactId}; those URLs were counted as not matching.",
+                    IDENTIFIER,
+                    processName,
+                    contactId));
+        }
+
+        return count;
+    }
+
+
     private void LogInvalidConfiguration(string processName, string? activityType, string reason) =>
         logger.LogWithIntervalPolicy(
-            LoggingIntervalPolicy.OncePerPeriod($"{IDENTIFIER}|InvalidConfiguration|{processName}|{activityType}", invalidConfigurationLogInterval),
+            LoggingIntervalPolicy.OncePerPeriod($"{IDENTIFIER}|InvalidConfiguration|{processName}|{activityType}", warningLogInterval),
             l => l.LogWarning(
                 LogEvents.InvalidActivityFrequencyConfiguration,
                 "Step '{ComponentIdentifier}' in process '{ProcessName}' is not configured correctly and sends all contacts through the No branch: {Reason}.",
