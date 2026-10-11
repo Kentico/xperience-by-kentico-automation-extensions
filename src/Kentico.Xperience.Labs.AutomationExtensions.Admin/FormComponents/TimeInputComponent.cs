@@ -27,7 +27,7 @@ public sealed class TimeInputComponent : FormComponent<FormComponentProperties, 
     public const string IDENTIFIER = "Kentico.Xperience.Labs.AutomationExtensions.TimeInput";
 
     // Client resolves "TimeInput" + "FormComponent" suffix => TimeInputFormComponent export
-    public override string ClientComponentName => "@kentico/xperience-admin-labs-automation-extensions/TimeInput";
+    public override string ClientComponentName => "@kentico/xperience-labs-automation-extensions-admin/TimeInput";
 }
 
 

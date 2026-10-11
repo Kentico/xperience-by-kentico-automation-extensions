@@ -6,6 +6,6 @@
     <Project Path="src/Kentico.Xperience.Labs.AutomationExtensions.Admin/Kentico.Xperience.Labs.AutomationExtensions.Admin.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Kentico.Xperience.Labs.AutomationExtensions.Tests/Kentico.Xperience.Labs.AutomationExtensions.Tests.csproj" />
+    <Project Path="tests/Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests/Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests.csproj" />
   </Folder>
 </Solution>

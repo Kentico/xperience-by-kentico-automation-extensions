@@ -54,7 +54,7 @@ Use existing NUnit patterns and the existing test project; no new packages.
 - Verify a deterministic population of at least 10,000 unique GUIDs allocates between 45% and 55% to Yes at percentage 50. This is deterministic coverage, not a randomized/flaky test.
 - Cover production condition gating (disabled, enabled/skipped Yes and No), cancellation propagation, and the active evaluation path as far as the installed context API permits. Do not duplicate the calculation in the condition or tests to substitute for production-path coverage. Report any context-testing limitation plainly.
 - Verify registration/catalog, localization coverage, skippable properties, and log-length guards with the full existing unit suite.
-- Run `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Tests\Kentico.Xperience.Labs.AutomationExtensions.Tests.csproj --no-restore` and report counts.
+- Run `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests.csproj --no-restore` and report counts.
 - Run the existing formatting verification scoped to changed library/test files if supported by repository tooling.
 - Build the DancingGoat consumer with existing dependencies to catch integration compile errors; do not change dependency manifests.
 

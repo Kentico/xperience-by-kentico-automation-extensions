@@ -81,7 +81,7 @@ New `LogEvents` (next free block, e.g. 41040 `ContactScoreAdjusted`, 41041 `Inva
 - Field resolver filtering: if `FormInfo` can be constructed in tests, verify integer custom field included and PK/system/reference/non-integer excluded. Report plainly if not testable without Xperience container.
 - Gating tests (disabled, skipped) following existing condition/action test approach, as far as the context API allows; report limitations.
 - Existing catalog/registration, localization key coverage, skippable properties, log-category/event-name length, and `StepRegistryPageTests` count expectations (update counts: actions +1).
-- Run `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Tests\Kentico.Xperience.Labs.AutomationExtensions.Tests.csproj --no-restore`; report counts.
+- Run `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests.csproj --no-restore`; report counts.
 - `dotnet build .\examples\DancingGoat\DancingGoat.csproj --no-restore -t:Compile` (app may be running and lock the DLL).
 - Format per `AGENTS.md`: `dotnet format Kentico.Xperience.Labs.AutomationExtensions.slnx --no-restore --exclude ./examples/**` – only keep formatter changes in files touched by this task. `git diff --check`.
 

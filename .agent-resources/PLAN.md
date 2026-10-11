@@ -386,7 +386,7 @@ Append-only record of each slice as it was delivered. "Open"/"unverified" notes 
 
 **Validation**
 
-- `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Tests\Kentico.Xperience.Labs.AutomationExtensions.Tests.csproj --no-restore`: **108 passed, 0 failed/skipped** (24 new cases).
+- `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests.csproj --no-restore`: **108 passed, 0 failed/skipped** (24 new cases).
 - Fixed hash vectors including UTF-8, case sensitivity, repeatability, exact thresholds, 0/100, monotonic percentages, invalid configuration/GUID, deterministic 10,000-contact allocation within 45–55%, disabled/skip precedence, and cancellation covered.
 - `dotnet build .\examples\DancingGoat\DancingGoat.csproj --no-restore`: **0 warnings/errors**. Subagent's scoped formatting verification passed; caller's `git diff --check` passed.
 - **Running-app feedback:** user reached the disabled condition in DancingGoat's *Sample requests* process and observed No (B). Requested disabled behavior is Yes (A); corrected the return value, warning text, docs, and regression coverage. Enabled split/contact retrieval remains unverified in the running app. Isolated tests construct the nonpublic platform context for gating, but reading `ContactGUID` needs an initialized Xperience container. Production evaluation calls the tested bucket helper; no duplicate calculation.

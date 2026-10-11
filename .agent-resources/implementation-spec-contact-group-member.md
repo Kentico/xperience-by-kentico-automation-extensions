@@ -99,7 +99,7 @@ Check the block is free after #17. Names must pass length tests.
 - Options provider: only resolved groups, text format.
 - Task: disabled → result text, no queries; no groups → result text; query shape if testable like `ContactInactiveTask`.
 - Catalog/registration, localization keys, options binding, log name lengths; `StepRegistryPageTests` counts (components +1, triggers +1).
-- `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Tests\Kentico.Xperience.Labs.AutomationExtensions.Tests.csproj --no-restore`; report counts.
+- `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests.csproj --no-restore`; report counts.
 - `dotnet build .\examples\DancingGoat\DancingGoat.csproj --no-restore -t:Compile`.
 - Format per `AGENTS.md`: `dotnet format Kentico.Xperience.Labs.AutomationExtensions.slnx --no-restore --exclude ./examples/**`
   – only files touched by this task. `git diff --check`.

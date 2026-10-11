@@ -121,7 +121,7 @@ New `LogEvents`: block 41080 (`InvalidSetContactFieldConfiguration`, `SetContact
 - Gating (disabled / skipped / invalid config) like existing action tests.
 - Catalog/registration, localization keys, skippable properties, step result source registration, log name lengths;
   `StepRegistryPageTests` counts (components +1, actions +1).
-- Run `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Tests\Kentico.Xperience.Labs.AutomationExtensions.Tests.csproj --no-restore`; report counts.
+- Run `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests.csproj --no-restore`; report counts.
 - `dotnet build .\examples\DancingGoat\DancingGoat.csproj --no-restore -t:Compile`.
 - Format per `AGENTS.md`: `dotnet format Kentico.Xperience.Labs.AutomationExtensions.slnx --no-restore --exclude ./examples/**`
   – keep formatter changes only in files touched by this task. `git diff --check`.

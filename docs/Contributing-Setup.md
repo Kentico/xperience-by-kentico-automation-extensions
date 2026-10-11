@@ -53,7 +53,7 @@ The sample's `appsettings.Development.json` already enables the HTTPS client pro
 
 ```json
 "CMSAdminClientModuleSettings": {
-  "kentico-xperience-admin-labs-automation-extensions": {
+  "kentico-xperience-labs-automation-extensions-admin": {
     "Mode": "Proxy",
     "Port": 3009,
     "UseSSL": true
@@ -87,7 +87,7 @@ reference's React Aria time field and dropdown. It preserves `HH:mm` values and
 uses scoped CSS with admin design tokens.
 Add React page templates or form components there and export them from `entry.tsx`.
 Register the corresponding C# extension using client module
-`@kentico/xperience-admin-labs-automation-extensions` and its exported component name.
+`@kentico/xperience-labs-automation-extensions-admin` and its exported component name.
 `AutomationExtensionsAdminModule` registers the module; webpack and the project's
 `AdminClientPath` package its assets under the same organization and project name.
 

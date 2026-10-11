@@ -14,7 +14,7 @@
   <ItemGroup>
     <!-- Build the client before a Debug .NET build to embed assets without the development proxy. -->
     <AdminClientPath Include="Client\dist\**" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-      <ProjectName>xperience-admin-labs-automation-extensions</ProjectName>
+      <ProjectName>xperience-labs-automation-extensions-admin</ProjectName>
     </AdminClientPath>
   </ItemGroup>
 
@@ -33,7 +33,7 @@
 
     <ItemGroup>
       <AdminClientPath Include="Client\dist\**">
-        <ProjectName>xperience-admin-labs-automation-extensions</ProjectName>
+        <ProjectName>xperience-labs-automation-extensions-admin</ProjectName>
       </AdminClientPath>
     </ItemGroup>
   </Target>
@@ -47,7 +47,7 @@
   <ItemGroup>
     <!-- Required for Xperience to process the assembly's registration attributes (automation steps, triggers, scheduled tasks, localization resources) -->
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
-    <InternalsVisibleTo Include="Kentico.Xperience.Labs.AutomationExtensions.Tests" />
+    <InternalsVisibleTo Include="Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests" />
   </ItemGroup>
 
 </Project>

@@ -16,6 +16,6 @@ internal sealed class AutomationExtensionsAdminModule : AdminModule
     {
         base.OnInit();
 
-        RegisterClientModule("kentico", "xperience-admin-labs-automation-extensions");
+        RegisterClientModule("kentico", "xperience-labs-automation-extensions-admin");
     }
 }

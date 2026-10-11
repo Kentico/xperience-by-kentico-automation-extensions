@@ -81,7 +81,7 @@ public sealed class UrlMatchComponent : FormComponent<FormComponentProperties, U
 
 
     // Client resolves "UrlMatch" + "FormComponent" suffix => UrlMatchFormComponent export
-    public override string ClientComponentName => "@kentico/xperience-admin-labs-automation-extensions/UrlMatch";
+    public override string ClientComponentName => "@kentico/xperience-labs-automation-extensions-admin/UrlMatch";
 
 
     public UrlMatchComponent(ILocalizationService localizationService)

@@ -86,7 +86,7 @@ must pass existing length tests.
   following `RandomSplitConditionTests`; report limits of reaching `GetProcessedObject` without Xperience container.
 - Existing catalog/registration, localization key coverage, skippable properties, log-category/event-name length tests;
   update `StepRegistryPageTests` counts (components +1, conditions +1).
-- Run `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Tests\Kentico.Xperience.Labs.AutomationExtensions.Tests.csproj --no-restore`; report counts.
+- Run `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests.csproj --no-restore`; report counts.
 - `dotnet build .\examples\DancingGoat\DancingGoat.csproj --no-restore -t:Compile` (running app may lock the DLL).
 - Format per `AGENTS.md`: `dotnet format Kentico.Xperience.Labs.AutomationExtensions.slnx --no-restore --exclude ./examples/**`
   – keep formatter changes only in files touched by this task. `git diff --check`.

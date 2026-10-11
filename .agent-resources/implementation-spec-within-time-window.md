@@ -147,7 +147,7 @@ Use the existing NUnit project and patterns, no new dependencies.
 - Verify dropdown option identities, UTC availability, saved-value validation,
   registration/catalog consistency, skippable properties, and resource coverage.
 - Run the full existing suite:
-  `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Tests\Kentico.Xperience.Labs.AutomationExtensions.Tests.csproj --no-restore`.
+  `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests.csproj --no-restore`.
 - Run existing scoped formatting verification on changed C# files and
   `git diff --check`.
 - Build the library and DancingGoat with existing dependencies. If the running

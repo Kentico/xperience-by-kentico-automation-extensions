@@ -99,7 +99,7 @@ New `LogEvents`: block 41060 `InvalidActivityFrequencyConfiguration`, 41061 `Act
   limits of `GetProcessedObject` without Xperience container.
 - Existing catalog/registration, localization key coverage, skippable, log category/event-name length tests; update
   `StepRegistryPageTests` counts (components +1, conditions +1).
-- `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Tests\Kentico.Xperience.Labs.AutomationExtensions.Tests.csproj --no-restore`; report counts.
+- `dotnet test .\tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests\Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests.csproj --no-restore`; report counts.
 - `dotnet build .\examples\DancingGoat\DancingGoat.csproj --no-restore -t:Compile` (running app may lock DLL).
 - Format per `AGENTS.md` (`dotnet format --no-restore`); keep formatter changes only in touched files; `git diff --check`.
 

@@ -141,7 +141,7 @@ public class UrlMatchComponentTests
             Assert.That(registration.MarkedType, Is.EqualTo(typeof(UrlMatchComponent)));
             Assert.That(typeof(UrlMatchComponent).GetCustomAttribute<ComponentAttributeAttribute>()!.AttributeType, Is.EqualTo(typeof(UrlMatchComponentAttribute)));
             Assert.That(new UrlMatchComponent(new ResourceLocalizationService()).ClientComponentName,
-                Is.EqualTo("@kentico/xperience-admin-labs-automation-extensions/UrlMatch"));
+                Is.EqualTo("@kentico/xperience-labs-automation-extensions-admin/UrlMatch"));
         });
     }
 
