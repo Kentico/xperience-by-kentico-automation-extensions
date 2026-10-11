@@ -79,7 +79,7 @@ public partial class LocalizationResourceTests
 
 
     [Test]
-    public void LibraryStepResultSources_DisplayNameKeysExist() => AssertKeysExist([StepResultKeys.SendWebhook.DisplayName]);
+    public void LibraryStepResultSources_DisplayNameKeysExist() => AssertKeysExist([StepResultKeys.SendWebhook.DisplayName, StepResultKeys.SetContactField.DisplayName]);
 
 
     [TestCase("labs.automationextensions.randomsplit.description")]
@@ -105,6 +105,8 @@ public partial class LocalizationResourceTests
     [TestCase("labs.automationextensions.stepresult.number.text")]
     [TestCase("labs.automationextensions.contactdateanniversary.daysbefore.ontheday")]
     [TestCase("labs.automationextensions.contactdateanniversary.daysbefore.format")]
+    [TestCase("labs.automationextensions.contactinactive.inactivedays.format")]
+    [TestCase("labs.automationextensions.contactgroupmember.contactgroup.format")]
     [TestCase("labs.automationextensions.adjustcontactscore.operation.add")]
     [TestCase("labs.automationextensions.adjustcontactscore.operation.subtract")]
     [TestCase("labs.automationextensions.adjustcontactscore.operation.set")]
@@ -114,6 +116,14 @@ public partial class LocalizationResourceTests
     [TestCase("labs.automationextensions.contactnumberfieldcompare.operator.greaterthanorequal")]
     [TestCase("labs.automationextensions.contactnumberfieldcompare.operator.lessthan")]
     [TestCase("labs.automationextensions.contactnumberfieldcompare.operator.lessthanorequal")]
+    [TestCase("labs.automationextensions.setcontactfield.field.systemformat")]
+    [TestCase("labs.automationextensions.setcontactfield.mode.setvalue")]
+    [TestCase("labs.automationextensions.setcontactfield.mode.calculate")]
+    [TestCase("labs.automationextensions.setcontactfield.operator.add")]
+    [TestCase("labs.automationextensions.setcontactfield.operator.subtract")]
+    [TestCase("labs.automationextensions.setcontactfield.operator.multiply")]
+    [TestCase("labs.automationextensions.setcontactfield.operator.divide")]
+    [TestCase("labs.automationextensions.setcontactfield.operator.modulo")]
     public void CodeKeys_Exist(string key) => AssertKeysExist([key]);
 
 

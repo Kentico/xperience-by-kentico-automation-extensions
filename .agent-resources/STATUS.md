@@ -3,7 +3,7 @@
 Single source for current state. Update after every slice (and when a check or decision closes).
 Design, research, decisions with reasons, and the slice log: `PLAN.md`. Per-slice scope: `implementation-spec-*.md`.
 
-Last updated: 2026-10-11. Xperience 31.9.1. Unit tests: 727 passed.
+Last updated: 2026-10-11. Xperience 31.9.1. Unit tests: 1083 passed.
 
 ## Components
 
@@ -20,15 +20,16 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 | 16 | Adjust contact score | A | Done | app | – |
 | 22 | Compare contact number field | C | Done | unit | Field dropdown, Yes/No per operator, 41050 warning |
 | 8 | Activity frequency | C | Done | app | Invalid config → No + 41060; disabled → No + 41003 |
-| 1 | Contact in contact group (daily) | T | Not started | | |
-| 3 | Contact inactive for N days | T | Not started | | |
+| 1 | Contact in contact group (daily) (+ scheduled task) | T | Done | unit | Type filter excludes recipient lists (`UseObjectTypeCondition = false` lookup), end-to-end firing (group has 0 members), dropdown, *Last result* texts |
+| 23 | Contact in recipient list (daily) | T | Not started | | Split from #1 (recipient lists = static groups); spec #1 excludes them |
+| 3 | Contact inactive for N days (+ scheduled task) | T | Done | unit + PROD-DB query check | Task config, firing (`InactiveDays: [1]`), *If not already running* + Wait blocks same-day re-run, disabled *Last result* shown as failure? |
 | 4 | Content engagement threshold | T | Not started | | |
 | 5 | Inbound webhook received | T | Not started | | |
 | 6 | Order completed | T | Not started | | |
 | 11 | Started by trigger / trigger data matches | C | Not started | | |
 | 13 | Purchase history meets threshold | C | Not started | | |
 | 15 | Post to Teams / Slack | A | Not started | | |
-| 17 | Set contact field (dynamic value) | A | Not started | | |
+| 17 | Set contact field (dynamic value) | A | Done | unit | Clear field (null), system field save (email side effects), Mode visibility, Previous step succeeded pairing, `{triggerData.*}` per trigger |
 | 18 | Subscribe / unsubscribe recipient list | A | Not started | | |
 | 19 | Assign contact owner (round-robin) | A | Not started | | |
 | 20 | Enrich contact from external API | A | Not started | | |

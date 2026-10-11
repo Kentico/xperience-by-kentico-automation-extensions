@@ -1,5 +1,6 @@
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.AdjustContactScore;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
+using Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.WriteToLog;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.ActivityFrequency;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.ContactNumberFieldCompare;
@@ -7,6 +8,8 @@ using Kentico.Xperience.Labs.AutomationExtensions.Conditions.PreviousStepSucceed
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.RandomSplit;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.WithinTimeWindow;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 
@@ -22,6 +25,8 @@ public static class AutomationComponentCatalog
 
 
     public static readonly AutomationComponentDescriptor ContactDateAnniversary = new(ContactDateAnniversaryTrigger.NAME, AutomationComponentKind.Trigger);
+    public static readonly AutomationComponentDescriptor ContactGroupMember = new(ContactGroupMemberTrigger.NAME, AutomationComponentKind.Trigger);
+    public static readonly AutomationComponentDescriptor ContactInactive = new(ContactInactiveTrigger.NAME, AutomationComponentKind.Trigger);
     public static readonly AutomationComponentDescriptor ActivityFrequency = new(ActivityFrequencyCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor ContactNumberFieldCompare = new(ContactNumberFieldCompareCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor PreviousStepSucceeded = new(PreviousStepSucceededCondition.NAME, AutomationComponentKind.Condition);
@@ -29,6 +34,7 @@ public static class AutomationComponentCatalog
     public static readonly AutomationComponentDescriptor WithinTimeWindow = new(WithinTimeWindowCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor AdjustContactScore = new(AdjustContactScoreAction.NAME, AutomationComponentKind.Action);
     public static readonly AutomationComponentDescriptor SendWebhook = new(SendWebhookAction.NAME, AutomationComponentKind.Action);
+    public static readonly AutomationComponentDescriptor SetContactField = new(SetContactFieldAction.NAME, AutomationComponentKind.Action);
     public static readonly AutomationComponentDescriptor WriteToLog = new(WriteToLogAction.NAME, AutomationComponentKind.Action);
 
 
@@ -38,6 +44,8 @@ public static class AutomationComponentCatalog
     public static IReadOnlyList<AutomationComponentDescriptor> All { get; } =
     [
         ContactDateAnniversary,
+        ContactGroupMember,
+        ContactInactive,
         ActivityFrequency,
         ContactNumberFieldCompare,
         PreviousStepSucceeded,
@@ -45,6 +53,7 @@ public static class AutomationComponentCatalog
         WithinTimeWindow,
         AdjustContactScore,
         SendWebhook,
+        SetContactField,
         WriteToLog
     ];
 }

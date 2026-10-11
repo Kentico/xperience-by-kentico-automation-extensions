@@ -237,6 +237,40 @@
     <value>{0} days before</value>
     <comment>{0} = number of days</comment>
   </data>
+  <!-- Contact inactive -->
+  <data name="labs.automationextensions.contactinactive.displayname" xml:space="preserve">
+    <value>Contact inactive for N days</value>
+  </data>
+  <data name="labs.automationextensions.contactinactive.description" xml:space="preserve">
+    <value>Starts when a contact's last activity was exactly the selected number of days ago – requires a scheduled task set up by your developers.</value>
+  </data>
+  <data name="labs.automationextensions.contactinactive.inactivedays.label" xml:space="preserve">
+    <value>Days without activity</value>
+  </data>
+  <data name="labs.automationextensions.contactinactive.inactivedays.explanation" xml:space="preserve">
+    <value>Starts once on the day the contact's last activity (of any type) reaches this number of days.&lt;br&gt;Missing a value?&lt;br&gt;Ask your developers to add it to the application configuration.&lt;br&gt;Contacts without any activity never start the process.&lt;br&gt;If the scheduled task doesn't run on a day, contacts reaching the value that day aren't started later.&lt;br&gt;If the task runs more than once a day, set the process recurrence to "If not already running" and keep contacts in the process for at least one day (e.g. with a Wait step).</value>
+  </data>
+  <data name="labs.automationextensions.contactinactive.inactivedays.format" xml:space="preserve">
+    <value>{0} days</value>
+    <comment>{0} = number of days</comment>
+  </data>
+  <!-- Contact in contact group -->
+  <data name="labs.automationextensions.contactgroupmember.displayname" xml:space="preserve">
+    <value>Contact in contact group (daily)</value>
+  </data>
+  <data name="labs.automationextensions.contactgroupmember.description" xml:space="preserve">
+    <value>Starts for contacts in the selected contact group, checked once per day – requires a scheduled task set up by your developers.</value>
+  </data>
+  <data name="labs.automationextensions.contactgroupmember.contactgroup.label" xml:space="preserve">
+    <value>Contact group</value>
+  </data>
+  <data name="labs.automationextensions.contactgroupmember.contactgroup.explanation" xml:space="preserve">
+    <value>Only contact groups listed in the application configuration can be selected.&lt;br&gt;Missing a group?&lt;br&gt;Ask your developers to add it to the application configuration. Recipient lists aren't supported.&lt;br&gt;Fires every day for every contact in the group, not only for new members. Set the process recurrence to "If not already running" or "Only once" – "Always" restarts the process for every member every day.&lt;br&gt;Group membership is updated by Xperience's contact group recalculation and can lag behind.</value>
+  </data>
+  <data name="labs.automationextensions.contactgroupmember.contactgroup.format" xml:space="preserve">
+    <value>{0} ({1})</value>
+    <comment>{0} = contact group display name, {1} = contact group code name</comment>
+  </data>
 
   <!-- Within time window -->
   <data name="labs.automationextensions.withintimewindow.displayname" xml:space="preserve">
@@ -422,6 +456,84 @@
   </data>
   <data name="labs.automationextensions.adjustcontactscore.maximum.explanation" xml:space="preserve">
     <value>Highest allowed score.</value>
+  </data>
+
+  <!-- Set contact field (dynamic value) -->
+  <data name="labs.automationextensions.setcontactfield.displayname" xml:space="preserve">
+    <value>Set contact field (dynamic value)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.description" xml:space="preserve">
+    <value>Sets a contact field to a value built from placeholders (date, process, trigger data, other fields) or calculates a number from the current value.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.field.label" xml:space="preserve">
+    <value>Field</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.field.explanation" xml:space="preserve">
+    <value>Contact field to change. Custom fields are listed first, built-in fields are marked as system fields.&lt;br&gt;Built-in fields drive Xperience features (for example, the email address is used for recipient lists and contact matching), so prefer custom fields.&lt;br&gt;Fields maintained by Xperience (IDs, created and modified dates, bounces) aren't listed.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.field.required" xml:space="preserve">
+    <value>Select a field.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.field.systemformat" xml:space="preserve">
+    <value>{0} – system field</value>
+    <comment>{0} = field caption and code name</comment>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.mode.label" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.mode.explanation" xml:space="preserve">
+    <value>Set to value: replaces the field value with the value below (placeholders allowed).&lt;br&gt;Calculate: combines the current number with an operand, for example + 1. Only for number fields.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.mode.required" xml:space="preserve">
+    <value>Select a mode.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.mode.setvalue" xml:space="preserve">
+    <value>Set to value</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.mode.calculate" xml:space="preserve">
+    <value>Calculate (number fields)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.valuetemplate.label" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.valuetemplate.explanation" xml:space="preserve">
+    <value>Text and placeholders, for example Spring sale or {processName}.&lt;br&gt;{now} – current date and time, {today} – current date.&lt;br&gt;{processName}, {triggerIdentifier}, {contactId}, {contactGuid}.&lt;br&gt;{contact.FieldName} – value of another contact field.&lt;br&gt;{triggerData.PropertyName} – data of the trigger that started the process, for example {triggerData.InactiveDays}.&lt;br&gt;Unknown placeholders become empty and a warning is logged.&lt;br&gt;Numbers use a dot as decimal separator, dates yyyy-MM-dd, yes/no fields true or false.&lt;br&gt;An empty value clears the field.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.onlyifempty.label" xml:space="preserve">
+    <value>Only if the field is empty</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.onlyifempty.explanation" xml:space="preserve">
+    <value>Leaves fields that already have a value unchanged. The step still counts as succeeded.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.label" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.explanation" xml:space="preserve">
+    <value>Calculates: current value, operator, operand. An empty field counts as 0.&lt;br&gt;Whole-number fields divide without decimals (7 ÷ 2 = 3).&lt;br&gt;Division by zero or a result outside the field's range fails the step without changing the field.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.add" xml:space="preserve">
+    <value>+ (add)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.subtract" xml:space="preserve">
+    <value>− (subtract)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.multiply" xml:space="preserve">
+    <value>× (multiply)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.divide" xml:space="preserve">
+    <value>÷ (divide)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.modulo" xml:space="preserve">
+    <value>% (remainder)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operand.label" xml:space="preserve">
+    <value>Operand</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operand.explanation" xml:space="preserve">
+    <value>Number combined with the current value, for example 1 or 2.5 (dot as decimal separator).&lt;br&gt;Placeholders are allowed, for example {triggerData.Years}.&lt;br&gt;Whole-number fields accept whole numbers only.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.resultnumber.explanation" xml:space="preserve">
+    <value>The step always saves whether it succeeded. Select the same step and number in the "Previous step succeeded" condition. When a process has several steps of this type, give each one a different number.</value>
   </data>
   <data name="labs.automationextensions.contactnumberfieldcompare.displayname" xml:space="preserve">
     <value>Compare contact number field</value>

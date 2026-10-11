@@ -8,11 +8,11 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Core;
 public class StepResultSourceRegistrationTests
 {
     [Test]
-    public void AddAutomationExtensions_RegistersSendWebhookSource()
+    public void AddAutomationExtensions_RegistersLibrarySources()
     {
         var sources = CreateServices().BuildServiceProvider().GetServices<StepResultSource>();
 
-        Assert.That(sources, Is.EqualTo(new[] { StepResultKeys.SendWebhook }));
+        Assert.That(sources, Is.EqualTo(new[] { StepResultKeys.SendWebhook, StepResultKeys.SetContactField }));
     }
 
 
@@ -23,7 +23,7 @@ public class StepResultSourceRegistrationTests
 
         var sources = services.BuildServiceProvider().GetServices<StepResultSource>();
 
-        Assert.That(sources.Select(source => source.Name), Is.EqualTo(new[] { StepResultKeys.SendWebhook.Name, "Acme.SyncToCrm" }));
+        Assert.That(sources.Select(source => source.Name), Is.EqualTo(new[] { StepResultKeys.SendWebhook.Name, StepResultKeys.SetContactField.Name, "Acme.SyncToCrm" }));
     }
 
 
@@ -41,7 +41,7 @@ public class StepResultSourceRegistrationTests
 
 
     [Test]
-    public void AddAutomationExtensions_CalledTwice_RegistersLibrarySourceOnce()
+    public void AddAutomationExtensions_CalledTwice_RegistersLibrarySourcesOnce()
     {
         var configuration = new ConfigurationBuilder().Build();
         var services = new ServiceCollection()
@@ -50,7 +50,7 @@ public class StepResultSourceRegistrationTests
 
         var sources = services.BuildServiceProvider().GetServices<StepResultSource>();
 
-        Assert.That(sources.Count(), Is.EqualTo(1));
+        Assert.That(sources.Count(), Is.EqualTo(2));
     }
 
 

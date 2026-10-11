@@ -44,10 +44,13 @@ At application start, the library logs which components are enabled and warns ab
       "ActivityFrequency": true,
       "AdjustContactScore": true,
       "ContactDateAnniversary": true,
+      "ContactGroupMember": true,
+      "ContactInactive": true,
       "ContactNumberFieldCompare": true,
       "PreviousStepSucceeded": true,
       "RandomSplit": true,
       "SendWebhook": true,
+      "SetContactField": true,
       "WriteToLog": true
     }
   }
@@ -125,6 +128,8 @@ verify signatures, tab order, and routing when upgrading Xperience.
 | Component | Name (configuration key) | Identifier |
 | --- | --- | --- |
 | Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExtensions.ContactDateAnniversary` |
+| Trigger – Contact in contact group (daily) | `ContactGroupMember` | `Labs.AutomationExtensions.ContactGroupMember` |
+| Trigger – Contact inactive for N days | `ContactInactive` | `Labs.AutomationExtensions.ContactInactive` |
 | Condition – Activity frequency | `ActivityFrequency` | `Labs.AutomationExtensions.ActivityFrequency` |
 | Condition – Compare contact number field | `ContactNumberFieldCompare` | `Labs.AutomationExtensions.ContactNumberFieldCompare` |
 | Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` |
@@ -132,6 +137,7 @@ verify signatures, tab order, and routing when upgrading Xperience.
 | Condition – Within time window | `WithinTimeWindow` | `Labs.AutomationExtensions.WithinTimeWindow` |
 | Action – Adjust contact score | `AdjustContactScore` | `Labs.AutomationExtensions.AdjustContactScore` |
 | Action – Send webhook | `SendWebhook` | `Labs.AutomationExtensions.SendWebhook` |
+| Action – Set contact field (dynamic value) | `SetContactField` | `Labs.AutomationExtensions.SetContactField` |
 | Action – Write to log | `WriteToLog` | `Labs.AutomationExtensions.WriteToLog` |
 
 ### Trigger – Contact date anniversary
@@ -181,6 +187,166 @@ Recommended process recurrence: **If not already running**. Avoid **Only once** 
 
 > **Load:** each task run fires one trigger per matching contact into Xperience's shared in-memory trigger queue (also used by the *Form* trigger).
 > For very large contact bases, run the task off-peak and consider increasing the `CMSAutomationTriggerQueueCapacity` application setting.
+
+### Trigger – Contact in contact group (daily)
+
+Starts a process for contacts in the selected contact group, checked once per day – for example a nurture series for a *High intent* group.
+The scheduled task fires the trigger every day for **every** current member of the group (not only for contacts that joined since the last run); the process recurrence decides whether a contact starts again.
+
+**Requires** a scheduled task configuration – without it the trigger never fires:
+
+1. Open the **Scheduled tasks** application and select **New scheduled task configuration**.
+2. Set **Task implementation** to `Labs.AutomationExtensions.ContactGroupMemberTask`.
+3. Set the **Task schedule** to run **once per day**, preferably off-peak.
+4. Select **Enabled** and **Save**.
+
+When the component is disabled, the task does nothing and its **Last result** shows `Disabled via configuration (…)`.
+When no contact groups are configured, it shows `No contact groups configured in 'AutomationExtensions:ContactGroupMember:ContactGroups'. …`; when none of the configured groups exists, `None of the contact groups configured … exist as contact groups …`.
+
+Configuration:
+
+```json
+{
+  "AutomationExtensions": {
+    "ContactGroupMember": {
+      "ContactGroups": [ "HighIntent", "TrialUsers" ],
+      "BatchSize": 500
+    }
+  }
+}
+```
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `ContactGroups` | `[]` | Code names of the contact groups scanned by the task (trimmed; empty entries and duplicates ignored, case-insensitive). Marketers can select only these groups. Each group adds one set of queries and one trigger per member to every run. Empty: the task fires nothing. |
+| `BatchSize` | `500` | Contacts loaded per database query. |
+
+Unknown code names (`ContactGroupNotFound`) and recipient lists (`ContactGroupIsRecipientList`) are skipped with a warning on every task run and aren't listed in the drop-down.
+Other object types stored in the contact group table (Xperience 31.9 *segments*) are skipped the same way (`ContactGroupNotFound`).
+
+Marketer properties:
+
+- **Contact group** – one of the configured contact groups that exist, shown as *Display name (code name)*.
+
+Trigger data (`ContactGroupMemberTriggerData`, available to custom steps via `GetTriggerData`): `ContactGroupName` (code name), `ContactGroupDisplayName`.
+
+How the task finds contacts: on each run, for every configured group, it reads the group's contact members (`OM_ContactGroupMember`, member type *contact*) in batches ordered by contact ID and fires the trigger for each existing contact. A contact in several configured groups fires once per group; each process starts only for its selected group.
+
+Process recurrence:
+
+| Recurrence | Behavior |
+| --- | --- |
+| **If not already running** (recommended) | A member starts when it isn't currently in the process – again the day after it finishes, while it is still in the group. Keep members in the process (e.g. *Wait* steps) as long as they shouldn't restart. |
+| **Only once** (recommended) | Each contact starts once, ever – even if it leaves and rejoins the group. |
+| **Always** | Every task run starts the process again for every member – daily duplicates. Avoid. |
+
+Limitations:
+
+- **No "newly joined" detection.** No state is stored: the task doesn't know when a contact joined. Every member fires on every run; recurrence prevents repeated starts.
+- **Recipient lists aren't supported.** A separate trigger (*Contact in recipient list (daily)*) is planned.
+- **Membership lags.** Group membership is maintained by Xperience's [contact group recalculation](https://docs.kentico.com/documentation/business-users/digital-marketing/contact-groups#recalculate-contact-groups). Contacts that recently started or stopped matching the conditions, or members of a group whose conditions changed but which wasn't recalculated yet, are fired according to the stored membership.
+- **Missed runs are not caught up.** If the task doesn't run on a day, or fired triggers are lost from the in-memory trigger queue (application restart), no start happens for that day – members are fired again on the next run.
+- Leaving the group doesn't stop a running process.
+
+> **Load:** each task run fires one trigger per member per configured group into Xperience's shared in-memory trigger queue (also used by the *Form* trigger).
+> When the queue is full, Xperience drops further triggers and logs a warning. Keep groups targeted, run the task off-peak, and for large groups raise the `CMSAutomationTriggerQueueCapacity` application setting (default 5000, see [configuration keys](https://docs.kentico.com/documentation/developers-and-admins/configuration/reference-configuration-keys#automation-settings)).
+> Recurrence settings don't reduce the load: triggers are fired for every member and filtered when processes evaluate them.
+
+Example – high-intent nurture:
+
+1. Contact group *High intent* (e.g. visited pricing pages and submitted a form), code name added to `ContactGroups`.
+2. Trigger: *Contact in contact group (daily)* (*High intent*), recurrence **Only once**.
+3. *Send email* – case study, *Wait* 3 days, *Send email* – demo offer.
+4. *Adjust contact score* (+20) or internal notification for sales.
+
+### Trigger – Contact inactive for N days
+
+Starts a process when a contact's last activity was exactly the selected number of days ago – for example a win-back email after 90 days without activity.
+Each contact starts once per inactivity period: on the day its last activity reaches the threshold. If it becomes active again and later reaches the threshold again, it starts again.
+
+**Requires** a scheduled task configuration – without it the trigger never fires:
+
+1. Open the **Scheduled tasks** application and select **New scheduled task configuration**.
+2. Set **Task implementation** to `Labs.AutomationExtensions.ContactInactiveTask`.
+3. Set the **Task schedule** to run **once per day** (see the recurrence notes below for more frequent runs).
+4. Select **Enabled** and **Save**.
+
+When the component is disabled, the task does nothing and its **Last result** shows `Disabled via configuration (…)`.
+
+Configuration:
+
+```json
+{
+  "AutomationExtensions": {
+    "ContactInactive": {
+      "InactiveDays": [ 30, 90, 180 ],
+      "BatchSize": 500
+    }
+  }
+}
+```
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `InactiveDays` | `[90]` | Numbers of days without activity scanned by the task (1 – 3650; invalid values are ignored). Marketers can select only these values. Each value adds one set of queries to every run. |
+| `BatchSize` | `500` | Contacts loaded per database query. |
+
+Marketer properties:
+
+- **Days without activity** – one of the configured `InactiveDays` values.
+
+Trigger data (`ContactInactiveTriggerData`, available to custom steps via `GetTriggerData`): `InactiveDays`, `LastActivityDate` (date of the last activity, UTC midnight of the server-local date).
+
+How the task matches contacts: on each run it takes today's date (server local time) and, for every configured value N, selects contacts whose **latest** activity was logged on the day exactly N days ago (at least one activity that day and none after it).
+
+Process recurrence:
+
+| Recurrence | Behavior |
+| --- | --- |
+| **If not already running** (recommended) | Starts once per inactivity period. If the task runs more than once per day, keep contacts in the process for at least one day (e.g. a *Wait* step) – later runs on the same day fire the same contacts again and only a running process prevents a second start. |
+| **Always** | Every task run on the threshold day starts the process again – duplicates if the task runs more than once per day. |
+| **Only once** | The contact never enters the process again, even after later inactivity periods. |
+
+Limitations:
+
+- **Missed runs are not caught up.** No state is stored: if the task doesn't run on a day (server down, task disabled, aborted run), or fired triggers are lost from the in-memory trigger queue (application restart), contacts that reached the threshold that day never start the process for this inactivity period.
+- **Contacts without any activity never start the process** (the contact creation date isn't used).
+- **All activity types count** – any logged activity (page visit, form submission, email click, custom activity, …) resets inactivity.
+- Dates use the **server local time** (the time zone `ActivityCreated` is stored in), not the contact's time zone.
+
+> **Load:** each task run fires one trigger per matching contact into Xperience's shared in-memory trigger queue (also used by the *Form* trigger).
+> The query reads all activities since the oldest scanned day, so large `InactiveDays` values (e.g. 365+) on big activity tables take longer. Run the task off-peak.
+
+**Optional index (large activity tables).** The query filters `OM_Activity` by `ActivityCreated` and groups by `ActivityContactID`.
+The built-in indexes cover each column separately, so SQL Server joins two index scans. A covering index removes that join.
+
+Add it with a [CI/CD database migration script](https://docs.kentico.com/documentation/developers-and-admins/ci-cd/ci-cd-database-migration-scripts)
+(also applied automatically when [deploying to SaaS](https://docs.kentico.com/documentation/developers-and-admins/deployment/deploy-to-the-saas-environment)):
+
+1. Add `@migrations/AddActivityCreatedContactIndex.sql` to your CI/CD repository folder:
+
+    ```sql
+    IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_OM_Activity_ActivityCreated_ActivityContactID' AND object_id = OBJECT_ID('OM_Activity'))
+    BEGIN
+        CREATE NONCLUSTERED INDEX IX_OM_Activity_ActivityCreated_ActivityContactID
+            ON OM_Activity (ActivityCreated)
+            INCLUDE (ActivityContactID);
+    END
+    ```
+
+2. Add `AddActivityCreatedContactIndex` on a new line in `After.txt` (create indexes after the restore).
+3. Restore with `--enable-migrations` (`--kxp-ci-restore` / `--kxp-cd-restore`). Applied migrations are recorded in `CI_Migration` / `CD_Migration` and run once.
+
+- Measured without it on ~298k activities: 40–80 ms for 1–90 days, ~190 ms for 365 days, ~280 ms for 1000 days. Add it only if the task gets slow.
+- `OM_Activity` is an Xperience system table: the index is a custom schema change. Check it still exists after hotfixes/upgrades, and expect slightly slower activity inserts.
+- To remove it: a new migration that drops the index if it exists, listed in `Before.txt` (see the docs' rollback example).
+
+Example – win-back:
+
+1. Trigger: *Contact inactive for N days* (90 days), recurrence **If not already running**.
+2. *Send email* – "We miss you" with an offer.
+3. *Wait* 7 days.
+4. *Activity frequency* (*Page visit*, 1 or more in the last 7 days) → **Yes**: *Finish*; **No**: *Adjust contact score* or internal notification.
 
 ### Action – Adjust contact score
 
@@ -265,6 +431,88 @@ Payload:
 ```
 
 Failures (non-success status, network error, timeout) are logged once as a `WebhookFailed` warning (with the exception, if any); the contact always continues to the next step.
+
+### Action – Set contact field (dynamic value)
+
+Sets a contact field to a value built from placeholders, or calculates a number from the field's current value. The built-in *Set contact field* step only sets fixed values.
+
+Examples:
+
+- Stamp the campaign: field *Last campaign* (custom text field), **Set to value** `{processName}`.
+- Remember how long a contact was inactive: field *Last inactive days* (custom integer field), **Set to value** `{triggerData.InactiveDays}` (process started by *Contact inactive for N days*).
+- Count something: field *Webinar count* (custom integer field), **Calculate** `+ 1`.
+- Stamp a date once: field *First contacted* (custom date field), **Set to value** `{today}`, **Only if the field is empty** on.
+
+**Requires:** nothing for system fields; for custom fields, a developer adds them in **Modules → Contact management → Classes → Contact management - Contact → Database columns** (see [Add custom fields to contacts](https://docs.kentico.com/documentation/developers-and-admins/digital-marketing-setup/contact-configuration#add-custom-fields-to-contacts)).
+
+Marketer properties:
+
+- **Field** – custom contact fields first (shown as *Caption (CodeName)*), then built-in fields marked *system field*. Supported data types: text, long text, integer, long integer, decimal, floating-point number, boolean (yes/no), date, date and time. Never listed: primary key (`ContactID`), `ContactGUID`, `ContactCreated`, `ContactLastModified`, `ContactBounces` (maintained by bounce handling), the legacy `ContactSalesForce*` replication fields, fields that aren't stored in the database, and other data types (GUID, binary, time span, references to content, …). Also never listed: foreign keys (`ContactStatusID`, `ContactOwnerUserID`, `ContactCountryID`, `ContactStateID`, and custom fields referencing another object) and `ContactGender` (enum).
+- **Mode** – *Set to value* (default) or *Calculate (number fields)*.
+- **Value** (*Set to value*) – text with placeholders (see below). An empty result clears the field.
+- **Only if the field is empty** (*Set to value*, off by default) – fields that already have a value aren't changed; the step still counts as succeeded.
+- **Operator** (*Calculate*) – *+ (add)* (default), *− (subtract)*, *× (multiply)*, *÷ (divide)*, *% (remainder)*.
+- **Operand** (*Calculate*) – default `1`. A number with a dot as decimal separator, or placeholders that resolve to one (for example `{triggerData.Years}`).
+- **Result number** (*Result for later steps* section) – the step always saves whether it succeeded (*Result 1–5*) for the [*Previous step succeeded*](#condition--previous-step-succeeded) condition.
+
+Placeholders (case-insensitive):
+
+| Placeholder | Value |
+| --- | --- |
+| `{now}` | Current server-local date and time, `yyyy-MM-ddTHH:mm:ss` (Xperience stores contact dates in server-local time) |
+| `{today}` | Current server-local date, `yyyy-MM-dd` |
+| `{processName}` | Name of the automation process |
+| `{triggerIdentifier}` | Identifier of the trigger that started the process (empty when unknown) |
+| `{contactId}`, `{contactGuid}` | ID / GUID of the processed contact |
+| `{contact.<Field>}` | Current value of another contact field (any database field, for example `{contact.ContactEmail}`); dates `yyyy-MM-dd` (date fields) or `yyyy-MM-ddTHH:mm:ss` |
+| `{triggerData.<Property>}` | Data of the trigger that started the process – see the table below |
+
+| Trigger | Properties |
+| --- | --- |
+| Form (built-in) | `BizFormId`, `BizFormItemId` |
+| Registration (built-in) | `MemberId` |
+| Custom activity (built-in) | `ActivityType`, `ActivityItemId`, `ActivityItemDetailId`, `ActivityValue`, `ActivityChannelId` |
+| Contact date anniversary | `FieldName`, `DaysBefore`, `AnniversaryDate`, `Years` |
+| Contact inactive for N days | `InactiveDays`, `LastActivityDate` |
+| Contact in contact group (daily) | `ContactGroupName`, `ContactGroupDisplayName` |
+
+- An unknown placeholder, an unknown field or property, or a `{triggerData.…}` placeholder in a process started by another trigger is replaced by empty text and logs a `SetContactFieldTokenUnresolved` warning (once per hour per process and placeholder). The step continues.
+- Text in braces that doesn't look like a placeholder (for example `{}` or `{a b}`) is kept as typed. There's no escaping: a literal `{word}` can't be written.
+
+Conversion of the resolved value (culture-invariant):
+
+| Field type | Accepted value |
+| --- | --- |
+| Text, long text | As is. Text longer than the field size is truncated (`SetContactFieldValueTruncated` warning, once per hour per process and field). |
+| Integer, long integer | Whole number, for example `-12` (no thousands separators) |
+| Decimal, floating-point number | Number with a dot as decimal separator, for example `12.75` or `1e3` (the database rounds decimals to the field's decimal places) |
+| Boolean | `true`, `false`, `1`, `0` (case-insensitive) |
+| Date | `yyyy-MM-dd`; a time part (`yyyy-MM-ddTHH:mm[:ss]`) is dropped |
+| Date and time | `yyyy-MM-ddTHH:mm:ss`, `yyyy-MM-ddTHH:mm`, or `yyyy-MM-dd` (midnight); no time zone offsets – values are server-local time |
+
+An empty result clears the field (stores no value). Fields that don't allow empty values get empty text (text fields) or fail the step (other types).
+
+*Calculate*: `current value <operator> operand` in the field's number type; an empty field counts as 0. Integer fields divide without decimals (truncated toward zero, `7 ÷ 2 = 3`, `-7 ÷ 2 = -3`); `%` returns the remainder with the sign of the current value. Only number fields can be calculated – *Calculate* on another field type is an invalid configuration.
+
+Behavior:
+
+- **Fails without changing the field** (step result *failed*, `SetContactFieldFailed` warning with process, contact ID, field, and reason) when the value can't be converted to the field type, the operand isn't a valid number, division or remainder by zero, the result is outside the field type's range (overflow), or saving the contact fails. The contact continues to the next step.
+- **Invalid settings** (no field, field deleted or no longer changeable, unknown mode or operator, *Calculate* on a non-number field, empty operand) log an `InvalidSetContactFieldConfiguration` warning (event ID `41080`, at most once per hour per process and field) and save a *failed* result. Nothing is changed.
+- Unchanged values aren't saved again (step succeeds). The contact is read, changed, and saved without locking – when several processes change the same field of the same contact at the same moment, the last save wins.
+- Values are never logged (they may be personal data). Successful changes log at Debug level (`ContactFieldSet`) with process, contact ID, and field name.
+- Disabled component: does nothing and saves no result, warning logged (see [Enable components](#enable-components)). **Skip this step**: does nothing and saves a *skipped* result.
+
+**Works with:** [*Previous step succeeded*](#condition--previous-step-succeeded) (step *Set contact field (dynamic value)*, same result number) to branch on failures; triggers providing data for `{triggerData.…}` placeholders; [*Compare contact number field*](#condition--compare-contact-number-field) for counters kept in integer custom fields.
+
+#### Risks of changing system fields
+
+Built-in contact fields drive Xperience features. Prefer custom fields; change system fields only when you know the effect:
+
+- **Email** (`ContactEmail`) – the address all contact emailing is sent to (marketing emails, recipient lists, automation emails). A wrong or duplicate address sends emails to the wrong person. Membership emails use the member's email and customer emails the customer's email – changing the contact email doesn't change those.
+- **Names, company, phone, address** – shown in the admin UI and used in email personalization.
+- **Boolean flags** (for example `ContactMonitored`) and `ContactCampaign` can also be set by Xperience itself and may be overwritten later.
+
+Changes apply immediately and the process can't undo them. The step keeps no history of previous values. Test on a staging copy before using it on system fields in production.
 
 ### Action – Write to log
 
@@ -417,7 +665,7 @@ Marketer properties:
 - **Step** – type of the earlier step (e.g. *Send webhook*). Lists library steps and [custom steps registered by developers](#support-previous-step-succeeded-in-custom-steps).
 - **Result number** – the number selected on the earlier step (*Result 1–5*).
 
-**Works with:** *Send webhook* (or a registered custom step) with **Record result for later steps** turned on and the same **Result number**.
+**Works with:** *Send webhook* (or a registered custom step) with **Record result for later steps** turned on, or *Set contact field (dynamic value)* (always saves its result), and the same **Result number**.
 If no earlier step saved that result (missing step, different number, or the earlier step was disabled), an enabled condition follows **No** and logs a warning. If this condition itself is disabled, all contacts follow **No** without reading the saved result.
 
 Each step type has its own numbered results, so different step types never overwrite each other. Within a process, give each step of the same type a different number. Steps can't detect which other steps exist in a process, so the step and number must be matched manually.
@@ -506,7 +754,7 @@ When the component is disabled globally, all contacts follow the **No** branch w
 
 Xperience doesn't allow deleting steps from a process that is enabled or has contact history. All library actions and conditions have a **Step behavior** section (at the bottom of the step configuration) to take a step out of such a process instead:
 
-- **Actions** – **Skip this step**: contacts move on without the step running. If the step saves results (*Record result for later steps*), it saves a *skipped* result, which *Previous step succeeded* treats as not succeeded (No branch, no warning), and *Write to log* shows as `skipped`.
+- **Actions** – **Skip this step**: contacts move on without the step running. If the step saves results (*Record result for later steps*; always for *Set contact field (dynamic value)*), it saves a *skipped* result, which *Previous step succeeded* treats as not succeeded (No branch, no warning), and *Write to log* shows as `skipped`.
 - **Conditions** – **Skip this step** + **Always follow** (*No branch* by default, or *Yes branch*): the condition isn't evaluated and all contacts follow the selected branch.
 
 Changes apply immediately, also to contacts already in the process (including contacts in *Wait* steps). Skipped steps log at debug level (`StepSkipped`).
@@ -551,9 +799,12 @@ Keep your own property and category `Order` values below `SkippableStep.CATEGORY
 | Adjust contact score | Integer custom contact field | Field list empty; invalid step does nothing, warning logged |
 | Compare contact number field | Integer custom contact field (usually kept by *Adjust contact score*) | Field list empty; invalid step follows **No** branch, warning logged |
 | Contact date anniversary | Scheduled task configuration | Trigger never fires |
+| Contact in contact group (daily) | Scheduled task configuration; contact group code names in `ContactGroups`; contact group recalculation | Trigger never fires; drop-down empty; stale membership |
+| Contact inactive for N days | Scheduled task configuration; logged activities | Trigger never fires; contacts without activity never start |
 | Previous step succeeded | Earlier step of the selected type saving the same result number | Follows **No** branch, warning logged |
 | Random split (A/B) | None | No additional setup required |
 | Send webhook | Endpoint in configuration | Does nothing, warning logged |
+| Set contact field (dynamic value) | Custom contact field (recommended); trigger providing data for `{triggerData.…}` placeholders | Field list has system fields only; placeholder empty, warning logged |
 | Write to log | Logging configuration routing `Kentico*` categories at the selected level | Nothing visible in the Event log |
 
 ## Example process – CRM sync with retry
@@ -609,7 +860,7 @@ If a registered step type is removed later, conditions that reference it keep th
 
 ### Saved result format
 
-Results are stored in the `StepResultData` automation process data (identifier `Labs.AutomationExtensions.StepResultData`): a dictionary keyed by `<step name>.<result number>`, e.g. `SendWebhook.1` or `Acme.SyncToCrm.2`.
+Results are stored in the `StepResultData` automation process data (identifier `Labs.AutomationExtensions.StepResultData`): a dictionary keyed by `<step name>.<result number>`, e.g. `SendWebhook.1`, `SetContactField.1`, or `Acme.SyncToCrm.2`.
 Values: `Succeeded`, `ActionIdentifier`, `RecordedAt` (UTC), `Message`. The data is deleted together with the contact.
 
 ## Logging
@@ -643,6 +894,15 @@ All library log entries use named event IDs, shown in the **Code** column of the
 | 41061 | `ActivityFrequencyEvaluated` | Debug | *Activity frequency* count and result for a contact |
 | 41062 | `ActivityUrlLimitExceeded` | Warning | *Activity frequency* URL rules skipped: contact has more than 10,000 distinct URLs in the window, contact follows **No** (once per hour per process and activity type) |
 | 41063 | `UrlMatchTimeout` | Warning | A *matches pattern* URL rule took too long; affected URLs counted as not matching (once per hour per process) |
+| 41070 | `ContactInactiveTaskCompleted` | Information | *Contact inactive for N days* scheduled task run summary |
+| 41080 | `InvalidSetContactFieldConfiguration` | Warning | *Set contact field (dynamic value)* settings can't be applied, nothing changed (once per hour per process and field) |
+| 41081 | `SetContactFieldTokenUnresolved` | Warning | *Set contact field (dynamic value)* placeholder replaced by empty text (once per hour per process and placeholder) |
+| 41082 | `SetContactFieldValueTruncated` | Warning | *Set contact field (dynamic value)* text longer than the field size was truncated (once per hour per process and field) |
+| 41083 | `SetContactFieldFailed` | Warning | *Set contact field (dynamic value)* didn't change a contact's field: conversion, calculation, or save failed (no values logged) |
+| 41084 | `ContactFieldSet` | Debug | *Set contact field (dynamic value)* outcome for a contact (updated, unchanged, or not empty) |
+| 41090 | `ContactGroupMemberTaskCompleted` | Information | *Contact in contact group (daily)* scheduled task run summary (total and per-group trigger counts) |
+| 41091 | `ContactGroupNotFound` | Warning | Configured contact group doesn't exist or isn't a contact group (e.g. a segment); skipped (every task run) |
+| 41092 | `ContactGroupIsRecipientList` | Warning | Configured contact group is a recipient list; skipped (every task run) |
 
 ## Localization
 

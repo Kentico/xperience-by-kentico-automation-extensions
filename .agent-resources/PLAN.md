@@ -600,6 +600,34 @@ Details, user decisions, real-data checks: spec `implementation-spec-activity-fr
 - Regex rejected (SaaS DB compat level 160 < 170). No UTM filters (not populated by default).
 - **Validation:** 727 unit tests passed. Running app (user, 2026-10-11): URL rules, Test a URL, property visibility/ordering per type. Open: 41060 invalid config, disabled → 41003.
 
+### Slice 8 (2026-10-11) – Contact inactive for N days (#3), implemented and unit-validated
+
+Spec: `implementation-spec-contact-inactive.md`. Trigger `Labs.AutomationExtensions.ContactInactive` + `ContactInactiveTask`; mirrors anniversary (#2).
+
+- Fires for contacts whose last activity local date = today − N (N from appsettings `ContactInactive:InactiveDays`, 1–3650, default `[90]`). Once per threshold crossing, no stored state.
+- User decisions: missed/aborted runs not caught up (no contact extension for now); same-day re-runs allowed with *If not already running* + Wait step (user confirmed Wait = running); no-activity contacts skipped; no activity type filter in v1.
+- Query: `OM_Activity` grouped by `ActivityContactID`, `WHERE ActivityCreated >= start … HAVING MAX(ActivityCreated) < end`, keyset batches. PROD analysis DB (298k activities): 42–280 ms per N; no covering index (`(ActivityCreated) INCLUDE (ActivityContactID)` option, not added; Usage Guide documents it as an optional CI/CD migration script in `After.txt` – also works for SaaS deployments).
+- Icon `Pause`; log event 41070. Tests: 754 (+27).
+
+### Slice 9 (2026-10-11) – Set contact field (dynamic value) (#17), implemented and unit-validated
+
+Spec: `implementation-spec-set-contact-field.md`. Action `Labs.AutomationExtensions.SetContactField`; step result source `SetContactField`.
+
+- Modes: *Set to value* (tokens `{now}`, `{today}`, `{processName}`, `{triggerIdentifier}`, `{contactId}`, `{contactGuid}`, `{contact.X}`, `{triggerData.X}` for 5 known trigger data types; *Only if empty*) and *Calculate* (`+ − × ÷ %`, checked math, empty current = 0). Adjust contact score (#16) unchanged.
+- User decisions: all modifiable system + custom fields (risks documented); unresolved token → empty + warning; fail only on unrecoverable errors (conversion, ÷0, overflow, invalid config, save).
+- Excluded fields: `ContactID`, `ContactGUID`, `ContactCreated`, `ContactLastModified`, `ContactBounces`, `ContactSalesForceLead*`, foreign keys (`ContactStatusID`, `ContactOwnerUserID`, `ContactCountryID`, `ContactStateID` – the only FKs on `OM_Contact`, checked in DB – plus any custom field with a reference object type), `ContactGender` (enum), dummy fields, unsupported types (user decision 2026-10-11). Contact email drives all contact emailing; member/customer emails drive membership/customer emailing.
+- `{now}`/`{today}` server local time (contact dates stored local). Save failure restores the in-memory value; only exception type logged (PII).
+- Icon `EditInSquare`; log events 41080–41084. Tests: 1054 (+293).
+
+### Slice 10 (2026-10-11) – Contact in contact group (daily) (#1), implemented and unit-validated
+
+Spec: `implementation-spec-contact-group-member.md`. Trigger `Labs.AutomationExtensions.ContactGroupMember` + `ContactGroupMemberTask`.
+
+- User decisions: groups from appsettings `ContactGroupMember:ContactGroups` (future: admin-UI settings object behind `ContactGroupResolver`); dynamic contact groups only; recipient lists → separate future trigger (#23). Fires every member every run (PLAN 4.1).
+- Verified (31.9.1 reflection + DancingGoat DB): `ContactGroupMemberTypeEnum.Contact = 0`; recipient list flag `ContactGroupIsRecipientList` (`om.recipientlist`); `om.contactgroup` type condition already excludes recipient lists and **segments** (`ContactGroupIsSegment`, `om.segment` – evaluation-only API in 31.9.1, KXE0006 – not referenced; skipped).
+- Resolver: type-filtered lookup, then unfiltered lookup to classify recipient list / other type / missing → warnings 41091/41092. Task summary 41090 with per-group counts.
+- Icon `Users`. Trigger data added to Write to log details and `{triggerData.X}`; Write to log now also describes #3 trigger data. Tests: 1082 (+28).
+
 ### Decision (2026-10-05): disabled library conditions → No
 
 History: Yes (Slice 2) → texts said "No (A)" while code returned `true` (Yes) → final **No** for all library conditions (`return false`). Changed several times; don't revisit without the user.

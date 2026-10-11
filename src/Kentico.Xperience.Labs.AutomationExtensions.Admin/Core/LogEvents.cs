@@ -25,4 +25,13 @@ public static class LogEvents
     public static readonly EventId ActivityFrequencyEvaluated = new(41061, nameof(ActivityFrequencyEvaluated));
     public static readonly EventId ActivityUrlLimitExceeded = new(41062, nameof(ActivityUrlLimitExceeded));
     public static readonly EventId UrlMatchTimeout = new(41063, nameof(UrlMatchTimeout));
+    public static readonly EventId ContactInactiveTaskCompleted = new(41070, nameof(ContactInactiveTaskCompleted));
+    public static readonly EventId InvalidSetContactFieldConfiguration = new(41080, nameof(InvalidSetContactFieldConfiguration));
+    public static readonly EventId SetContactFieldTokenUnresolved = new(41081, nameof(SetContactFieldTokenUnresolved));
+    public static readonly EventId SetContactFieldValueTruncated = new(41082, nameof(SetContactFieldValueTruncated));
+    public static readonly EventId SetContactFieldFailed = new(41083, nameof(SetContactFieldFailed));
+    public static readonly EventId ContactFieldSet = new(41084, nameof(ContactFieldSet));
+    public static readonly EventId ContactGroupMemberTaskCompleted = new(41090, nameof(ContactGroupMemberTaskCompleted));
+    public static readonly EventId ContactGroupNotFound = new(41091, nameof(ContactGroupNotFound));
+    public static readonly EventId ContactGroupIsRecipientList = new(41092, nameof(ContactGroupIsRecipientList));
 }

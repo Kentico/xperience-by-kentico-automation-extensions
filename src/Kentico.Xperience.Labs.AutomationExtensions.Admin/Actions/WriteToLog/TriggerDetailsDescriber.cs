@@ -3,6 +3,8 @@ using System.Globalization;
 using CMS.Automation;
 
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Actions.WriteToLog;
 
@@ -31,6 +33,23 @@ internal static class TriggerDetailsDescriber
                 ? null
                 : string.Format(CultureInfo.InvariantCulture, "field {0}, {1} day(s) before, {2:yyyy-MM-dd}, {3} year(s)",
                     anniversary.FieldName, anniversary.DaysBefore, anniversary.AnniversaryDate, anniversary.Years);
+        }
+
+        if (string.Equals(identifier, ContactGroupMemberTrigger.IDENTIFIER, StringComparison.Ordinal))
+        {
+            var groupMember = await context.GetTriggerData<ContactGroupMemberTriggerData>(cancellationToken);
+
+            return groupMember is null ? null : $"contact group {groupMember.ContactGroupName}";
+        }
+
+        if (string.Equals(identifier, ContactInactiveTrigger.IDENTIFIER, StringComparison.Ordinal))
+        {
+            var inactive = await context.GetTriggerData<ContactInactiveTriggerData>(cancellationToken);
+
+            return inactive is null
+                ? null
+                : string.Format(CultureInfo.InvariantCulture, "inactive {0} day(s), last activity {1:yyyy-MM-dd}",
+                    inactive.InactiveDays, inactive.LastActivityDate);
         }
 
         if (await context.TriggeredByFormSubmission(cancellationToken))

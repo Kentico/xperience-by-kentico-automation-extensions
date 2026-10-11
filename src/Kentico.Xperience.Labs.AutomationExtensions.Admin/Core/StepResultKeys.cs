@@ -1,6 +1,7 @@
 using System.Globalization;
 
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
+using Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Core;
 
@@ -30,6 +31,12 @@ public static class StepResultKeys
     /// Result source of the library's "Send webhook" action.
     /// </summary>
     public static readonly StepResultSource SendWebhook = new(SendWebhookAction.NAME, "labs.automationextensions.sendwebhook.displayname");
+
+
+    /// <summary>
+    /// Result source of the library's "Set contact field (dynamic value)" action.
+    /// </summary>
+    public static readonly StepResultSource SetContactField = new(SetContactFieldAction.NAME, "labs.automationextensions.setcontactfield.displayname");
 
 
     /// <summary>

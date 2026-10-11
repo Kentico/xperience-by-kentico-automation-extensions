@@ -1,9 +1,11 @@
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.AdjustContactScore;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
+using Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.ActivityFrequency;
 using Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 using Kentico.Xperience.Labs.AutomationExtensions.Core;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -34,12 +36,15 @@ public static class AutomationExtensionsServiceCollectionExtensions
         services.TryAddSingleton<IWebhookSender, WebhookSender>();
 
         services.TryAddSingleton<DateFieldResolver>();
+        services.TryAddSingleton<ContactGroupResolver>();
         services.TryAddSingleton<ContactScoreFieldResolver>();
+        services.TryAddSingleton<ContactFieldResolver>();
         services.TryAddSingleton<ActivityTypeResolver>();
         services.TryAddSingleton<ActivityLanguageResolver>();
         services.TryAddSingleton<IActivityCounter, ActivityCounter>();
 
         services.AddStepResultSource(StepResultKeys.SendWebhook);
+        services.AddStepResultSource(StepResultKeys.SetContactField);
 
         return services;
     }
