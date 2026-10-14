@@ -183,6 +183,42 @@ public class StepRegistryTests
     }
 
 
+    [Test]
+    public void AdditionalComponents_ShownAsLibraryRowsWithStatus()
+    {
+        var extra = new AutomationComponentDescriptor("OrderCompleted", AutomationComponentKind.Trigger);
+        var options = new TestOptionsMonitor<AutomationExtensionsOptions>(new AutomationExtensionsOptions { Components = { ["OrderCompleted"] = true } });
+        var registrations = LibraryRegistrations()
+            .Append(new RegisteredAutomationComponent(extra.Identifier, "Order completed", null, AutomationComponentKind.Trigger))
+            .ToList();
+        var registry = new StepRegistry(new AutomationComponentStatus(options), options, () => registrations, [extra]);
+
+        var rows = registry.GetRows();
+        var row = rows.Single(row => row.Identifier == extra.Identifier);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(rows, Has.Count.EqualTo(AutomationComponentCatalog.All.Count + 1));
+            Assert.That(row.Status, Is.EqualTo("enabled"));
+            Assert.That(rows.Where(other => other.Kind is null), Is.Empty, "Configured extra component isn't reported as unknown.");
+        });
+    }
+
+
+    [Test]
+    public void AdditionalComponents_NotRegistered_RemainVisible()
+    {
+        var extra = new AutomationComponentDescriptor("OrderCompleted", AutomationComponentKind.Trigger);
+        var options = new AutomationExtensionsOptions();
+
+        var rows = StepRegistry.BuildRows(LibraryRegistrations(), options,
+            new AutomationComponentStatus(new TestOptionsMonitor<AutomationExtensionsOptions>(options)),
+            AutomationComponentCatalog.WithAdditional([extra]));
+
+        Assert.That(rows.Single(row => row.Identifier == extra.Identifier).Status, Is.EqualTo("notapplicable"));
+    }
+
+
     internal static IReadOnlyList<StepRegistryRow> BuildRows(
         AutomationExtensionsOptions options,
         IEnumerable<RegisteredAutomationComponent>? registrations = null) =>

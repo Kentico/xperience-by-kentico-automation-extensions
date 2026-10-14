@@ -1,6 +1,7 @@
 using CMS.Automation.Internal;
 
 using Kentico.Xperience.Admin.Base.Forms;
+using Kentico.Xperience.Labs.AutomationExtensions.Core;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Conditions.StartedByTrigger;
 

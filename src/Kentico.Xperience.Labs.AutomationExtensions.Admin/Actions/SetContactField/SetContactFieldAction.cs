@@ -1,4 +1,5 @@
 using CMS.Automation;
+using CMS.Automation.Internal;
 using CMS.ContactManagement;
 using CMS.Core;
 using CMS.DataEngine;
@@ -32,6 +33,7 @@ public sealed class SetContactFieldAction(
     IAutomationComponentStatus componentStatus,
     IInfoProvider<ContactInfo> contactInfoProvider,
     ContactFieldResolver fieldResolver,
+    ICustomAutomationTriggerProvider triggerProvider,
     TimeProvider timeProvider,
     ILoggerFactory loggerFactory) : AutomationAction<SetContactFieldActionProperties>
 {
@@ -45,6 +47,7 @@ public sealed class SetContactFieldAction(
     private readonly IAutomationComponentStatus componentStatus = componentStatus;
     private readonly IInfoProvider<ContactInfo> contactInfoProvider = contactInfoProvider;
     private readonly ContactFieldResolver fieldResolver = fieldResolver;
+    private readonly ICustomAutomationTriggerProvider triggerProvider = triggerProvider;
     private readonly TimeProvider timeProvider = timeProvider;
     private readonly ILogger logger = loggerFactory.CreateLogger(LogCategories.For(AutomationComponentCatalog.SetContactField));
 
@@ -149,16 +152,22 @@ public sealed class SetContactFieldAction(
         AutomationProcessContext context,
         ContactInfo contact,
         string processName,
-        CancellationToken cancellationToken) => new()
+        CancellationToken cancellationToken)
+    {
+        string triggerIdentifier = await context.GetTriggerIdentifier(cancellationToken) ?? string.Empty;
+
+        return new()
         {
             Now = timeProvider.GetLocalNow().DateTime,
             ProcessName = processName,
-            TriggerIdentifier = await context.GetTriggerIdentifier(cancellationToken) ?? string.Empty,
+            TriggerIdentifier = triggerIdentifier,
             ContactId = contact.ContactID,
             ContactGuid = contact.ContactGUID,
             GetContactFieldValue = name => GetContactFieldValue(contact, name),
+            Trigger = RegisteredTriggers.Find(triggerProvider, triggerIdentifier),
             TriggerData = await context.GetTriggerData<IAutomationTriggerData>(cancellationToken)
         };
+    }
 
 
     private string? GetContactFieldValue(ContactInfo contact, string name)

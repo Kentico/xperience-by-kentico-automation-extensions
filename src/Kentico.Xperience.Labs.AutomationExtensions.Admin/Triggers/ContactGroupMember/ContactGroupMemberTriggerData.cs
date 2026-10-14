@@ -6,7 +6,7 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMembe
 /// Payload of <see cref="ContactGroupMemberTrigger"/>. Available to later steps via <c>GetTriggerData</c>.
 /// Property names are persisted with process data – never rename them.
 /// </summary>
-public sealed class ContactGroupMemberTriggerData : IAutomationTriggerData
+public sealed class ContactGroupMemberTriggerData : IAutomationTriggerData, ITriggerDataDescription
 {
     /// <inheritdoc />
     public string Identifier => "Labs.AutomationExtensions.ContactGroupMemberTriggerData";
@@ -22,4 +22,8 @@ public sealed class ContactGroupMemberTriggerData : IAutomationTriggerData
     /// Display name of the contact group at the time the trigger fired.
     /// </summary>
     public string ContactGroupDisplayName { get; init; } = string.Empty;
+
+
+    /// <inheritdoc />
+    public string Describe() => $"contact group {ContactGroupName}";
 }

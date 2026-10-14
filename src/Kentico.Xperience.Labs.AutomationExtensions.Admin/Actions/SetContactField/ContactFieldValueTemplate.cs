@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.WriteToLog;
+using Kentico.Xperience.Labs.AutomationExtensions.Core;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 
@@ -90,6 +91,13 @@ internal sealed class ContactFieldTokenValues
 
 
     /// <summary>
+    /// Registered trigger that started the process (<see cref="RegisteredTriggers.Find"/>), or <c>null</c> when it isn't
+    /// registered. <c>{triggerData.X}</c> tokens resolve only for data of this trigger's data type.
+    /// </summary>
+    public RegisteredTrigger? Trigger { get; init; }
+
+
+    /// <summary>
     /// Trigger data of the process (<c>null</c> when the trigger provides none).
     /// </summary>
     public object? TriggerData { get; init; }
@@ -109,7 +117,7 @@ internal sealed class ContactFieldTokenValues
 
             if (Is(name, ContactFieldValueTemplate.TRIGGER_DATA))
             {
-                return TriggerDataTokens.TryGetValue(TriggerData, part, out string value) ? value : null;
+                return TriggerDataTokens.TryGetValue(Trigger, TriggerData, part, out string value) ? value : null;
             }
 
             return null;

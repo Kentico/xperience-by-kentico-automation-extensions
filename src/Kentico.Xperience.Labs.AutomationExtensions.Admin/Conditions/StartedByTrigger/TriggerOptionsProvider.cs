@@ -2,6 +2,7 @@ using CMS.Automation.Internal;
 using CMS.Core;
 
 using Kentico.Xperience.Admin.Base.FormAnnotations;
+using Kentico.Xperience.Labs.AutomationExtensions.Core;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Conditions.StartedByTrigger;
 

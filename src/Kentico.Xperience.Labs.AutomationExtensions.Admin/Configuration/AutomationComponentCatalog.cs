@@ -59,4 +59,14 @@ public static class AutomationComponentCatalog
         SetContactField,
         WriteToLog
     ];
+
+
+    /// <summary>
+    /// Returns <see cref="All"/> followed by components registered outside this assembly
+    /// (<c>AddAutomationComponent</c>, e.g. commerce components), without duplicate names.
+    /// </summary>
+    public static IReadOnlyList<AutomationComponentDescriptor> WithAdditional(IEnumerable<AutomationComponentDescriptor>? additional) =>
+        All.Concat(additional ?? [])
+            .DistinctBy(component => component.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
 }

@@ -1,6 +1,8 @@
 using CMS.Automation;
 
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
+using Kentico.Xperience.Labs.AutomationExtensions.Core;
+using Kentico.Xperience.Labs.AutomationExtensions.Tests.TestDoubles;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
@@ -10,6 +12,7 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Actions;
 public class ContactFieldValueTemplateTests
 {
     private static readonly Guid contactGuid = Guid.Parse("8f6c2b8e-6d33-4c4a-9c47-0e2b1d1f6a10");
+    private static readonly StubTriggerProvider triggers = ProjectTriggers.CreateProvider();
 
 
     [TestCase("{now}", "2026-10-11T14:05:09")]
@@ -157,22 +160,53 @@ public class ContactFieldValueTemplateTests
 
 
     [Test]
-    public void TriggerData_UnknownTypeIsNotRead()
+    public void TriggerData_ProjectTriggerFromTriggerStore() => AssertTriggerData(
+        new ProjectTriggers.DescribedTriggerData { Score = 5, Amount = 12.5m, Code = "B2" },
+        ("Score", "5"), ("Amount", "12.5"), ("Code", "B2"));
+
+
+    [Test]
+    public void TriggerData_UnregisteredTypeIsNotRead()
     {
         var data = new UnknownTriggerData { Secret = "value" };
+        var unresolved = new List<string>();
+
+        string result = ContactFieldValueTemplate.Resolve("{triggerData.Secret}", CreateValues(data), unresolved);
 
         Assert.Multiple(() =>
         {
             Assert.That(data.Secret, Is.Not.Empty);
-            Assert.That(TriggerDataTokens.TryGetValue(data, nameof(UnknownTriggerData.Secret), out _), Is.False);
-            Assert.That(TriggerDataTokens.GetPropertyNames(typeof(UnknownTriggerData)), Is.Empty);
+            Assert.That(result, Is.Empty);
+            Assert.That(unresolved, Is.EqualTo(new[] { "triggerData.Secret" }));
+            Assert.That(TriggerDataTokens.TryGetValue(null, data, nameof(UnknownTriggerData.Secret), out _), Is.False);
         });
     }
 
 
     [Test]
-    public void TriggerData_PropertyNamesExcludeIdentifier() =>
-        Assert.That(TriggerDataTokens.GetPropertyNames(typeof(ContactInactiveTriggerData)), Is.EquivalentTo(new[] { "InactiveDays", "LastActivityDate" }));
+    public void TriggerData_DataOfAnotherTriggerIsNotRead()
+    {
+        var unresolved = new List<string>();
+        var values = new ContactFieldTokenValues
+        {
+            Trigger = RegisteredTriggers.Find(triggers, ContactInactiveTrigger.IDENTIFIER),
+            TriggerData = new ContactGroupMemberTriggerData { ContactGroupName = "HighIntent" }
+        };
+
+        string result = ContactFieldValueTemplate.Resolve("{triggerData.ContactGroupName}", values, unresolved);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result, Is.Empty);
+            Assert.That(unresolved, Is.EqualTo(new[] { "triggerData.ContactGroupName" }));
+        });
+    }
+
+
+    [Test]
+    public void TriggerData_TriggerWithoutDataIsNotRead() => Assert.That(
+        TriggerDataTokens.TryGetValue(RegisteredTriggers.Find(triggers, StubTriggerProvider.NO_DATA_TRIGGER), new ContactInactiveTriggerData(), "InactiveDays", out _),
+        Is.False);
 
 
     private static void AssertTriggerData(IAutomationTriggerData data, params (string Property, string Expected)[] expectations) => Assert.Multiple(() =>
@@ -216,6 +250,7 @@ public class ContactFieldValueTemplateTests
             "acmeempty" => string.Empty,
             _ => null
         },
+        Trigger = triggerData is null ? null : RegisteredTriggers.GetAll(triggers).FirstOrDefault(trigger => trigger.DataType == triggerData.GetType()),
         TriggerData = triggerData
     };
 

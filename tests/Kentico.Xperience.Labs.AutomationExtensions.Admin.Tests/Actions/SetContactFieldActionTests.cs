@@ -8,6 +8,7 @@ using Kentico.Xperience.Admin.Base;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 using Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 using Kentico.Xperience.Labs.AutomationExtensions.Core;
+using Kentico.Xperience.Labs.AutomationExtensions.Tests.TestDoubles;
 
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -158,7 +159,7 @@ public class SetContactFieldActionTests
 
 
     private static SetContactFieldAction CreateAction(bool enabled, IInfoProvider<ContactInfo> provider, ContactFieldResolver resolver) =>
-        new(new StubComponentStatus(enabled), provider, resolver, new FixedTimeProvider(), NullLoggerFactory.Instance);
+        new(new StubComponentStatus(enabled), provider, resolver, StubTriggerProvider.WithLibraryTriggers(), new FixedTimeProvider(), NullLoggerFactory.Instance);
 
 
     private static ContactFieldResolver ThrowingResolver() => new(

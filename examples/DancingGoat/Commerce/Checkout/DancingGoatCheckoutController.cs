@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using CMS.Commerce;
+using CMS.ContactManagement;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 using CMS.Membership;
@@ -18,6 +19,7 @@ using DancingGoat.Services;
 using Kentico.Commerce.Web.Mvc;
 using Kentico.Content.Web.Mvc.Routing;
 using Kentico.Membership;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.OrderCompleted;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +51,7 @@ public sealed class DancingGoatCheckoutController : Controller
     private readonly CalculationService calculationService;
     private readonly ShippingMethodOptionsService shippingMethodOptionsService;
     private readonly IInfoProvider<OrderInfo> orderInfoProvider;
+    private readonly IOrderCompletedTriggerDispatcher orderCompletedTriggerDispatcher;
 
     public DancingGoatCheckoutController(
         CountryStateRepository countryStateRepository,
@@ -66,7 +69,8 @@ public sealed class DancingGoatCheckoutController : Controller
         ShippingRepository shippingRepository,
         CalculationService calculationService,
         ShippingMethodOptionsService shippingMethodOptionsService,
-        IInfoProvider<OrderInfo> orderInfoProvider)
+        IInfoProvider<OrderInfo> orderInfoProvider,
+        IOrderCompletedTriggerDispatcher orderCompletedTriggerDispatcher)
     {
         this.countryStateRepository = countryStateRepository;
         this.webPageUrlProvider = webPageUrlProvider;
@@ -84,6 +88,7 @@ public sealed class DancingGoatCheckoutController : Controller
         this.calculationService = calculationService;
         this.shippingMethodOptionsService = shippingMethodOptionsService;
         this.orderInfoProvider = orderInfoProvider;
+        this.orderCompletedTriggerDispatcher = orderCompletedTriggerDispatcher;
     }
 
 
@@ -185,13 +190,18 @@ public sealed class DancingGoatCheckoutController : Controller
 
         await currentShoppingCartDiscardHandler.Discard(cancellationToken);
 
-        var orderNumber = await OrderIdToOrderNumber(orderId, cancellationToken);
+        var orderInfo = await GetOrder(orderId, cancellationToken);
 
-        return View(new ConfirmOrderViewModel(orderNumber));
+        // Automation extensions "Order completed" trigger: pass the contact of this request explicitly
+        // (null when the visitor isn't tracked, e.g. no cookie consent → not fired). Never resolve it from the customer email.
+        var contact = ContactManagementContext.GetCurrentContact(createAnonymous: false);
+        await orderCompletedTriggerDispatcher.Fire(orderInfo, contact, PriceFormatter.CurrencyCode, cancellationToken);
+
+        return View(new ConfirmOrderViewModel(orderInfo.OrderNumber));
     }
 
 
-    private async Task<string> OrderIdToOrderNumber(int orderId, CancellationToken cancellationToken)
+    private async Task<OrderInfo> GetOrder(int orderId, CancellationToken cancellationToken)
     {
         var orderInfo = await orderInfoProvider.GetAsync(orderId, cancellationToken);
 
@@ -200,7 +210,7 @@ public sealed class DancingGoatCheckoutController : Controller
             throw new InvalidOperationException($"Order with ID {orderId} does not exist.");
         }
 
-        return orderInfo.OrderNumber;
+        return orderInfo;
     }
 
 

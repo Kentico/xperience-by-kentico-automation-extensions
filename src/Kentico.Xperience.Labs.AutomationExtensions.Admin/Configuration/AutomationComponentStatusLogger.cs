@@ -12,21 +12,23 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 internal sealed class AutomationComponentStatusLogger(
     IAutomationComponentStatus componentStatus,
     IOptions<AutomationExtensionsOptions> options,
+    IEnumerable<AutomationComponentDescriptor> additionalComponents,
     ILoggerFactory loggerFactory) : IHostedService
 {
     private readonly IAutomationComponentStatus componentStatus = componentStatus;
     private readonly IOptions<AutomationExtensionsOptions> options = options;
+    private readonly IReadOnlyList<AutomationComponentDescriptor> components = AutomationComponentCatalog.WithAdditional(additionalComponents);
     private readonly ILogger logger = loggerFactory.CreateLogger(LogCategories.CONFIGURATION);
 
 
     /// <inheritdoc />
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        var enabledNames = AutomationComponentCatalog.All
+        var enabledNames = components
             .Where(componentStatus.IsEnabled)
             .Select(component => component.Name)
             .ToList();
-        var disabledNames = AutomationComponentCatalog.All
+        var disabledNames = components
             .Where(component => !componentStatus.IsEnabled(component))
             .Select(component => component.Name)
             .ToList();
@@ -38,7 +40,7 @@ internal sealed class AutomationComponentStatusLogger(
             FormatNames(disabledNames),
             AutomationExtensionsOptions.SECTION_NAME);
 
-        var knownNames = AutomationComponentCatalog.All
+        var knownNames = components
             .Select(component => component.Name)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 

@@ -1,4 +1,5 @@
 using CMS.Automation;
+using CMS.Automation.Internal;
 using CMS.ContactManagement;
 
 using Kentico.Xperience.Admin.Base;
@@ -27,6 +28,7 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Actions.WriteToLog;
 /// </remarks>
 public sealed class WriteToLogAction(
     IAutomationComponentStatus componentStatus,
+    ICustomAutomationTriggerProvider triggerProvider,
     ILoggerFactory loggerFactory) : AutomationAction<WriteToLogActionProperties>
 {
     public const string NAME = "WriteToLog";
@@ -34,6 +36,7 @@ public sealed class WriteToLogAction(
 
 
     private readonly IAutomationComponentStatus componentStatus = componentStatus;
+    private readonly ICustomAutomationTriggerProvider triggerProvider = triggerProvider;
     private readonly ILogger logger = loggerFactory.CreateLogger(LogCategories.For(AutomationComponentCatalog.WriteToLog));
 
 
@@ -66,7 +69,7 @@ public sealed class WriteToLogAction(
             ? StepResultSummary.Format(await context.GetProcessData<StepResultData>(cancellationToken))
             : "-";
         string triggerDetails = properties.IncludeTriggerDetails
-            ? await TriggerDetailsDescriber.Describe(context, cancellationToken)
+            ? await TriggerDetailsDescriber.Describe(context, triggerProvider, cancellationToken)
             : "-";
 
         logger.Log(

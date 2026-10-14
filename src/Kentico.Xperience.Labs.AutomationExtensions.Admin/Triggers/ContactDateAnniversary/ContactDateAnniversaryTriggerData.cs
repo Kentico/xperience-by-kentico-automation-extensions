@@ -1,3 +1,5 @@
+using System.Globalization;
+
 using CMS.Automation;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
@@ -5,7 +7,7 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnnive
 /// <summary>
 /// Payload of <see cref="ContactDateAnniversaryTrigger"/>. Available to later steps via <c>GetTriggerData</c>.
 /// </summary>
-public sealed class ContactDateAnniversaryTriggerData : IAutomationTriggerData
+public sealed class ContactDateAnniversaryTriggerData : IAutomationTriggerData, ITriggerDataDescription
 {
     /// <inheritdoc />
     public string Identifier => "Labs.AutomationExtensions.ContactDateAnniversaryTriggerData";
@@ -33,4 +35,14 @@ public sealed class ContactDateAnniversaryTriggerData : IAutomationTriggerData
     /// Whole years since the original date on the anniversary (e.g. age on a birthday).
     /// </summary>
     public int Years { get; init; }
+
+
+    /// <inheritdoc />
+    public string Describe() => string.Format(
+        CultureInfo.InvariantCulture,
+        "field {0}, {1} day(s) before, {2:yyyy-MM-dd}, {3} year(s)",
+        FieldName,
+        DaysBefore,
+        AnniversaryDate,
+        Years);
 }

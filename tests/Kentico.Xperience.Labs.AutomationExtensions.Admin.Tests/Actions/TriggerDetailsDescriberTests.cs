@@ -9,7 +9,8 @@ using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
 namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Actions;
 
 /// <summary>
-/// Pins the <c>{triggerDetails}</c> text of Write to log (behavior before the known trigger registry refactoring).
+/// Pins the <c>{triggerDetails}</c> text of Write to log: built-in formats, library <c>ITriggerDataDescription</c> texts (unchanged
+/// since slice 9), project triggers through the trigger store.
 /// </summary>
 public class TriggerDetailsDescriberTests
 {
@@ -35,11 +36,30 @@ public class TriggerDetailsDescriberTests
         new TestCaseData(DefaultTriggerIdentifiers.FORM_SUBMISSION, null).Returns("Kentico.FormSubmissionTrigger"),
         new TestCaseData(DefaultTriggerIdentifiers.FORM_SUBMISSION, new RegistrationTriggerData { MemberId = 5 }).Returns("Kentico.FormSubmissionTrigger"),
         new TestCaseData("Acme.OrderCompleted", new FormSubmissionTriggerData { BizFormId = 3 }).Returns("Acme.OrderCompleted"),
-        new TestCaseData(null, null).Returns("unknown")
+        new TestCaseData(null, null).Returns("unknown"),
+        new TestCaseData(ProjectTriggers.DESCRIBED, new ProjectTriggers.DescribedTriggerData { Score = 5, Code = "B2" })
+            .Returns("Acme.DescribedTrigger (score 5, code B2)"),
+        new TestCaseData(ProjectTriggers.PLAIN, new ProjectTriggers.PlainTriggerData { Secret = "value" }).Returns("Acme.PlainTrigger"),
+        new TestCaseData(ProjectTriggers.THROWING, new ProjectTriggers.ThrowingTriggerData())
+            .Returns("Acme.ThrowingTrigger (description failed: InvalidOperationException)"),
+        new TestCaseData(ProjectTriggers.PLAIN, new ProjectTriggers.DescribedTriggerData { Score = 5 }).Returns("Acme.PlainTrigger"),
+        new TestCaseData(StubTriggerProvider.NO_DATA_TRIGGER, new ProjectTriggers.DescribedTriggerData { Score = 5 }).Returns(StubTriggerProvider.NO_DATA_TRIGGER),
+        new TestCaseData("Acme.Unregistered", new ProjectTriggers.DescribedTriggerData { Score = 5 }).Returns("Acme.Unregistered")
     ];
 
 
     [TestCaseSource(nameof(cases))]
     public Task<string> Describe(string? identifier, IAutomationTriggerData? data) =>
-        TriggerDetailsDescriber.Describe(TriggerProcessContext.Create(identifier, data), CancellationToken.None);
+        TriggerDetailsDescriber.Describe(TriggerProcessContext.Create(identifier, data), ProjectTriggers.CreateProvider(), CancellationToken.None);
+
+
+    [Test]
+    public async Task Describe_UnregisteredLibraryTriggerIsIdentifierOnly()
+    {
+        var context = TriggerProcessContext.Create(ContactInactiveTrigger.IDENTIFIER, new ContactInactiveTriggerData { InactiveDays = 30 });
+
+        string text = await TriggerDetailsDescriber.Describe(context, new StubTriggerProvider(), CancellationToken.None);
+
+        Assert.That(text, Is.EqualTo(ContactInactiveTrigger.IDENTIFIER));
+    }
 }

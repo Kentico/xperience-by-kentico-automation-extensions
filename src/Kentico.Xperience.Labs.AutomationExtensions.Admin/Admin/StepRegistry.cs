@@ -11,6 +11,7 @@ internal sealed class StepRegistry
     private readonly IAutomationComponentStatus status;
     private readonly IOptionsMonitor<AutomationExtensionsOptions> options;
     private readonly Func<IEnumerable<RegisteredAutomationComponent>> getRegistrations;
+    private readonly IReadOnlyList<AutomationComponentDescriptor> components;
 
 
     public StepRegistry(
@@ -18,8 +19,9 @@ internal sealed class StepRegistry
         IOptionsMonitor<AutomationExtensionsOptions> options,
         ICustomAutomationTriggerProvider triggerProvider,
         ICustomAutomationActionProvider actionProvider,
-        ICustomAutomationConditionProvider conditionProvider)
-        : this(status, options, () => GetRegistrations(triggerProvider, actionProvider, conditionProvider))
+        ICustomAutomationConditionProvider conditionProvider,
+        IEnumerable<AutomationComponentDescriptor> additionalComponents)
+        : this(status, options, () => GetRegistrations(triggerProvider, actionProvider, conditionProvider), additionalComponents)
     {
     }
 
@@ -27,15 +29,17 @@ internal sealed class StepRegistry
     internal StepRegistry(
         IAutomationComponentStatus status,
         IOptionsMonitor<AutomationExtensionsOptions> options,
-        Func<IEnumerable<RegisteredAutomationComponent>> getRegistrations)
+        Func<IEnumerable<RegisteredAutomationComponent>> getRegistrations,
+        IEnumerable<AutomationComponentDescriptor>? additionalComponents = null)
     {
         this.status = status;
         this.options = options;
         this.getRegistrations = getRegistrations;
+        components = AutomationComponentCatalog.WithAdditional(additionalComponents);
     }
 
 
-    public IReadOnlyList<StepRegistryRow> GetRows() => BuildRows(getRegistrations(), options.CurrentValue, status);
+    public IReadOnlyList<StepRegistryRow> GetRows() => BuildRows(getRegistrations(), options.CurrentValue, status, components);
 
 
     private static IEnumerable<RegisteredAutomationComponent> GetRegistrations(
@@ -53,14 +57,16 @@ internal sealed class StepRegistry
     internal static IReadOnlyList<StepRegistryRow> BuildRows(
         IEnumerable<RegisteredAutomationComponent> registrations,
         AutomationExtensionsOptions options,
-        IAutomationComponentStatus status)
+        IAutomationComponentStatus status,
+        IReadOnlyList<AutomationComponentDescriptor>? components = null)
     {
+        components ??= AutomationComponentCatalog.All;
         var registered = registrations.ToList();
         var rows = new List<StepRegistryRow>();
 
         foreach (var registration in registered)
         {
-            var component = AutomationComponentCatalog.All.SingleOrDefault(component =>
+            var component = components.SingleOrDefault(component =>
                 component.Identifier.Equals(registration.Identifier, StringComparison.OrdinalIgnoreCase)
                 && component.Kind == registration.Kind);
 
@@ -71,7 +77,7 @@ internal sealed class StepRegistry
                 : CreateLibraryRow(component, registration.DisplayName, registration.Description, true, status));
         }
 
-        foreach (var component in AutomationComponentCatalog.All.Where(component =>
+        foreach (var component in components.Where(component =>
             !registered.Any(registration => registration.Identifier.Equals(component.Identifier, StringComparison.OrdinalIgnoreCase)
                 && registration.Kind == component.Kind)))
         {
@@ -80,7 +86,7 @@ internal sealed class StepRegistry
         }
 
         foreach (string configuredKey in options.Components.Keys.Where(configuredKey =>
-            !AutomationComponentCatalog.All.Any(component => component.Name.Equals(configuredKey, StringComparison.OrdinalIgnoreCase))))
+            !components.Any(component => component.Name.Equals(configuredKey, StringComparison.OrdinalIgnoreCase))))
         {
             rows.Add(new StepRegistryRow(
                 $"configuration:{configuredKey}", configuredKey, null, null, "notapplicable", null));

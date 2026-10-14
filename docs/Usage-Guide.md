@@ -16,6 +16,9 @@
 
 3. Enable the components you want to use (all are **disabled by default**) – see [Enable components](#enable-components).
 
+Commerce components (*Order completed*) are in the separate `Kentico.Xperience.Labs.AutomationExtensions.Commerce` package.
+Add it and call `AddAutomationExtensionsCommerce()` after `AddAutomationExtensions(...)` – see [Trigger – Order completed](#trigger--order-completed).
+
 The `.Admin` package includes the automation components and admin UI client module.
 Existing C# namespaces remain under `Kentico.Xperience.Labs.AutomationExtensions`;
 service registration and component identifiers are unchanged. Client assets are embedded
@@ -131,6 +134,7 @@ verify signatures, tab order, and routing when upgrading Xperience.
 | Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExtensions.ContactDateAnniversary` |
 | Trigger – Contact in contact group (daily) | `ContactGroupMember` | `Labs.AutomationExtensions.ContactGroupMember` |
 | Trigger – Contact inactive for N days | `ContactInactive` | `Labs.AutomationExtensions.ContactInactive` |
+| Trigger – Order completed (`.Commerce` package) | `OrderCompleted` | `Labs.AutomationExtensions.OrderCompleted` |
 | Condition – Activity frequency | `ActivityFrequency` | `Labs.AutomationExtensions.ActivityFrequency` |
 | Condition – Compare contact number field | `ContactNumberFieldCompare` | `Labs.AutomationExtensions.ContactNumberFieldCompare` |
 | Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` |
@@ -350,6 +354,43 @@ Example – win-back:
 3. *Wait* 7 days.
 4. *Activity frequency* (*Page visit*, 1 or more in the last 7 days) → **Yes**: *Finish*; **No**: *Adjust contact score* or internal notification.
 
+### Trigger – Order completed
+
+Starts a process when a visitor completes an order – for example a thank-you email, review request, or cross-sell.
+Package `Kentico.Xperience.Labs.AutomationExtensions.Commerce`.
+
+**Requires** checkout code that fires the trigger – Xperience doesn't fire it on its own:
+
+```csharp
+builder.Services
+    .AddAutomationExtensions(builder.Configuration)
+    .AddAutomationExtensionsCommerce();
+```
+
+```csharp
+// In the checkout controller, after IOrderCreationService.CreateOrder (inject IOrderCompletedTriggerDispatcher)
+var order = await orderInfoProvider.GetAsync(orderId, cancellationToken);
+var contact = ContactManagementContext.GetCurrentContact(createAnonymous: false);
+await orderCompletedTriggerDispatcher.Fire(order, contact, "USD", cancellationToken);
+```
+
+- **Contact is passed by your code.** The library never looks up a contact from the customer, member, or email – anyone can check out with an email they don't own, and a lookup would start processes (and send emails) for someone else's contact.
+- `GetCurrentContact(createAnonymous: false)` returns `null` when the visitor isn't tracked (cookie level below *Visitor*, no consent, bot) – the trigger is then not fired (Debug log, no exception).
+- **Contacts and consent:** every automation process runs for one contact, so no contact means no process. The library doesn't check consent – but Xperience usually only has a contact for visitors who allowed tracking. Orders from untracked visitors don't start processes.
+  - To cover them, your checkout code must create or pick a contact itself. Don't look one up by checkout email (see above). Creating a new contact per order is safe from that, but adds duplicate contacts and stores personal data outside tracking consent – your site needs a legal basis for that (e.g. contract).
+  - Transactional messages (order confirmation, shipping updates) belong in [order status notifications](https://docs.kentico.com/documentation/developers-and-admins/digital-commerce-setup/configure-order-statuses#configure-notifications-for-order-statuses), which need no contact or consent. Use this trigger for marketing follow-ups.
+- `Fire` never throws for failures (the order already exists); it returns `Fired`, `Disabled`, `NoContact`, or `Failed` (Error log).
+- **Currency:** Xperience orders store no currency. Pass the currency code your site uses (optional).
+
+Marketer properties:
+
+- **Minimum order total** – grand total (incl. tax and shipping) at least this amount; `0` = any order.
+- **Currency** – empty = any currency; otherwise must equal the code passed by the checkout code (case-insensitive).
+- **First order only** – starts only when the customer had no earlier order (matched by customer record, not contact). Evaluated when the trigger fires, stored in the trigger data.
+
+Trigger data (`OrderCompletedTriggerData`): `OrderId`, `CustomerId`, `Total`, `Currency`, `ItemCount` (sum of item quantities, rounded up), `IsFirstOrder`. No personal data and no product references.
+Usable in [*Started by trigger*](#condition--started-by-trigger) data checks, `{triggerData.…}` placeholders of [*Set contact field*](#action--set-contact-field-dynamic-value), and [*Write to log*](#action--write-to-log) trigger details (`order 42, customer 7, total 25.00 USD, 3 item(s), first order`).
+
 ### Action – Adjust contact score
 
 Adds points to, subtracts points from, or sets a number field of the contact. Use it for lightweight lead scoring (Xperience has no built-in lead scoring): for example, add 10 points after a form submission and 5 after a webinar registration, then branch on the score.
@@ -467,7 +508,9 @@ Placeholders (case-insensitive):
 | `{triggerIdentifier}` | Identifier of the trigger that started the process (empty when unknown) |
 | `{contactId}`, `{contactGuid}` | ID / GUID of the processed contact |
 | `{contact.<Field>}` | Current value of another contact field (any database field, for example `{contact.ContactEmail}`); dates `yyyy-MM-dd` (date fields) or `yyyy-MM-ddTHH:mm:ss` |
-| `{triggerData.<Property>}` | Data of the trigger that started the process – see the table below |
+| `{triggerData.<Property>}` | Data of the trigger that started the process – see below |
+
+`{triggerData.<Property>}` works for every trigger that provides trigger data: built-in triggers, this library's triggers, and triggers registered by your project or other packages (`RegisterAutomationTrigger`). Properties = public readable properties of the trigger's data class (without `Identifier`), the same list as the *Trigger data field* of [*Started by trigger*](#condition--started-by-trigger). Built-in and library triggers:
 
 | Trigger | Properties |
 | --- | --- |
@@ -477,8 +520,9 @@ Placeholders (case-insensitive):
 | Contact date anniversary | `FieldName`, `DaysBefore`, `AnniversaryDate`, `Years` |
 | Contact inactive for N days | `InactiveDays`, `LastActivityDate` |
 | Contact in contact group (daily) | `ContactGroupName`, `ContactGroupDisplayName` |
+| Order completed (`.Commerce`) | `OrderId`, `CustomerId`, `Total`, `Currency`, `ItemCount`, `IsFirstOrder` |
 
-- An unknown placeholder, an unknown field or property, or a `{triggerData.…}` placeholder in a process started by another trigger is replaced by empty text and logs a `SetContactFieldTokenUnresolved` warning (once per hour per process and placeholder). The step continues.
+- An unknown placeholder, an unknown field or property, or a `{triggerData.…}` placeholder in a process started by another trigger (or by a trigger that is no longer registered or provides no data) is replaced by empty text and logs a `SetContactFieldTokenUnresolved` warning (once per hour per process and placeholder). The step continues.
 - Text in braces that doesn't look like a placeholder (for example `{}` or `{a b}`) is kept as typed. There's no escaping: a literal `{word}` can't be written.
 
 Conversion of the resolved value (culture-invariant):
@@ -525,7 +569,10 @@ Marketer properties:
 - **Message** – supports `{processName}`, `{contactId}`, `{contactGuid}`, `{triggerIdentifier}`. Unknown placeholders are kept as typed. New steps start with a default message that uses these placeholders.
 - **Level** – Information, Warning, or Error.
 - **Include results of earlier steps** (default on) – e.g. `SendWebhook.1: failed (HTTP 500, 2026-10-04T12:00:00Z)`.
-- **Include trigger details** (default on) – trigger identifier plus non-personal data of built-in triggers (form/record ID, member ID, activity type) and library triggers.
+- **Include trigger details** (default on) – trigger identifier plus non-personal trigger data:
+  - Built-in triggers: form and record ID, member ID, activity type and item ID.
+  - Library triggers and other registered triggers whose data implements `ITriggerDataDescription` (see [Describe custom trigger data in Write to log](#describe-custom-trigger-data-in-write-to-log)) – for example `order 42, customer 7, total 25.00 USD, 3 item(s), first order`.
+  - Any other trigger: identifier only.
 
 Log entry (event ID `41000`, name `AutomationLog`):
 
@@ -535,7 +582,7 @@ Automation 'Example automation', contact c382…: Contact 4 reached this step. |
 
 Entries use the logger category `Kentico.Xperience.Labs.AutomationExtensions.WriteToLog`. With the default Xperience logging configuration (`Logging:XperienceEventLog:LogLevel:Kentico` = `Information`) they appear in the **Event log** application, and in any other logging provider configured in the application.
 
-Only the contact ID/GUID is logged – never email or name. Keep personal data out of messages.
+Only the contact ID/GUID is logged – never email or name. Keep personal data out of messages. The message has no `{triggerData.…}` or `{contact.…}` placeholders on purpose – trigger data can contain personal data (for example custom activity values); trigger details only log what the data type describes itself.
 
 > **Volume:** the step logs once per contact. Enable it in development or for short troubleshooting periods (`"WriteToLog": true` in `appsettings.Development.json`) and keep it disabled in production. Disabled steps do nothing.
 >
@@ -715,6 +762,7 @@ Fields of built-in and library triggers (custom triggers list the properties of 
 | Contact date anniversary | `FieldName`, `DaysBefore`, `AnniversaryDate`, `Years` |
 | Contact inactive for N days | `InactiveDays`, `LastActivityDate` |
 | Contact in contact group (daily) | `ContactGroupName`, `ContactGroupDisplayName` |
+| Order completed (`.Commerce`) | `OrderId`, `CustomerId`, `Total`, `Currency`, `ItemCount`, `IsFirstOrder` |
 
 | Field type | Operators and value format |
 | --- | --- |
@@ -849,6 +897,7 @@ Keep your own property and category `Order` values below `SkippableStep.CATEGORY
 | Contact date anniversary | Scheduled task configuration | Trigger never fires |
 | Contact in contact group (daily) | Scheduled task configuration; contact group code names in `ContactGroups`; contact group recalculation | Trigger never fires; drop-down empty; stale membership |
 | Contact inactive for N days | Scheduled task configuration; logged activities | Trigger never fires; contacts without activity never start |
+| Order completed | `.Commerce` package; checkout code calling `IOrderCompletedTriggerDispatcher.Fire` with the visitor's contact | Trigger never fires; untracked visitors (no contact) never start |
 | Previous step succeeded | Earlier step of the selected type saving the same result number | Follows **No** branch, warning logged |
 | Random split (A/B) | None | No additional setup required |
 | Send webhook | Endpoint in configuration | Does nothing, warning logged |
@@ -912,6 +961,28 @@ If a registered step type is removed later, conditions that reference it keep th
 Results are stored in the `StepResultData` automation process data (identifier `Labs.AutomationExtensions.StepResultData`): a dictionary keyed by `<step name>.<result number>`, e.g. `SendWebhook.1`, `SetContactField.1`, or `Acme.SyncToCrm.2`.
 Values: `Succeeded`, `ActionIdentifier`, `RecordedAt` (UTC), `Message`. The data is deleted together with the contact.
 
+## Describe custom trigger data in Write to log
+
+*Write to log* (*Include trigger details*) logs only the identifier of your own triggers. To add data, implement `ITriggerDataDescription` (namespace `Kentico.Xperience.Labs.AutomationExtensions.Triggers`) on the trigger data class:
+
+```csharp
+public sealed class AcmeQuoteTriggerData : IAutomationTriggerData, ITriggerDataDescription
+{
+    public string Identifier => "Acme.QuoteTriggerData";
+
+    public int QuoteId { get; init; }
+
+    public decimal Amount { get; init; }
+
+    // Logged for every contact – identifiers and non-personal values only, invariant culture.
+    public string Describe() => string.Format(CultureInfo.InvariantCulture, "quote {0}, amount {1:0.00}", QuoteId, Amount);
+}
+```
+
+- The text is written to the application log: return IDs, code names, counts, amounts, or dates only – never names, emails, addresses, or text entered by visitors.
+- Used only when the trigger is registered (`RegisterAutomationTrigger`) and the trigger data of the process is of the trigger's data type. Empty text → identifier only. An exception → `(description failed: <exception type>)`; the message isn't logged.
+- `{triggerData.…}` placeholders and *Started by trigger* need no extra code – they read public properties of any registered trigger's data class.
+
 ## Logging
 
 > **Known issue – long logger categories:** the Xperience event log stores the logger category (full type name of `T` in
@@ -954,6 +1025,9 @@ All library log entries use named event IDs, shown in the **Code** column of the
 | 41092 | `ContactGroupIsRecipientList` | Warning | Configured contact group is a recipient list; skipped (every task run) |
 | 41100 | `InvalidStartedByTriggerConfiguration` | Warning | *Started by trigger* settings can't be evaluated, contacts follow **No** (once per hour per process and trigger) |
 | 41101 | `StartedByTriggerDataMissing` | Warning | *Started by trigger* found no trigger data of the selected trigger, contact follows **No** (once per hour per process and trigger) |
+| 41110 | `OrderCompletedFired` | Debug | *Order completed* trigger fired for an order |
+| 41111 | `OrderCompletedNotFired` | Debug | *Order completed* not fired: component disabled or no contact passed |
+| 41112 | `OrderCompletedFailed` | Error | *Order completed* failed (loading order details or firing); checkout continues |
 
 ## Localization
 

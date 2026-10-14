@@ -158,7 +158,7 @@ Legend: **T** trigger, **C** condition, **A** action. "Showcases" = XbyK automat
 | 3 | **Contact inactive for N days** | T | Re-engagement / win-back | Daily task: contacts with last activity older than N days (bounded batch) | Days inactive, activity types to count | time-based audience trigger, queue-safe batching |
 | 4 | **Content engagement threshold** | T | Contact views N pages tagged with taxonomy X → interest-based follow-up | `ActivityInfo` after-insert handler counts page visits by tag | Taxonomy tag(s), visit count, lookback days | event-handler trigger, "custom audience engagement" |
 | 5 | **Inbound webhook received** | T | External system (CRM, event platform, webinar tool) starts a process for a contact | Authenticated minimal API endpoint, resolves contact by email/GUID, fires with small payload (event name + key/values) | Event name filter | webhook trigger, trigger data with typed payload |
-| 6 | **Order completed** | T | Post-purchase thank-you, review request, cross-sell | Order created event / checkout hook; data: order ID, total, currency, item count | Min total, currency, first order only? | commerce integration, data + props trigger |
+| 6 | **Order completed** | T | Post-purchase thank-you, review request, cross-sell | Firing helper called from checkout code with order, customer ID, contact. Contact passed explicitly by caller (`AutomationTriggerDispatch(contact, data)`); never looked up from customer/member/email (someone may check out with an email they don't own). No contact → no fire. Data: order ID, customer ID, total, currency, item count (no product IDs; #24 resolves). *First order* = no earlier order for the same customer ID (no contact link needed) | Min total, Currency, First order only (user confirmed 2026-10-13) | commerce integration, data + props trigger |
 
 ### 3.2 Conditions (7)
 
@@ -190,12 +190,14 @@ Legend: **T** trigger, **C** condition, **A** action. "Showcases" = XbyK automat
 | --- | --- | --- | --- | --- | --- | --- |
 | 22 | **Contact number field compare** | C | Branch on lead score (#16) or any integer contact field, e.g. "score ≥ 50" → sales path | Read integer custom contact field (reuse `ContactScoreFieldResolver`), empty = 0 (or option), compare with operator | Field (dropdown), operator (=, ≠, >, ≥, <, ≤), value | **built-in Rule-based condition can't compare numbers (user confirmed 2026-10-05)** – pairs with #16 |
 | 21 | **Write to log** | A | Debug which branch contacts take; lightweight troubleshooting trail | `ILogger` entry (event `AutomationLog`) with process, contact GUID, message, saved step results, trigger details; no PII | Message with placeholders (pre-filled default), level, include step results, include trigger details | step data + trigger data inspection, enablement for dev-only use |
+| 24 | **Order contains products** ("Items purchased") | C | Cross-sell / onboarding per product bought, e.g. bought grinder → beans offer | Order ID from #6 trigger data → resolver hook (order ID → product content item GUIDs, same as selector values); match against selection. `OrderItemInfo` has no product reference (only name, SKU, price snapshot – checked 31.9.1 DLL), so mapping is per project. Default resolver returns `[]` for every order (→ No); projects replace it (e.g. SKU match, order item custom field). Not started by #6 → No + warning | Products (content item selector, scoped to product types; selector works in step props – user confirmed 2026-10-13), Match (any / all) | trigger data read in condition, content item selector in step props. Decision 2026-10-13 (section 7). Commerce package question: `STATUS.md` pending decision 3 |
 
 ### 3.5 Example compositions (for README / demo processes)
 
 - **Hot lead routing**: #4 Content engagement → #7 consent → #16 score +10 → #8 pricing visits? → #19 assign owner → #15 Teams post.
 - **Win-back**: #3 inactive 90 days → #9 business hours → Send email → Wait 7d → #8 any visit? → else #17 set "Dormant".
 - **Post-purchase**: #6 order → #13 VIP? → #10 A/B split → emails → #18 remove from prospects list.
+- **Cross-sell**: #6 order (first order only) → #24 contains grinder? → Yes: beans offer email / No: generic thank-you.
 - **CRM sync with retry**: Form trigger → #14 webhook → #12 succeeded? → false → Wait 1h → #14 → #12 → false → #15 alert.
 
 ---
@@ -282,6 +284,9 @@ Some components only work with others. Known dependencies:
 | #17 Set field – `{triggerData.X}` tokens | process started by trigger providing that data | token empty, warning logged |
 | #13 Purchase history | contact↔customer mapping (custom field) | false branch |
 | #6 Order completed | firing code in checkout / order event | trigger never fires |
+| #6 Order completed | contact passed by firing code (never looked up from customer) | trigger not fired |
+| #24 Order contains products | process started by #6 (order ID in trigger data) | false branch, warning logged |
+| #24 Order contains products | project resolver (order ID → product content item GUIDs) replacing default | default returns `[]` → false branch |
 | #15 Teams post with owner | #19 Assign owner earlier (optional) | owner omitted from message |
 | #14, #15 | named endpoint/channel in appsettings | action no-op + warning |
 
@@ -639,6 +644,33 @@ Spec: `implementation-spec-started-by-trigger.md`. Condition `Labs.AutomationExt
 - Note: `dotnet format` inserted `throw new NotImplementedException()` into a switch arm (broke tests; fixed). Check format diffs.
 - Revision 1 (user): trigger list = built-ins (`DefaultTriggerIdentifiers`, not in store) + `ICustomAutomationTriggerProvider.GetAll()` (internal API, accepted); value = identifier (exact match); fields from `TriggerDataType`; *Other* dropped; data properties hidden for triggers without data type. #17 tokens / Write to log unchanged (generalizing = follow-up). Tests: 1293.
 
+### Slice 12 (2026-10-13) – Order completed (#6), implemented and unit-validated
+
+Spec: `implementation-spec-order-completed.md`. Trigger `Labs.AutomationExtensions.OrderCompleted` in new project `src/Kentico.Xperience.Labs.AutomationExtensions.Commerce` (refs `.Admin`); tests in new `tests/...Commerce.Tests` (tests are per assembly: discovery, registration, resx, log events). #24 not done.
+
+- Firing API: `IOrderCompletedTriggerDispatcher.Fire(OrderInfo, ContactInfo?, currency?, ct)` → `Fired`/`Disabled`/`NoContact`/`Failed`. Never throws except cancellation. Registered by `AddAutomationExtensionsCommerce()`.
+- Verified 31.9.1 (ILSpy): `AutomationTriggerDispatch` throws `ArgumentNullException` for null contact (and `ArgumentException` for non-`om.contact`) → helper checks null first. `IAutomationTriggerDispatcher` has an internal member (not implementable in tests) → delegate seam. `OrderInfo` has no currency column. `ContactManagementContext.GetCurrentContact(false)` → `null` when cookie level < Visitor, online marketing off, bot, or no existing contact.
+- *First order only*: `IsFirstOrder` computed once at fire time (any order with same `OrderCustomerID` and lower `OrderID` → false; customer ID 0 → false). Reasons: 1 query per order vs. 1 per process in `Evaluate`; snapshot correct when queued `Evaluate` runs after a later order; field usable by #11.
+- Currency: optional text property (max 10, trim, ignore case, empty = any); caller passes code. No currency object in XbyK to fill a dropdown.
+- Data: `OrderId`, `CustomerId`, `Total` (`OrderGrandTotal`), `Currency`, `ItemCount` (sum of quantities, rounded up), `IsFirstOrder`.
+- Admin change: `AddAutomationComponent(descriptor)` + `AutomationComponentCatalog.WithAdditional` → status log + step registry include Commerce components.
+- DancingGoat: `ConfirmOrder` fires with `GetCurrentContact(createAnonymous: false)` and `PriceFormatter.CurrencyCode` (USD); `OrderCompleted` enabled in Development settings.
+- Info object setters/getters need the Xperience container → tests use `CompletedOrder` snapshot overload; contact ID read only when logging enabled.
+- Log events 41110–41112 (`CommerceLogEvents`). Icon `ShoppingCart`. Tests: 1351 (Admin 1300 (+7), Commerce 51).
+- App: started DancingGoat, startup log lists `OrderCompleted` enabled. End-to-end firing not done (process needs Builder UI; checkout needs browser + consent).
+- Packaging blockers (clean base/`.Admin`/`.Commerce` split): trigger/step property classes need `Kentico.Xperience.Admin.Base.FormAnnotations` attributes (`Kentico.Xperience.Admin` package) and `Icons` (Admin.Base) → every step package depends on the admin package anyway; shared infra (`AutomationComponentCatalog`, `IAutomationComponentStatus`, options, `LogCategories`, `LogEvents`, step results, skippable bases) lives in `.Admin`; static `KnownTriggers` (#17 tokens, Write to log) and catalog can't reference Commerce types → needed the DI extension point; Commerce has its own resx registration.
+
+### Slice 13 (2026-10-13) – trigger store for trigger data (#17 tokens, Write to log), unit-validated
+
+No spec (follow-up of slice 11 revision 1 and slice 12 blocker). User decisions: see decision below.
+
+- `KnownTriggers` removed. `RegisteredTriggers` (+ `TriggerDataProperties`) moved to `Core/` (shared by #11, #17, #21). New `RegisteredTrigger.IsDataOfTrigger` (instance of the registered data type).
+- #17 `{triggerData.X}`: trigger from `GetTriggerIdentifier` → `RegisteredTriggers.Find`; data must be an instance of its data type; properties of the registered data type (case-insensitive). Unregistered trigger, no data type, or other data type → empty + `SetContactFieldTokenUnresolved` (unchanged). `SetContactFieldAction` injects `ICustomAutomationTriggerProvider`.
+- Write to log: same lookup; data implementing public `ITriggerDataDescription` (`Triggers` namespace) → `Describe()`; built-in form/registration/custom activity → fixed formats; else identifier only. `Describe()` exception → `(description failed: <type>)` (message not logged). `WriteToLogAction` injects the provider.
+- `ITriggerDataDescription` on #1, #2, #3 data (text unchanged) and `OrderCompletedTriggerData` (`order 42, customer 7, total 25.00 USD, 3 item(s), first order`; total `0.00##`, currency omitted when empty, `repeat order` when not first; invariant).
+- DI hook: slice 12 added no `KnownTriggers`-specific hook; `AddAutomationComponent` (status log + step registry) stays. Admin `InternalsVisibleTo` Commerce.Tests (end-to-end tests with `OrderCompletedTriggerData`).
+- Resx: #17 explanation texts don't list triggers → unchanged. Usage Guide: #17 token section, Write to log, Order completed, new "Describe custom trigger data in Write to log".
+- Tests: 1375 (Admin 1309 (+9), Commerce 66 (+15)). Test doubles: `ProjectTriggers` (described/plain/throwing project triggers), Commerce `StubTriggerProvider` + `TriggerProcessContext` copies.
 ### Decision (2026-10-05): disabled library conditions → No
 
 History: Yes (Slice 2) → texts said "No (A)" while code returned `true` (Yes) → final **No** for all library conditions (`return false`). Changed several times; don't revisit without the user.
@@ -649,6 +681,23 @@ Applied: `PreviousStepSucceeded`, `RandomSplit`, `WithinTimeWindow` return `fals
 
 Open items moved to `STATUS.md` (2026-10-10).
 
+### Decision (2026-10-13): "Items purchased" = new condition #24, not a #6 property
+
+Options: (a) product filter on #6 trigger (`Evaluate`), (b) condition after the trigger.
+
+Reasons for (b): Yes/No branch keeps both paths in one process (product offer vs. generic follow-up; a trigger filter just drops other orders); any/all match fits a condition; #6 stays simple (min total, currency, first order only); same step reusable later with other order sources or purchase history. Conditions read trigger data (`GetTriggerData`, as #11), so no extra order query needed. Marketer gets "filter only" by placing #24 right after #6 with No → Finish.
+
+Constraints: `OrderItemInfo` stores no product reference (name, SKU, price snapshot; checked 31.9.1). Options for product lookup: (1) SKU match vs. project SKU field, (2) order item custom column with content item ID, (3) resolver hook. Chosen (user, 2026-10-13): (3) – library interface maps order ID → product content item GUIDs (matches content item selector values); default returns `[]` for every order; projects register their own. #6 trigger data carries no product IDs.
+
+Contact rule (user, 2026-10-13): #6 firing code passes the contact explicitly; library never resolves a contact from customer/member/email (prevents capturing a contact's data via checkout with an email the buyer doesn't own). No contact → trigger not fired. *First order only* counts orders per customer ID. Later option: "Has purchased products" over order history (needs customer↔contact link, like #13). Package placement follows pending decision 3 (`STATUS.md`).
+
+### Decision (2026-10-13): trigger data via trigger store; `ITriggerDataDescription`; no trigger data in Write to log message
+
+User decisions:
+
+1. #17 `{triggerData.X}` and Write to log trigger details use the trigger store (built-ins + `ICustomAutomationTriggerProvider`, as #11) instead of the static `KnownTriggers` list. Reason: static list in `.Admin` can't know `.Commerce` or project triggers. Matching: trigger identifier from context, data must be an instance of the registered data type.
+2. New public `ITriggerDataDescription { string Describe(); }` – Write to log uses it; output must hold identifiers / non-personal values only (logged). Library data types implement it; built-in Kentico types keep hard-coded formats; others → identifier only.
+3. No `{triggerData.X}` placeholders in the Write to log message – keeps its "no personal data" design (trigger data can hold personal data, e.g. custom activity value).
 ---
 
 ## 8. Within time window condition (historical log)
@@ -733,3 +782,4 @@ Unresolved questions live in `STATUS.md` (pending decisions).
 5. Datetime picker UX: built-in date picker and custom styled time picker (section 8.3).
 6. Disabled library conditions → No (section 7, decision 2026-10-05).
 7. #7 *Has consent agreement* dropped – built-in rule covers it (Slice 4).
+8. #6 *First order only* property confirmed (per customer ID); contact passed explicitly, never looked up; "Items purchased" = condition #24 with product resolver hook, default `[]` (section 7, decision 2026-10-13).

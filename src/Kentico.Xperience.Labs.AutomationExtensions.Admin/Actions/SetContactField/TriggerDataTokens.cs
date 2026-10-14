@@ -3,38 +3,31 @@ using Kentico.Xperience.Labs.AutomationExtensions.Core;
 namespace Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 
 /// <summary>
-/// Reads public properties of known trigger data types for <c>{triggerData.&lt;Property&gt;}</c> tokens.
+/// Reads trigger data properties for <c>{triggerData.&lt;Property&gt;}</c> tokens. Works for every trigger in
+/// <see cref="RegisteredTriggers"/> (built-in and registered with <c>RegisterAutomationTrigger</c>) that provides data.
 /// </summary>
 internal static class TriggerDataTokens
 {
     /// <summary>
-    /// Trigger data types whose properties can be used in tokens: built-in form submission, registration, and custom
-    /// activity triggers, and the library's date anniversary, inactivity, and contact group triggers (<see cref="KnownTriggers"/>).
+    /// Returns <c>true</c> and the formatted value when <paramref name="triggerData"/> is data of the registered
+    /// <paramref name="trigger"/> (instance of its data type) and the data type has a readable public property named
+    /// <paramref name="propertyName"/> (case-insensitive, see <see cref="TriggerDataProperties.Get"/>). Empty property values
+    /// are returned as empty text.
     /// </summary>
-    public static IReadOnlyList<Type> KnownTypes => KnownTriggers.DataTypes;
-
-
-    /// <summary>
-    /// Returns the property names available for the given trigger data type (empty for unknown types).
-    /// </summary>
-    public static IReadOnlyList<string> GetPropertyNames(Type triggerDataType) =>
-        KnownTriggers.GetDataProperties(triggerDataType).Select(property => property.Name).ToList();
-
-
-    /// <summary>
-    /// Returns <c>true</c> and the formatted value when <paramref name="triggerData"/> is a known type with a readable public
-    /// property named <paramref name="propertyName"/> (case-insensitive). Empty property values are returned as empty text.
-    /// </summary>
-    public static bool TryGetValue(object? triggerData, string propertyName, out string value)
+    /// <param name="trigger">Registered trigger that started the process, or <c>null</c> when it isn't registered.</param>
+    /// <param name="triggerData">Trigger data of the process.</param>
+    /// <param name="propertyName">Property name from the token.</param>
+    /// <param name="value">Formatted value, or empty text.</param>
+    public static bool TryGetValue(RegisteredTrigger? trigger, object? triggerData, string propertyName, out string value)
     {
         value = string.Empty;
 
-        if (triggerData is null)
+        if (trigger is null || !trigger.IsDataOfTrigger(triggerData))
         {
             return false;
         }
 
-        var property = KnownTriggers.GetDataProperties(triggerData.GetType())
+        var property = trigger.DataProperties
             .FirstOrDefault(property => string.Equals(property.Name, propertyName, StringComparison.OrdinalIgnoreCase));
         if (property is null)
         {

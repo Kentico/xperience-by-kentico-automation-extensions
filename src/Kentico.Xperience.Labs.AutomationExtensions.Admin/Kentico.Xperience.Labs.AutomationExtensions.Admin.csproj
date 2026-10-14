@@ -48,6 +48,7 @@
     <!-- Required for Xperience to process the assembly's registration attributes (automation steps, triggers, scheduled tasks, localization resources) -->
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
     <InternalsVisibleTo Include="Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests" />
+    <InternalsVisibleTo Include="Kentico.Xperience.Labs.AutomationExtensions.Commerce.Tests" />
   </ItemGroup>
 
 </Project>

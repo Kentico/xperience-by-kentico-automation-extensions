@@ -38,8 +38,9 @@ public sealed class StepRegistryPage : DataContainerListingPage
         ICustomAutomationTriggerProvider triggerProvider,
         ICustomAutomationActionProvider actionProvider,
         ICustomAutomationConditionProvider conditionProvider,
+        IEnumerable<AutomationComponentDescriptor> additionalComponents,
         ILocalizationService localization)
-        : this(new StepRegistry(status, options, triggerProvider, actionProvider, conditionProvider), localization)
+        : this(new StepRegistry(status, options, triggerProvider, actionProvider, conditionProvider, additionalComponents), localization)
     {
     }
 

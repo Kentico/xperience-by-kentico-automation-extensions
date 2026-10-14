@@ -4,8 +4,10 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Kentico.Xperience.Labs.AutomationExtensions.Admin/Kentico.Xperience.Labs.AutomationExtensions.Admin.csproj" />
+    <Project Path="src/Kentico.Xperience.Labs.AutomationExtensions.Commerce/Kentico.Xperience.Labs.AutomationExtensions.Commerce.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests/Kentico.Xperience.Labs.AutomationExtensions.Admin.Tests.csproj" />
+    <Project Path="tests/Kentico.Xperience.Labs.AutomationExtensions.Commerce.Tests/Kentico.Xperience.Labs.AutomationExtensions.Commerce.Tests.csproj" />
   </Folder>
 </Solution>

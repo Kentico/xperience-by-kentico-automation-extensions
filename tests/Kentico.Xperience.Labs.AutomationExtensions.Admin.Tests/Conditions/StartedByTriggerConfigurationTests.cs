@@ -9,6 +9,7 @@ using CMS.Core;
 using Kentico.Xperience.Admin.Base.FormAnnotations;
 using Kentico.Xperience.Admin.Base.Forms;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.StartedByTrigger;
+using Kentico.Xperience.Labs.AutomationExtensions.Core;
 using Kentico.Xperience.Labs.AutomationExtensions.Resources;
 using Kentico.Xperience.Labs.AutomationExtensions.Tests.TestDoubles;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;

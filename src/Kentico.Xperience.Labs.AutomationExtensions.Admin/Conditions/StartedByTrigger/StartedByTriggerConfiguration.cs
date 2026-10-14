@@ -1,5 +1,7 @@
 using System.Reflection;
 
+using Kentico.Xperience.Labs.AutomationExtensions.Core;
+
 namespace Kentico.Xperience.Labs.AutomationExtensions.Conditions.StartedByTrigger;
 
 /// <summary>
