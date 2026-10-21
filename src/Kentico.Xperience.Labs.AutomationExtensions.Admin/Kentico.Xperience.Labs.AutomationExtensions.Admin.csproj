@@ -1,11 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <PackageId>Kentico.Xperience.Labs.AutomationExtensions.Admin</PackageId>
-    <Title>Xperience by Kentico: Automation Extensions</Title>
+    <!-- Code uses the Kentico.Xperience.Labs.AutomationExtensions namespace (no .Admin suffix) -->
+    <RootNamespace>Kentico.Xperience.Labs.AutomationExtensions</RootNamespace>
+    <Product>Xperience by Kentico: Automation Extensions</Product>
+    <Title>$(Product)</Title>
     <Description>Library of automation triggers, conditions, and actions for Xperience by Kentico.</Description>
     <PackageTags>$(PackageTags);automation;marketing</PackageTags>
     <AdminOrgName>kentico</AdminOrgName>

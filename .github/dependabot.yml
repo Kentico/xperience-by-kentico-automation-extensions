@@ -1,0 +1,36 @@
+# Kentico.Xperience.* and @kentico/* are updated by hand together with examples/DancingGoat
+# (the update-xperience agent skill, once added, automates this).
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: "Kentico.Xperience.*"
+    groups:
+      nuget:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /src/Kentico.Xperience.Labs.AutomationExtensions.Admin/Client
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: "@kentico/*"
+      # Must match the React version the Xperience admin ships
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+      - dependency-name: "@types/react"
+      - dependency-name: "@types/react-dom"
+    groups:
+      npm:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]

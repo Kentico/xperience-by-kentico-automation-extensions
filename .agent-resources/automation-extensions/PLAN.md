@@ -243,7 +243,7 @@ Event-driven triggers (#4 activity handler, #5 endpoint, #6 order event) need no
 > easily exceed this. **Rule: never inject `ILogger<T>` in the library** – inject `ILoggerFactory` and call
 > `CreateLogger(LogCategories.For(AutomationComponentCatalog.<Component>))` (or `LogCategories.CONFIGURATION`).
 > Enforced by `LogCategoryLengthTests`. Reported to Kentico core product (2026-10-04):
-> `.agent-resources/kentico-issue-event-log-source-length.md`.
+> `.agent-resources/automation-extensions/kentico-issue-event-log-source-length.md`.
 
 Follow best practices from the docs above for automations, logging, error handling – specifically:
 
@@ -368,8 +368,8 @@ Append-only record of each slice as it was delivered. "Open"/"unverified" notes 
 
 **Findings**
 
-- Event log silently drops entries with logger category / event name > 100 chars → `LogCategories` + guard tests. Reported to Kentico core product: `.agent-resources/kentico-issue-event-log-source-length.md`.
-- Custom trigger display name registered as resource key is stored unresolved (`CMS_ObjectWorkflowTrigger`, Event log, CI file names). Report drafted: `.agent-resources/kentico-issue-trigger-display-name-resource-key.md`.
+- Event log silently drops entries with logger category / event name > 100 chars → `LogCategories` + guard tests. Reported to Kentico core product: `.agent-resources/automation-extensions/kentico-issue-event-log-source-length.md`.
+- Custom trigger display name registered as resource key is stored unresolved (`CMS_ObjectWorkflowTrigger`, Event log, CI file names). Report drafted: `.agent-resources/automation-extensions/kentico-issue-trigger-display-name-resource-key.md`.
 - `StepDisplayName` override in step properties blanks the builder's pre-filled step name and isn't passed to the step → removed.
 - "If not already running" lets finished contacts restart → extra same-day anniversary task runs re-fire. Documented "run once per day".
 - Recommended anniversary recurrence is "If not already running" only ("Only once" = first year only).
@@ -378,7 +378,7 @@ Append-only record of each slice as it was delivered. "Open"/"unverified" notes 
 
 **Selection:** #10 Random split (A/B) is the lowest-complexity remaining component: pure deterministic branching, no scheduled task, database query, external service, or prerequisite component. #9 needs time-zone/range semantics; #11 needs trigger/field comparison decisions; #16 needs contact field discovery and writes.
 
-**Spec:** `.agent-resources/implementation-spec-random-split.md`. Implementation delegated to a subagent, reviewed and validated by the caller.
+**Spec:** `.agent-resources/automation-extensions/implementation-spec-random-split.md`. Implementation delegated to a subagent, reviewed and validated by the caller.
 
 **Implementation**
 
@@ -402,7 +402,7 @@ Append-only record of each slice as it was delivered. "Open"/"unverified" notes 
 
 ### Slice 3 (2026-10-04) – Step registry tab, implemented and unit-validated
 
-**Spec:** `.agent-resources/implementation-spec-step-registry.md`.
+**Spec:** `.agent-resources/automation-extensions/implementation-spec-step-registry.md`.
 
 **Research:** Kentico docs MCP was unavailable to the implementing session. Used official
 web docs for UI pages/registration/routing, listing configuration, and callouts; fetched
@@ -511,7 +511,7 @@ Existing anniversary/Random split work preserved; no commit.
 
 **Selection:** #16 lowest remaining complexity: one contact read + one field write, no task, external service, or prerequisite step. #7 *Has consent agreement* dropped – user confirmed built-in *Rule-based condition* already has "Contact has agreed with consent".
 
-**Spec:** `.agent-resources/implementation-spec-adjust-contact-score.md`. Implemented by subagent, reviewed by caller.
+**Spec:** `.agent-resources/automation-extensions/implementation-spec-adjust-contact-score.md`. Implemented by subagent, reviewed by caller.
 
 **Implementation**
 
@@ -537,7 +537,7 @@ Existing anniversary/Random split work preserved; no commit.
 
 **Selection:** #22 lowest remaining complexity: one contact read + int compare, no task/external service/prerequisite. Reuses #16 field resolver; completes scoring (built-in rules can't compare numbers).
 
-**Spec:** `.agent-resources/implementation-spec-contact-number-field-compare.md`. Implemented by subagent, reviewed by caller.
+**Spec:** `.agent-resources/automation-extensions/implementation-spec-contact-number-field-compare.md`. Implemented by subagent, reviewed by caller.
 
 **User decisions:** empty field = 0 (no option); Field dropdown = same fields as *Adjust contact score* (custom `Integer` only, no LongInteger/Decimal).
 
@@ -560,7 +560,7 @@ Existing anniversary/Random split work preserved; no commit.
 
 **Reframe (user confirmed):** built-in *Rule-based condition* already covers existence ("performed activity X with value that contains … in the last N days", "visited page", "clicked link in email"). Gap = **how often**. Description points marketers to the built-in rule for "at least once" checks.
 
-**Spec:** `.agent-resources/implementation-spec-activity-frequency.md`. Implemented by subagent, reviewed by caller.
+**Spec:** `.agent-resources/automation-extensions/implementation-spec-activity-frequency.md`. Implemented by subagent, reviewed by caller.
 
 **User decisions / findings**
 

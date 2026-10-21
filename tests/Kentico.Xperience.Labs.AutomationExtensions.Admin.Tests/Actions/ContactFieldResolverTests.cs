@@ -155,7 +155,7 @@ public class ContactFieldResolverTests
         {
             Assert.That(custom, Has.Count.EqualTo(11));
             Assert.That(custom, Is.Ordered.Using((IComparer<string>)StringComparer.CurrentCultureIgnoreCase));
-            Assert.That(system, Has.All.Matches<ContactField>(field => field.IsSystem));
+            Assert.That(system, Has.All.Matches<ContactField>(field => field is { IsSystem: true }));
             Assert.That(system.Select(field => field.Caption), Is.Ordered.Using((IComparer<string>)StringComparer.CurrentCultureIgnoreCase));
             Assert.That(system, Has.Count.EqualTo(15));
         });

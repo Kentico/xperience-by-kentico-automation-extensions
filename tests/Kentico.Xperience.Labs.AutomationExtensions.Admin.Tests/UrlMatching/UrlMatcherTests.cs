@@ -313,7 +313,7 @@ public class UrlMatcherTests
         Assert.Multiple(() =>
         {
             Assert.That(UrlMatcher.Create(ruleSet).Evaluate(storedUrl).IsMatch, Is.True);
-            Assert.That(UrlMatcher.GetPrefilterLiterals(ruleSet), Is.All.Matches<string>(literal => storedUrl.Contains(literal, StringComparison.OrdinalIgnoreCase)));
+            Assert.That(UrlMatcher.GetPrefilterLiterals(ruleSet), Is.All.Matches<string>(literal => literal is not null && storedUrl.Contains(literal, StringComparison.OrdinalIgnoreCase)));
         });
     }
 

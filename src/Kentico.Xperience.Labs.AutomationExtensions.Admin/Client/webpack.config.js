@@ -8,6 +8,8 @@ const baseWebpackConfig = require("@kentico/xperience-webpack-config");
 module.exports = (opts, argv) => {
   const baseConfig = (webpackConfigEnv, webpackArgv) =>
     baseWebpackConfig({
+      // Must match RegisterClientModule(org, project) on the backend
+      // and AdminOrgName/ProjectName in the .csproj
       orgName: "kentico",
       projectName: "xperience-labs-automation-extensions-admin",
       webpackConfigEnv,
@@ -67,10 +69,18 @@ function buildConfig(baseConfig, opts, argv, certificate) {
     },
     output: {
       clean: true,
+      /**
+       * Separate chunks cause Xperience's admin to fail when loading the bundle
+       * ("Expected 1 file for source path '/adminresources/.../entry.js'").
+       * This setting forces the output to be a single chunk.
+       * https://github.com/webpack/webpack/issues/12464#issuecomment-1911309972
+       */
       chunkFormat: false,
     },
   };
 
+  // Required when running the admin client module in 'Proxy' mode.
+  // Must match CMSAdminClientModuleSettings in examples/DancingGoat/appsettings.Development.json
   if (certificate) {
     projectConfig.devServer = {
       port: 3009,

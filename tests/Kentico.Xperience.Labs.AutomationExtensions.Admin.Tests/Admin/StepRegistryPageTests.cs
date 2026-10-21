@@ -359,11 +359,11 @@ public class StepRegistryPageTests
         await page.ConfigurePage();
         var settings = new ListingDataSettings(new LoadDataSettings(10, 0, "Name", SortTypeEnum.Asc, ""), page.PageConfiguration.ColumnConfigurations);
 
-        Assert.Multiple(() =>
+        await Assert.MultipleAsync(async () =>
         {
-            Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
                 await LoadListing(page, settings, CancellationToken.None));
-            Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await Assert.ThrowsAsync<OperationCanceledException>(async () =>
                 await LoadListing(page, settings, new CancellationToken(true)));
         });
     }

@@ -24,4 +24,4 @@ Add deterministic unit coverage for the date calculation used by `AnniversaryTas
 
 - A running-app/database verification with the pre-existing sample contact.
 - Same-day repeat protection or other anniversary edge-case changes.
-- Updating `.agent-resources/PLAN.md`; the caller will update it after reviewing and validating the implementation.
+- Updating `.agent-resources/automation-extensions/PLAN.md`; the caller will update it after reviewing and validating the implementation.

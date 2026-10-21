@@ -62,13 +62,14 @@ jobs:
           dotnet restore `
             --locked-mode
 
+      # Release build runs npm ci and npm run build for the admin client
       - name: Build Solution
         run: |
           dotnet build `
             --configuration Release `
             --no-restore
 
-      - name: Type-check Admin client
+      - name: Type-check admin client
         working-directory: src/Kentico.Xperience.Labs.AutomationExtensions.Admin/Client
         run: npm run typecheck
 

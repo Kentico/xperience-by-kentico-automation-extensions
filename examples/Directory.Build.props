@@ -1,6 +1,12 @@
 <Project>
-  <!--
-    Stops inheriting the library build settings (target framework, analyzers, nullable errors) from the repository root.
-    Package versions still come from the root Directory.Packages.props (resolved independently of this file).
-  -->
+  <Import Project="$(MSBuildThisFileDirectory)..\Directory.Build.props" />
+
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);KXE0004;KXE0006</NoWarn>
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
+    <Nullable>annotations</Nullable>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
 </Project>

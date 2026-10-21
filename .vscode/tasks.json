@@ -7,7 +7,7 @@
       "path": "src/Kentico.Xperience.Labs.AutomationExtensions.Admin/Client",
       "group": "build",
       "problemMatcher": [],
-      "label": "npm: install - Admin/Client",
+      "label": "npm: install - admin client",
       "detail": "install dependencies from package"
     },
     {
@@ -23,7 +23,6 @@
       "args": [
         "format",
         "Kentico.Xperience.Labs.AutomationExtensions.slnx",
-        "--no-restore",
         "--exclude",
         "./examples/**"
       ],
@@ -44,7 +43,7 @@
       "path": "src/Kentico.Xperience.Labs.AutomationExtensions.Admin/Client",
       "group": "build",
       "problemMatcher": [],
-      "label": "npm: build - Admin/Client",
+      "label": "npm: build - admin client",
       "detail": "webpack --mode=production"
     },
     {
@@ -53,7 +52,7 @@
       "path": "src/Kentico.Xperience.Labs.AutomationExtensions.Admin/Client",
       "group": "build",
       "problemMatcher": [],
-      "label": "npm: build:dev - Admin/Client",
+      "label": "npm: build:dev - admin client",
       "detail": "webpack --mode=development"
     },
     {
@@ -61,7 +60,7 @@
       "script": "start",
       "path": "src/Kentico.Xperience.Labs.AutomationExtensions.Admin/Client",
       "problemMatcher": [],
-      "label": "npm: watch - Admin/Client",
+      "label": "npm: watch - admin client",
       "detail": "webpack serve --mode development"
     },
     {
