@@ -49,7 +49,7 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 | Components from other assemblies (`AddAutomationComponent`: status log + step registry) | Done (unit; startup log seen in app) | Step registry row for `OrderCompleted` in running app |
 | Trigger store for #17 `{triggerData.X}` + Write to log details (`Core/RegisteredTriggers`; `KnownTriggers` removed; public `ITriggerDataDescription`) | Done (app: Order completed via #17 + Write to log, 2026-10-13) | See #17, #21 |
 | Process-usage / dependency checks, separate admin app (PLAN 2.4) | Not started | |
-| README | Placeholder | |
+| README | Done (2026-10-21) | Screenshots; update component list per new component |
 
 ## Activity frequency (#8) – open
 

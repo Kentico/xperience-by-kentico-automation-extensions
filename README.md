@@ -4,56 +4,100 @@
 
 ## Description
 
----A short description of the functionality – what scenarios are fulfilled by the Intergration / App / Solution. Include screenshots displaying the functionality.---
+Extra triggers, conditions, and actions for the Xperience by Kentico **Automation Builder**, plus a *Step registry* admin page that shows which components are installed and enabled.
 
----Also list any limitations of the functionality that may result in unexpected behavior for the end user. These can be caused, e.g., by scope cuts or unexpected issues during implementation.---
+### Triggers
+
+- **Contact date anniversary** – yearly on (or N days before) a contact date field, such as a birthday.
+- **Contact in contact group (daily)** – daily for members of a contact group (nurture series).
+- **Contact inactive for N days** – when a contact's last activity was N days ago (win-back).
+- **Order completed** (`.Commerce` package) – when a visitor completes an order, with minimum total, currency, and first-order filters.
+
+### Conditions
+
+- **Activity frequency** – how often a contact performed an activity in the last N days (e.g. 3+ pricing page visits in 7 days).
+- **Compare contact number field** – compare an integer contact field, such as a lead score.
+- **Previous step succeeded** – branch on the saved result of an earlier step (e.g. a webhook).
+- **Random split (A/B)** – stable percentage split per contact.
+- **Started by trigger** – branch on the trigger that started the process and its trigger data.
+- **Within time window** – business hours / day-of-week check.
+
+### Actions
+
+- **Adjust contact score** – add, subtract, or set an integer contact field (lightweight lead scoring).
+- **Post to Teams / Slack** – message about the contact to a Teams (Workflows) or Slack webhook, with links to the contact, form submission, and process.
+- **Send webhook** – signed JSON payload to a CRM, CDP, Zapier, Power Automate, …
+- **Set contact field (dynamic value)** – set a field from placeholders (`{contact.X}`, `{triggerData.X}`, `{today}`, …) or calculate from its current value.
+- **Write to log** – log a message for each contact that reaches the step.
+
+Most steps can be skipped per step, and actions can record their result for *Previous step succeeded*.
+
+### Limitations
+
+- All components are **disabled by default** and are turned on in `appsettings.json`.
+- *Contact date anniversary*, *Contact in contact group*, and *Contact inactive* need scheduled task configuration.
+- *Order completed* needs a call from your checkout code; Xperience doesn't fire it on its own.
+- *Send webhook* and *Post to Teams / Slack* send once, without retries. *Post to Teams / Slack* hasn't been tested with a real Teams channel yet.
+- The *Post to Teams / Slack* process link is added only when exactly one automation process has the process's display name.
+- Trigger names are plain English (not localized) because of a platform issue with localized trigger names.
 
 ## Requirements
 
 ### Library Version Matrix
 
----This matrix explains which versions of the library are compatible with different versions of Xperience by Kentico---
-
 | Xperience Version | Library Version |
 | ----------------- | --------------- |
-| >= 31.9.1         | 1.0.0           |
+| >= 31.9.3         | 1.0.0           |
 
 ### Dependencies
-
----These are all the dependencies required to use (not build) the library---
 
 - [ASP.NET Core 10.0](https://dotnet.microsoft.com/en-us/download)
 - [Xperience by Kentico](https://docs.kentico.com)
 
-### Other requirements
-
----A list of other requirements and prerequisites needed to use the library. If there are none, don't include this section in the readme.---
-
 ## Package Installation
 
----This details the steps required to add the library to a solution. This could include multiple packages (NuGet and/or npm)---
-
-Add the package to your application using the .NET CLI
+Add the package to your application using the .NET CLI:
 
 ```powershell
 dotnet add package Kentico.Xperience.Labs.AutomationExtensions.Admin
 ```
 
-The `.Admin` package contains automation components and admin UI client extensibility.
-Client assets are embedded; Node.js is required only when developing this library.
-The repository remains `xperience-by-kentico-automation-extensions` for future projects.
+For the *Order completed* trigger, also add the commerce package:
+
+```powershell
+dotnet add package Kentico.Xperience.Labs.AutomationExtensions.Commerce
+```
+
+The `.Admin` package contains the automation components and the admin UI client module. Client assets are embedded, so your application doesn't need Node.js.
 
 ## Quick Start
 
----Minimal steps to get started with the library. Support the steps with helpful screenshots.---
+1. Register the services in `Program.cs` (after `AddKentico`):
 
----You can completely omit this section if the setup is complicated and cannot be realistically condensed into a few steps. Instead, describe everything in detail in _Usage-Guide.md_.---
+   ```csharp
+   builder.Services
+       .AddAutomationExtensions(builder.Configuration)
+       .AddAutomationExtensionsCommerce(); // only with the .Commerce package
+   ```
+
+2. Enable the components you want in `appsettings.json`:
+
+   ```json
+   {
+     "AutomationExtensions": {
+       "Components": {
+         "RandomSplit": true,
+         "WriteToLog": true
+       }
+     }
+   }
+   ```
+
+3. Restart the application, open **Automation**, and add the steps to a process. Check **Step registry** to see which components are enabled.
 
 ## Full Instructions
 
----Add the full instructions, guidance, and tips to the _Usage-Guide.md_ file---
-
-View the [Usage Guide](./docs/Usage-Guide.md) for more detailed instructions.
+View the [Usage Guide](./docs/Usage-Guide.md) for configuration of each component, scheduled tasks, webhooks and chat channels, logging, and extension points.
 
 ## Contributing
 
@@ -69,10 +113,8 @@ Distributed under the MIT License. See [`LICENSE.md`](./LICENSE.md) for more inf
 
 [![Kentico Labs](https://img.shields.io/badge/Kentico_Labs-grey?labelColor=orange&logo=data:image/svg+xml;base64,PHN2ZyBjbGFzcz0ic3ZnLWljb24iIHN0eWxlPSJ3aWR0aDogMWVtOyBoZWlnaHQ6IDFlbTt2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlO2ZpbGw6IGN1cnJlbnRDb2xvcjtvdmVyZmxvdzogaGlkZGVuOyIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik05NTYuMjg4IDgwNC40OEw2NDAgMjc3LjQ0VjY0aDMyYzE3LjYgMCAzMi0xNC40IDMyLTMycy0xNC40LTMyLTMyLTMyaC0zMjBjLTE3LjYgMC0zMiAxNC40LTMyIDMyczE0LjQgMzIgMzIgMzJIMzg0djIxMy40NEw2Ny43MTIgODA0LjQ4Qy00LjczNiA5MjUuMTg0IDUxLjIgMTAyNCAxOTIgMTAyNGg2NDBjMTQwLjggMCAxOTYuNzM2LTk4Ljc1MiAxMjQuMjg4LTIxOS41MnpNMjQxLjAyNCA2NDBMNDQ4IDI5NS4wNFY2NGgxMjh2MjMxLjA0TDc4Mi45NzYgNjQwSDI0MS4wMjR6IiAgLz48L3N2Zz4=)](https://github.com/Kentico/.github/blob/main/SUPPORT.md#labs-limited-support)
 
----Select the correct name for the support policy---
+This project has **Kentico Labs limited support**.
 
-This project has **Full support by 7-day bug-fix policy** / **Kentico Labs limited support**.
-
-See [`SUPPORT.md`](https://github.com/Kentico/.github/blob/main/SUPPORT.md#full-support) for more information.
+See [`SUPPORT.md`](https://github.com/Kentico/.github/blob/main/SUPPORT.md#labs-limited-support) for more information.
 
 For any security issues see [`SECURITY.md`](https://github.com/Kentico/.github/blob/main/SECURITY.md).
