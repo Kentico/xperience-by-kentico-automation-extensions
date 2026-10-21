@@ -1,5 +1,5 @@
-# Kentico.Xperience.* and @kentico/* are updated by hand together with examples/DancingGoat
-# (the update-xperience agent skill, once added, automates this).
+# Kentico.Xperience.* and @kentico/* are updated with the update-xperience agent skill,
+# which also regenerates examples/DancingGoat for the new version.
 version: 2
 updates:
   - package-ecosystem: nuget
