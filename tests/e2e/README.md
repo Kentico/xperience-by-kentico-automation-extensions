@@ -8,6 +8,7 @@ Playwright (TypeScript) tests against a running DancingGoat site: the live site 
 | --- | --- | --- |
 | `live-site` | `live-site/*.spec.ts` | public site behavior (widgets, sections, pages) |
 | `admin-setup` | `admin/auth.setup.ts` | signs in once and saves the session to `playwright/.auth/` |
+| `admin-data` | `admin/automation.setup.ts` | creates the *E2E automation* process when missing (a new database has none; the Step registry tab needs a process) |
 | `admin-tests` | `admin/*.spec.ts` | administration behavior, starting signed in |
 
 Page objects (`admin/*Page.ts`) hold selectors for UI this repository does not own, so an Xperience update that changes markup is fixed in one place.

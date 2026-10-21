@@ -34,13 +34,22 @@ export default defineConfig({
       testMatch: /[\\/]admin[\\/]auth\.setup\.ts/,
     },
     {
+      name: "admin-data",
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: adminStorageStatePath,
+      },
+      testMatch: /[\\/]admin[\\/]automation\.setup\.ts/,
+      dependencies: ["admin-setup"],
+    },
+    {
       name: "admin-tests",
       use: {
         ...devices["Desktop Chrome"],
         storageState: adminStorageStatePath,
       },
       testMatch: /[\\/]admin[\\/].*\.spec\.ts/,
-      dependencies: ["admin-setup"],
+      dependencies: ["admin-data"],
     },
   ],
 

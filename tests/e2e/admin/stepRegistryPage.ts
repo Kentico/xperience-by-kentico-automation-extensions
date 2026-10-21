@@ -1,5 +1,5 @@
 import { expect, type Locator, type Page } from "@playwright/test";
-import { adminBaseUrl } from "../shared/config";
+import { AutomationProcessListPage, e2eProcessName } from "./automationProcessListPage";
 
 // The Step registry tab registered by src/Kentico.Xperience.Labs.AutomationExtensions.Admin:
 // Admin/StepRegistryPage.cs ([assembly: UIPage] under AutomationProcessEditSection, slug
@@ -22,16 +22,10 @@ export class StepRegistryPage {
     return this.page.getByTestId("search-input");
   }
 
-  // Navigates the way a user would: Automation -> first process -> Step registry tab.
-  // The DancingGoat template database ships at least one automation process.
+  // Navigates the way a user would: Automation -> process -> Step registry tab.
+  // The process is created by admin/automation.setup.ts (a new database has none).
   async gotoViaNavigation(): Promise<void> {
-    await this.page.goto(`${adminBaseUrl}/${automationListPath}`);
-
-    const firstProcess = this.rows.locator(`a[href*="/admin/${automationListPath}/"]`).first();
-    await expect(firstProcess, "The automation process list is empty; the tab needs a process.").toBeVisible({
-      timeout: 30_000,
-    });
-    await firstProcess.click();
+    await new AutomationProcessListPage(this.page).openProcess(e2eProcessName);
 
     await this.page.locator(`a[href$="/${tabSlug}"]`).filter({ hasText: tabCaption }).first().click();
 
