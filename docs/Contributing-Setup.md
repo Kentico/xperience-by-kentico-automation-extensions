@@ -84,7 +84,7 @@ The sample's `appsettings.Development.json` already enables the client proxy (pl
 "CMSAdminClientModuleSettings": {
   "kentico-xperience-labs-automation-extensions-admin": {
     "Mode": "Proxy",
-    "Port": 3009
+    "Port": 3063
   }
 }
 ```

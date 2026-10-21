@@ -41,7 +41,7 @@ module.exports = (opts, argv) => {
     // Plain HTTP, like DancingGoat in Development, so no dev certificate is needed.
     // Must match CMSAdminClientModuleSettings in examples/DancingGoat/appsettings.Development.json
     devServer: {
-      port: 3009,
+      port: 3063,
       server: {
         type: "http",
       },

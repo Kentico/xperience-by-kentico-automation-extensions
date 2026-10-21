@@ -3,7 +3,7 @@
   <PropertyGroup>
     <!-- Code uses the Kentico.Xperience.Labs.AutomationExtensions namespace (no .Commerce suffix) -->
     <RootNamespace>Kentico.Xperience.Labs.AutomationExtensions</RootNamespace>
-    <Product>Xperience by Kentico: Automation Extensions – Commerce</Product>
+    <Product>Xperience by Kentico Labs: Automation Extensions – Commerce</Product>
     <Title>$(Product)</Title>
     <Description>Commerce automation triggers for Xperience by Kentico (e.g. Order completed).</Description>
     <PackageTags>$(PackageTags);automation;marketing;commerce</PackageTags>
