@@ -1,4 +1,5 @@
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.AdjustContactScore;
+using Kentico.Xperience.Labs.AutomationExtensions.Actions.PostChatMessage;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.ActivityFrequency;
@@ -35,6 +36,10 @@ public static class AutomationExtensionsServiceCollectionExtensions
         services.AddHttpClient(WebhookSender.HTTP_CLIENT_NAME);
         services.TryAddSingleton<IWebhookSender, WebhookSender>();
 
+        services.AddHttpClient(ChatMessageSender.HTTP_CLIENT_NAME);
+        services.TryAddSingleton<IChatMessageSender, ChatMessageSender>();
+        services.TryAddSingleton<IAutomationProcessResolver, AutomationProcessResolver>();
+
         services.TryAddSingleton<DateFieldResolver>();
         services.TryAddSingleton<ContactGroupResolver>();
         services.TryAddSingleton<ContactScoreFieldResolver>();
@@ -45,6 +50,7 @@ public static class AutomationExtensionsServiceCollectionExtensions
 
         services.AddStepResultSource(StepResultKeys.SendWebhook);
         services.AddStepResultSource(StepResultKeys.SetContactField);
+        services.AddStepResultSource(StepResultKeys.PostChatMessage);
 
         return services;
     }

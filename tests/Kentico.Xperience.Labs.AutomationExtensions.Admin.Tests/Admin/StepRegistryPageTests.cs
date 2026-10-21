@@ -152,9 +152,9 @@ public class StepRegistryPageTests
 
     [TestCase("trigger", null, new[] { "ContactDateAnniversary", "ContactGroupMember", "ContactInactive", "Acme.Trigger" })]
     [TestCase("condition", null, new[] { "ActivityFrequency", "ContactNumberFieldCompare", "PreviousStepSucceeded", "RandomSplit", "StartedByTrigger", "WithinTimeWindow" })]
-    [TestCase("action", null, new[] { "AdjustContactScore", "SendWebhook", "SetContactField", "WriteToLog", "Acme.Action" })]
+    [TestCase("action", null, new[] { "AdjustContactScore", "PostChatMessage", "SendWebhook", "SetContactField", "WriteToLog", "Acme.Action" })]
     [TestCase("unknown", null, new[] { "Typo" })]
-    [TestCase(null, "enabled", new[] { "ActivityFrequency", "AdjustContactScore", "ContactDateAnniversary", "ContactGroupMember", "ContactInactive", "ContactNumberFieldCompare", "PreviousStepSucceeded", "SendWebhook", "SetContactField", "StartedByTrigger", "WithinTimeWindow" })]
+    [TestCase(null, "enabled", new[] { "ActivityFrequency", "AdjustContactScore", "ContactDateAnniversary", "ContactGroupMember", "ContactInactive", "ContactNumberFieldCompare", "PostChatMessage", "PreviousStepSucceeded", "SendWebhook", "SetContactField", "StartedByTrigger", "WithinTimeWindow" })]
     [TestCase(null, "disabled", new[] { "RandomSplit" })]
     [TestCase(null, "notmanaged", new[] { "Acme.Action", "Acme.Trigger" })]
     [TestCase(null, "notapplicable", new[] { "WriteToLog", "Typo" })]
@@ -203,16 +203,18 @@ public class StepRegistryPageTests
         var third = await LoadFilteredListing(page, pageSize: 1, selectedPage: 2);
         var fourth = await LoadFilteredListing(page, pageSize: 1, selectedPage: 3);
         var fifth = await LoadFilteredListing(page, pageSize: 1, selectedPage: 4);
-        var pastEnd = await LoadFilteredListing(page, pageSize: 1, selectedPage: 5);
+        var sixth = await LoadFilteredListing(page, pageSize: 1, selectedPage: 5);
+        var pastEnd = await LoadFilteredListing(page, pageSize: 1, selectedPage: 6);
 
         Assert.Multiple(() =>
         {
-            Assert.That(new[] { first.TotalCount, second.TotalCount, third.TotalCount, fourth.TotalCount, fifth.TotalCount, pastEnd.TotalCount }, Is.All.EqualTo(5));
+            Assert.That(new[] { first.TotalCount, second.TotalCount, third.TotalCount, fourth.TotalCount, fifth.TotalCount, sixth.TotalCount, pastEnd.TotalCount }, Is.All.EqualTo(6));
             Assert.That(first.DataContainers.Single()["Identifier"], Is.EqualTo(AutomationComponentCatalog.WriteToLog.Identifier));
             Assert.That(second.DataContainers.Single()["Identifier"], Is.EqualTo(AutomationComponentCatalog.SetContactField.Identifier));
             Assert.That(third.DataContainers.Single()["Identifier"], Is.EqualTo(AutomationComponentCatalog.SendWebhook.Identifier));
-            Assert.That(fourth.DataContainers.Single()["Identifier"], Is.EqualTo("Acme.Action"));
-            Assert.That(fifth.DataContainers.Single()["Identifier"], Is.EqualTo(AutomationComponentCatalog.AdjustContactScore.Identifier));
+            Assert.That(fourth.DataContainers.Single()["Identifier"], Is.EqualTo(AutomationComponentCatalog.PostChatMessage.Identifier));
+            Assert.That(fifth.DataContainers.Single()["Identifier"], Is.EqualTo("Acme.Action"));
+            Assert.That(sixth.DataContainers.Single()["Identifier"], Is.EqualTo(AutomationComponentCatalog.AdjustContactScore.Identifier));
             Assert.That(pastEnd.DataContainers, Is.Empty);
         });
     }
@@ -237,7 +239,7 @@ public class StepRegistryPageTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(reset.TotalCount, Is.EqualTo(16));
+            Assert.That(reset.TotalCount, Is.EqualTo(17));
             Assert.That(reset.DataContainers.Select(row => row["RowId"]),
                 Is.EqualTo(before.DataContainers.Select(row => row["RowId"])));
             Assert.That(searched.TotalCount, Is.EqualTo(2));
@@ -385,14 +387,14 @@ public class StepRegistryPageTests
             CancellationToken.None);
 
         Assert.That(data.DataContainers.Select(row => row["Status"]),
-            Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Disabled", "Not managed", "Not applicable" }));
+            Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Enabled", "Disabled", "Not managed", "Not applicable" }));
 
         var second = await LoadListing(page,
             new ListingDataSettings(new LoadDataSettings(4, 1, "Status", SortTypeEnum.Asc, ""), page.PageConfiguration.ColumnConfigurations),
             CancellationToken.None);
         Assert.That(second.DataContainers.Select(row => row["Status"]),
             Is.EqualTo(new[] { "Enabled", "Enabled", "Enabled", "Enabled" }));
-        Assert.That(second.TotalCount, Is.EqualTo(15));
+        Assert.That(second.TotalCount, Is.EqualTo(16));
     }
 
 

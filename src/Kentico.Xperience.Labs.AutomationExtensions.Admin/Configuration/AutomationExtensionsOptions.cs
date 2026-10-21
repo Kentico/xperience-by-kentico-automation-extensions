@@ -1,3 +1,4 @@
+using Kentico.Xperience.Labs.AutomationExtensions.Actions.PostChatMessage;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
@@ -33,6 +34,12 @@ public sealed class AutomationExtensionsOptions
     /// Settings of the <see cref="SendWebhookAction"/>.
     /// </summary>
     public WebhookOptions Webhooks { get; set; } = new();
+
+
+    /// <summary>
+    /// Settings of the <see cref="PostChatMessageAction"/>.
+    /// </summary>
+    public ChatChannelOptions ChatChannels { get; set; } = new();
 
 
     /// <summary>

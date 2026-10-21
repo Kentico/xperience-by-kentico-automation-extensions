@@ -671,6 +671,20 @@ No spec (follow-up of slice 11 revision 1 and slice 12 blocker). User decisions:
 - DI hook: slice 12 added no `KnownTriggers`-specific hook; `AddAutomationComponent` (status log + step registry) stays. Admin `InternalsVisibleTo` Commerce.Tests (end-to-end tests with `OrderCompletedTriggerData`).
 - Resx: #17 explanation texts don't list triggers → unchanged. Usage Guide: #17 token section, Write to log, Order completed, new "Describe custom trigger data in Write to log".
 - Tests: 1375 (Admin 1309 (+9), Commerce 66 (+15)). Test doubles: `ProjectTriggers` (described/plain/throwing project triggers), Commerce `StubTriggerProvider` + `TriggerProcessContext` copies.
+### Slice 14 (2026-10-21) – Post to Teams / Slack (#15), implemented and unit-validated
+
+Spec: `implementation-spec-post-chat-message.md`. Action `Labs.AutomationExtensions.PostChatMessage` (`Actions/PostChatMessage/`). No new NuGet packages (`IHttpClientFactory`, `System.Text.Json`).
+
+- Config `AutomationExtensions:ChatChannels`: `AdminBaseUrl`, `Channels` (name → `Provider` Teams/Slack, https `Url` (secret), `DisplayName`, `TimeoutSeconds`).
+- Properties: channel, title, message (#17 tokens via shared `ContactFieldTokenValues.Create`), contact details (PII, off), admin link, record result (step result source `PostChatMessage`, for #12).
+- Teams: Workflows webhook, `type: message` + Adaptive Card attachment (`contentUrl: null`), `\n` doubled. Legacy connectors not supported (retired). Slack: incoming webhook, mrkdwn escaped, admin link as text link (link buttons need interaction acknowledgement). Limits: header 150, text 3000, 10 fields.
+- Single attempt, 2xx = success, Slack error body appended (≤ 200 chars), URL never logged. Log events 41120–41123.
+- Admin link route verified by reflecting 31.9.3 UI pages: `contact-management/contacts/{id}/overview` (`ContactAdminLink.CONTACT_OVERVIEW_ROUTE`).
+- Unverified: Adaptive Card 1.4 in Workflows (docs samples 1.0–1.2), Slack app setup steps in Usage Guide.
+- Tests: Admin 1365 (+55), Commerce 67. Execute path (tokens → send → record) not unit-tested (needs Xperience container); disabled/skip paths are.
+- Addendum (2026-10-21): links list (Slack one line, Teams one `Action.OpenUrl` each). Form submission link (`forms/list/{BizFormId}/submissions/{BizFormItemId}`, only for built-in Form submission trigger). Process link (`automation/list/{id}/automation-contacts`): step context exposes only process display name → lookup `WorkflowInfo` (type Automation) by exact display name, link only if exactly 1 match (display names not unique). Route constants, not `IPageLinkGenerator` (internal impl needs admin UI tree). Tests: Admin 1407.
+- App (2026-10-21): Slack post, all 3 links, bad URL → failure. Teams not tested (no admin access).
+
 ### Decision (2026-10-05): disabled library conditions → No
 
 History: Yes (Slice 2) → texts said "No (A)" while code returned `true` (Yes) → final **No** for all library conditions (`return false`). Changed several times; don't revisit without the user.

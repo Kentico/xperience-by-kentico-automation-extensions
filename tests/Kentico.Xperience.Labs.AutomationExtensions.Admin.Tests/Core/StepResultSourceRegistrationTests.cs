@@ -12,7 +12,7 @@ public class StepResultSourceRegistrationTests
     {
         var sources = CreateServices().BuildServiceProvider().GetServices<StepResultSource>();
 
-        Assert.That(sources, Is.EqualTo(new[] { StepResultKeys.SendWebhook, StepResultKeys.SetContactField }));
+        Assert.That(sources, Is.EqualTo(new[] { StepResultKeys.SendWebhook, StepResultKeys.SetContactField, StepResultKeys.PostChatMessage }));
     }
 
 
@@ -23,7 +23,7 @@ public class StepResultSourceRegistrationTests
 
         var sources = services.BuildServiceProvider().GetServices<StepResultSource>();
 
-        Assert.That(sources.Select(source => source.Name), Is.EqualTo(new[] { StepResultKeys.SendWebhook.Name, StepResultKeys.SetContactField.Name, "Acme.SyncToCrm" }));
+        Assert.That(sources.Select(source => source.Name), Is.EqualTo(new[] { StepResultKeys.SendWebhook.Name, StepResultKeys.SetContactField.Name, StepResultKeys.PostChatMessage.Name, "Acme.SyncToCrm" }));
     }
 
 
@@ -50,7 +50,7 @@ public class StepResultSourceRegistrationTests
 
         var sources = services.BuildServiceProvider().GetServices<StepResultSource>();
 
-        Assert.That(sources.Count(), Is.EqualTo(2));
+        Assert.That(sources.Count(), Is.EqualTo(3));
     }
 
 

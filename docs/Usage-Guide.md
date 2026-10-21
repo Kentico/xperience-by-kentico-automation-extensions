@@ -50,6 +50,7 @@ At application start, the library logs which components are enabled and warns ab
       "ContactGroupMember": true,
       "ContactInactive": true,
       "ContactNumberFieldCompare": true,
+      "PostChatMessage": true,
       "PreviousStepSucceeded": true,
       "RandomSplit": true,
       "SendWebhook": true,
@@ -142,6 +143,7 @@ verify signatures, tab order, and routing when upgrading Xperience.
 | Condition – Started by trigger | `StartedByTrigger` | `Labs.AutomationExtensions.StartedByTrigger` |
 | Condition – Within time window | `WithinTimeWindow` | `Labs.AutomationExtensions.WithinTimeWindow` |
 | Action – Adjust contact score | `AdjustContactScore` | `Labs.AutomationExtensions.AdjustContactScore` |
+| Action – Post to Teams / Slack | `PostChatMessage` | `Labs.AutomationExtensions.PostChatMessage` |
 | Action – Send webhook | `SendWebhook` | `Labs.AutomationExtensions.SendWebhook` |
 | Action – Set contact field (dynamic value) | `SetContactField` | `Labs.AutomationExtensions.SetContactField` |
 | Action – Write to log | `WriteToLog` | `Labs.AutomationExtensions.WriteToLog` |
@@ -475,6 +477,89 @@ Payload:
 
 Failures (non-success status, network error, timeout) are logged once as a `WebhookFailed` warning (with the exception, if any); the contact always continues to the next step.
 
+### Action – Post to Teams / Slack
+
+Posts a message about the processed contact to a Microsoft Teams or Slack channel – for example, to tell the sales team about a hot lead without sending an email.
+Channels (webhook URLs) are configured by developers and never stored in the automation process.
+
+Configuration:
+
+```json
+{
+  "AutomationExtensions": {
+    "ChatChannels": {
+      "AdminBaseUrl": "https://www.example.com/admin",
+      "Channels": {
+        "SalesTeams": { "Provider": "Teams", "Url": "<secret>", "DisplayName": "Sales (Teams)", "TimeoutSeconds": 30 },
+        "SalesSlack": { "Provider": "Slack", "Url": "<secret>", "DisplayName": "#sales (Slack)" }
+      }
+    }
+  }
+}
+```
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `AdminBaseUrl` | – | Optional. Absolute URL of the Xperience administration (e.g. `https://www.example.com/admin`). Used for the links to the contact (`<AdminBaseUrl>/contact-management/contacts/<contact ID>/overview`), the form submission (`<AdminBaseUrl>/forms/list/<form ID>/submissions/<submission ID>`), and the process Contacts tab (`<AdminBaseUrl>/automation/list/<process ID>/automation-contacts`). Empty: messages contain no links. |
+| `Channels:<name>:Provider` | `Teams` | `Teams` or `Slack`. Selects the message format. |
+| `Channels:<name>:Url` | – | Absolute HTTPS webhook URL. Required. Channels with a missing or invalid URL fail the step. |
+| `Channels:<name>:DisplayName` | channel name | Name shown to marketers. |
+| `Channels:<name>:TimeoutSeconds` | `30` | Request timeout (minimum 1). |
+
+**Webhook URLs are secrets** – anyone with the URL can post to the channel. Store them in user secrets, environment variables (`AutomationExtensions__ChatChannels__Channels__SalesSlack__Url`), or a key vault, never in committed appsettings files. Keep the rest of the channel (provider, display name) in appsettings.
+
+Create a **Teams** webhook (Workflows; the retired Office 365 connector incoming webhooks and their MessageCard format aren't supported):
+
+1. In Teams, open **More options (…)** next to the channel → **Workflows**.
+2. Select the template **Send webhook alerts to a channel** (trigger *When a Teams webhook request is received*), choose the team and channel, and save.
+3. Copy the webhook URL and store it as the channel `Url`.
+
+The workflow is owned by the user who created it; add co-owners so it keeps working when that user leaves. See [Create webhooks using Workflows](https://learn.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) and the [webhook trigger request schema](https://learn.microsoft.com/en-us/connectors/teams/#microsoft-teams-webhook).
+
+Create a **Slack** incoming webhook:
+
+1. Create a Slack app (or open an existing one) at [api.slack.com/apps](https://api.slack.com/apps) and turn on **Incoming Webhooks**.
+2. Select **Add New Webhook to Workspace**, choose the channel, and allow.
+3. Copy the URL (`https://hooks.slack.com/services/...`) and store it as the channel `Url`.
+
+See [Sending messages using incoming webhooks](https://docs.slack.dev/messaging/sending-messages-using-incoming-webhooks).
+
+Marketer properties:
+
+- **Channel** – one of the configured channels (required).
+- **Title** – optional heading, up to 150 characters.
+- **Message** – plain text, up to 2000 characters (required); line breaks are kept.
+- **Include contact details** (off by default) – adds email, name (first and last), and company name. Empty values are left out.
+- **Include link to the contact** (on by default) – adds a link to the contact's overview in the administration. Ignored when `AdminBaseUrl` is empty.
+- **Include link to the form submission** (on by default) – only for processes started by the built-in *Form submission* trigger: adds a link to the submitted data in the administration. Ignored for other triggers, when the trigger data is missing, or when `AdminBaseUrl` is empty.
+- **Include link to this process** (on by default) – adds a link to the Contacts tab of the automation process. The step only knows the process name, so it looks the process up by its display name (exact, case-sensitive match): when several automation processes share the name, or none matches, no link is added (`ChatMessageProcessLinkSkipped` debug entry, event ID `41124`). Give processes unique names to get the link. Ignored when `AdminBaseUrl` is empty (no lookup then).
+- **Record result for later steps** / **Result number** – saves the outcome (*Result 1–5*) for the *Previous step succeeded* condition.
+
+Title and message accept the [placeholders of *Set contact field (dynamic value)*](#action--set-contact-field-dynamic-value) (`{processName}`, `{contact.ContactFirstName}`, `{triggerData.<Property>}`, …). Unknown placeholders become empty text and log a `ChatMessageTokensUnresolved` warning (event ID `41122`, at most once per hour per process and placeholder).
+
+Message content:
+
+- Teams: an Adaptive Card (version 1.4) with the title, the text, a fact set, and one button per link (**Open contact**, **Open form submission**, **Open process contacts**).
+- Slack: a plain-text fallback (used in notifications) and blocks – header (title), text, fields, and the links (**Open contact** · **Open form submission** · **Open process contacts**) in one line. Links are text links, not buttons (Slack buttons need an app that answers interactions).
+- Link labels are fixed English text, like the fact labels.
+- Facts: *Process* (process name) always; *Email*, *Name*, *Company* with **Include contact details**. Fact labels are fixed English text – the message leaves the administration and has no user culture.
+- Teams renders a Markdown subset and Slack its *mrkdwn* format, so characters like `*` or `_` in the message can format text. For Slack, `&`, `<`, and `>` are escaped.
+- Long texts are shortened with "…" to the Slack Block Kit limits (header 150 characters, text 3000, fields 2000, at most 10 fields); Teams uses the same limits.
+
+**Personal data:** with **Include contact details**, or placeholders such as `{contact.ContactEmail}`, personal data leaves Xperience and is visible to everyone in the channel and stored by Microsoft or Slack. Only use it for channels that are allowed to receive it.
+
+Behavior:
+
+- One attempt, no retries. Any 2xx status is success (Slack returns `200 ok`, Teams Workflows usually `202 Accepted`).
+- Failures – unknown channel, missing or invalid URL, non-success status (Slack error text such as `invalid_payload` is added, up to 200 characters), network error, timeout – log a `ChatMessageFailed` warning (event ID `41121`) with process name, channel name, contact ID, and reason. The contact always continues to the next step.
+- Successful posts log a `ChatMessagePosted` Information entry (event ID `41120`) with process name, channel name, and contact ID. Message text, contact details, and webhook URLs are never logged.
+- Disabled component: does nothing, warning logged (see [Enable components](#enable-components)). **Skip this step**: posts nothing (records a skipped result when **Record result for later steps** is on).
+
+Example – fall back to email when the post fails:
+
+1. *Post to Teams / Slack* (**Channel** *Sales (Teams)*, **Record result for later steps** on, *Result 1*).
+2. *Previous step succeeded* (**Step** *Post to Teams / Slack*, *Result 1*) → **Yes**: *Finish*; **No**: send a built-in internal notification email to the sales team.
+
 ### Action – Set contact field (dynamic value)
 
 Sets a contact field to a value built from placeholders, or calculates a number from the field's current value. The built-in *Set contact field* step only sets fixed values.
@@ -714,7 +799,7 @@ Marketer properties:
 - **Step** – type of the earlier step (e.g. *Send webhook*). Lists library steps and [custom steps registered by developers](#support-previous-step-succeeded-in-custom-steps).
 - **Result number** – the number selected on the earlier step (*Result 1–5*).
 
-**Works with:** *Send webhook* (or a registered custom step) with **Record result for later steps** turned on, or *Set contact field (dynamic value)* (always saves its result), and the same **Result number**.
+**Works with:** *Send webhook*, *Post to Teams / Slack* (or a registered custom step) with **Record result for later steps** turned on, or *Set contact field (dynamic value)* (always saves its result), and the same **Result number**.
 If no earlier step saved that result (missing step, different number, or the earlier step was disabled), an enabled condition follows **No** and logs a warning. If this condition itself is disabled, all contacts follow **No** without reading the saved result.
 
 Each step type has its own numbered results, so different step types never overwrite each other. Within a process, give each step of the same type a different number. Steps can't detect which other steps exist in a process, so the step and number must be matched manually.
@@ -1028,6 +1113,11 @@ All library log entries use named event IDs, shown in the **Code** column of the
 | 41110 | `OrderCompletedFired` | Debug | *Order completed* trigger fired for an order |
 | 41111 | `OrderCompletedNotFired` | Debug | *Order completed* not fired: component disabled or no contact passed |
 | 41112 | `OrderCompletedFailed` | Error | *Order completed* failed (loading order details or firing); checkout continues |
+| 41120 | `ChatMessagePosted` | Information | *Post to Teams / Slack* posted a message (process, channel, contact ID) |
+| 41121 | `ChatMessageFailed` | Warning | *Post to Teams / Slack* failed: unknown channel, invalid URL, non-success status, network error, or timeout |
+| 41122 | `ChatMessageTokensUnresolved` | Warning | *Post to Teams / Slack* placeholder replaced by empty text (once per hour per process and placeholder) |
+| 41123 | `ChatMessageResponse` | Debug | Chat webhook status code |
+| 41124 | `ChatMessageProcessLinkSkipped` | Debug | *Post to Teams / Slack* added no process link: none or several automation processes have the process display name |
 
 ## Localization
 

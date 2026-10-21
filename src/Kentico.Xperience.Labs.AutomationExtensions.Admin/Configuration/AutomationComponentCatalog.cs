@@ -1,4 +1,5 @@
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.AdjustContactScore;
+using Kentico.Xperience.Labs.AutomationExtensions.Actions.PostChatMessage;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.WriteToLog;
@@ -35,6 +36,7 @@ public static class AutomationComponentCatalog
     public static readonly AutomationComponentDescriptor StartedByTrigger = new(StartedByTriggerCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor WithinTimeWindow = new(WithinTimeWindowCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor AdjustContactScore = new(AdjustContactScoreAction.NAME, AutomationComponentKind.Action);
+    public static readonly AutomationComponentDescriptor PostChatMessage = new(PostChatMessageAction.NAME, AutomationComponentKind.Action);
     public static readonly AutomationComponentDescriptor SendWebhook = new(SendWebhookAction.NAME, AutomationComponentKind.Action);
     public static readonly AutomationComponentDescriptor SetContactField = new(SetContactFieldAction.NAME, AutomationComponentKind.Action);
     public static readonly AutomationComponentDescriptor WriteToLog = new(WriteToLogAction.NAME, AutomationComponentKind.Action);
@@ -55,6 +57,7 @@ public static class AutomationComponentCatalog
         StartedByTrigger,
         WithinTimeWindow,
         AdjustContactScore,
+        PostChatMessage,
         SendWebhook,
         SetContactField,
         WriteToLog

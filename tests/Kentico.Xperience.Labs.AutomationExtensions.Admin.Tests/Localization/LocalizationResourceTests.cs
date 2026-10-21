@@ -100,7 +100,7 @@ public partial class LocalizationResourceTests
 
 
     [Test]
-    public void LibraryStepResultSources_DisplayNameKeysExist() => AssertKeysExist([StepResultKeys.SendWebhook.DisplayName, StepResultKeys.SetContactField.DisplayName]);
+    public void LibraryStepResultSources_DisplayNameKeysExist() => AssertKeysExist([StepResultKeys.SendWebhook.DisplayName, StepResultKeys.SetContactField.DisplayName, StepResultKeys.PostChatMessage.DisplayName]);
 
 
     [TestCase("labs.automationextensions.randomsplit.description")]

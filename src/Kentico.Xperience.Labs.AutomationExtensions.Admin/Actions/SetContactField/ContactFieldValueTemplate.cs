@@ -1,6 +1,11 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 
+using CMS.Automation;
+using CMS.Automation.Internal;
+using CMS.ContactManagement;
+using CMS.DataEngine;
+
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.WriteToLog;
 using Kentico.Xperience.Labs.AutomationExtensions.Core;
 
@@ -8,7 +13,8 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 
 /// <summary>
 /// Resolves <c>{token}</c> and <c>{token.Part}</c> placeholders (case-insensitive) in value templates and operands of
-/// <see cref="SetContactFieldAction"/>. Unknown or unresolvable tokens become empty text and are reported.
+/// <see cref="SetContactFieldAction"/> and texts of <c>PostChatMessageAction</c>. Unknown or unresolvable tokens become empty
+/// text and are reported.
 /// </summary>
 /// <remarks>
 /// Text in braces that doesn't look like a token (e.g. <c>{a b}</c> or <c>{}</c>) is kept as typed. There's no escaping –
@@ -104,6 +110,34 @@ internal sealed class ContactFieldTokenValues
 
 
     /// <summary>
+    /// Creates the token values for the processed <paramref name="contact"/> of the running process. Shared by the steps
+    /// that resolve tokens (<c>Set contact field</c>, <c>Post to Teams / Slack</c>).
+    /// </summary>
+    public static async Task<ContactFieldTokenValues> Create(
+        AutomationProcessContext context,
+        ContactInfo contact,
+        ContactFieldResolver fieldResolver,
+        ICustomAutomationTriggerProvider triggerProvider,
+        TimeProvider timeProvider,
+        CancellationToken cancellationToken)
+    {
+        string triggerIdentifier = await context.GetTriggerIdentifier(cancellationToken) ?? string.Empty;
+
+        return new()
+        {
+            Now = timeProvider.GetLocalNow().DateTime,
+            ProcessName = context.Process.DisplayName,
+            TriggerIdentifier = triggerIdentifier,
+            ContactId = contact.ContactID,
+            ContactGuid = contact.ContactGUID,
+            GetContactFieldValue = name => FormatContactField(fieldResolver, contact, name),
+            Trigger = RegisteredTriggers.Find(triggerProvider, triggerIdentifier),
+            TriggerData = await context.GetTriggerData<IAutomationTriggerData>(cancellationToken)
+        };
+    }
+
+
+    /// <summary>
     /// Returns the value of token <paramref name="name"/> (with optional <paramref name="part"/>), or <c>null</c> when unknown.
     /// </summary>
     public string? Resolve(string name, string? part)
@@ -149,6 +183,16 @@ internal sealed class ContactFieldTokenValues
         }
 
         return Is(name, ContactFieldValueTemplate.CONTACT_GUID) ? ContactGuid.ToString("D") : null;
+    }
+
+
+    private static string? FormatContactField(ContactFieldResolver fieldResolver, ContactInfo contact, string name)
+    {
+        var field = fieldResolver.ResolveReadable(name);
+
+        return field is null
+            ? null
+            : ContactFieldValueConverter.Format(contact.GetValue(field.Name), dateOnly: field.IsDataType(FieldDataType.Date));
     }
 
 

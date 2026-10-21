@@ -3,7 +3,7 @@
 Single source for current state. Update after every slice (and when a check or decision closes).
 Design, research, decisions with reasons, and the slice log: `PLAN.md`. Per-slice scope: `implementation-spec-*.md`.
 
-Last updated: 2026-10-20. Xperience: version in `Directory.Packages.props` (31.9.3). Unit tests: 1375 passed (Admin 1309, Commerce 66).
+Last updated: 2026-10-21. Xperience: version in `Directory.Packages.props` (31.9.3). Unit tests: 1474 passed (Admin 1407, Commerce 67).
 
 ## Components
 
@@ -29,7 +29,7 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 | 24 | Order contains products ("Items purchased") | C | Not started | | Design settled 2026-10-13: resolver hook (order ID → product GUIDs), default `[]`. Pending decision 3 |
 | 11 | Started by trigger (trigger data matches) | C | Done | unit | Trigger list (built-ins + registered, labels), data fields hide for no-data triggers, Field narrows/clears on Trigger change + save passes, end-to-end data check (library + built-in trigger), unregistered saved identifier fails resave? |
 | 13 | Purchase history meets threshold | C | Not started | | |
-| 15 | Post to Teams / Slack | A | Not started | | |
+| 15 | Post to Teams / Slack (`PostChatMessage`) | A | Done | unit + app (2026-10-21: Slack post, contact/form submission/process links, bad URL → failure) | Teams post + Adaptive Card 1.4 accepted (else lower `ADAPTIVE_CARD_VERSION`) – deferred, user lacks Teams admin access. |
 | 17 | Set contact field (dynamic value) | A | Done | unit | Clear field (null), system field save (email side effects), Mode visibility, Previous step succeeded pairing, `{triggerData.*}` per trigger (now any registered trigger, incl. project triggers) |
 | 18 | Subscribe / unsubscribe recipient list | A | Not started | | |
 | 19 | Assign contact owner (round-robin) | A | Not started | | |
@@ -62,6 +62,7 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 3. Package split. Proposal under consideration (user, 2026-10-13, not decided): `Kentico.Xperience.Labs.AutomationExtensions` (general steps), `.Admin` (admin UI extensions: form components, pages, client module), `.Commerce` (commerce steps #6, #13, #24). Now: `.Commerce` project exists (#6) and references `.Admin`; existing projects not restructured. Blockers for a clean split: see `PLAN.md` slice 12.
 4. ~~#15, #20~~: real (2026-10-20). #20 default provider: simple lookup from email TLD + business info, fills empty fields only.
 5. Minimum supported Xperience version: the version in `Directory.Packages.props` (decided 2026-10-20).
+6. ~~#15 process link~~: look up by display name, link only if exactly one match; target process Contacts tab (`automation/list/{id}/automation-contacts`) (user, 2026-10-21; built, app-verified). Step context exposes no process ID.
 
 ## Other open items
 

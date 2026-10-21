@@ -19,4 +19,8 @@ public class StepResultKeysTests
 
     [Test]
     public void SendWebhook_NameMatchesCatalog() => Assert.That(StepResultKeys.SendWebhook.Name, Is.EqualTo(AutomationComponentCatalog.SendWebhook.Name));
+
+
+    [Test]
+    public void PostChatMessage_NameMatchesCatalog() => Assert.That(StepResultKeys.PostChatMessage.Name, Is.EqualTo(AutomationComponentCatalog.PostChatMessage.Name));
 }

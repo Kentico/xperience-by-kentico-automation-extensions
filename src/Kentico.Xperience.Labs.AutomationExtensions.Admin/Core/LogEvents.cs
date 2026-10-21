@@ -36,4 +36,9 @@ public static class LogEvents
     public static readonly EventId ContactGroupIsRecipientList = new(41092, nameof(ContactGroupIsRecipientList));
     public static readonly EventId InvalidStartedByTriggerConfiguration = new(41100, nameof(InvalidStartedByTriggerConfiguration));
     public static readonly EventId StartedByTriggerDataMissing = new(41101, nameof(StartedByTriggerDataMissing));
+    public static readonly EventId ChatMessagePosted = new(41120, nameof(ChatMessagePosted));
+    public static readonly EventId ChatMessageFailed = new(41121, nameof(ChatMessageFailed));
+    public static readonly EventId ChatMessageTokensUnresolved = new(41122, nameof(ChatMessageTokensUnresolved));
+    public static readonly EventId ChatMessageResponse = new(41123, nameof(ChatMessageResponse));
+    public static readonly EventId ChatMessageProcessLinkSkipped = new(41124, nameof(ChatMessageProcessLinkSkipped));
 }

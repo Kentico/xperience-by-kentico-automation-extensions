@@ -1,5 +1,6 @@
 using System.Globalization;
 
+using Kentico.Xperience.Labs.AutomationExtensions.Actions.PostChatMessage;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
 using Kentico.Xperience.Labs.AutomationExtensions.Actions.SetContactField;
 
@@ -37,6 +38,12 @@ public static class StepResultKeys
     /// Result source of the library's "Set contact field (dynamic value)" action.
     /// </summary>
     public static readonly StepResultSource SetContactField = new(SetContactFieldAction.NAME, "labs.automationextensions.setcontactfield.displayname");
+
+
+    /// <summary>
+    /// Result source of the library's "Post to Teams / Slack" action.
+    /// </summary>
+    public static readonly StepResultSource PostChatMessage = new(PostChatMessageAction.NAME, "labs.automationextensions.postchatmessage.displayname");
 
 
     /// <summary>

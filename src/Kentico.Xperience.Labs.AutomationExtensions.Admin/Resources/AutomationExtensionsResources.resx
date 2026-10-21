@@ -130,6 +130,62 @@
     <value>Adds email, first name, last name, and company name.&lt;br&gt;Leave off to send only an anonymous contact ID.&lt;br&gt;Only enable when the destination is allowed to receive personal data.</value>
   </data>
 
+  <!-- Post to Teams / Slack -->
+  <data name="labs.automationextensions.postchatmessage.displayname" xml:space="preserve">
+    <value>Post to Teams / Slack</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.description" xml:space="preserve">
+    <value>Posts a message about the contact to a Microsoft Teams or Slack channel configured by your developers.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.channel.label" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.channel.explanation" xml:space="preserve">
+    <value>Teams or Slack channel that receives the message.&lt;br&gt;Channels are configured by your developers.&lt;br&gt;Missing a channel? Ask them to add it to the application configuration.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.channel.required" xml:space="preserve">
+    <value>Select a channel.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.title.label" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.title.explanation" xml:space="preserve">
+    <value>Optional heading, for example Hot lead: {contact.ContactFirstName} {contact.ContactLastName}. Placeholders as in the message.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.message.label" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.message.explanation" xml:space="preserve">
+    <value>Plain text, line breaks are kept. Placeholders:&lt;br&gt;{now} – current date and time, {today} – current date.&lt;br&gt;{processName}, {triggerIdentifier}, {contactId}, {contactGuid}.&lt;br&gt;{contact.FieldName} – value of a contact field, for example {contact.ContactEmail}.&lt;br&gt;{triggerData.PropertyName} – data of the trigger that started the process.&lt;br&gt;Unknown placeholders become empty and a warning is logged.&lt;br&gt;Contact fields in placeholders leave Xperience like contact details do.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.message.required" xml:space="preserve">
+    <value>Enter a message.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includecontactdetails.label" xml:space="preserve">
+    <value>Include contact details</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includecontactdetails.explanation" xml:space="preserve">
+    <value>Adds email, name, and company name.&lt;br&gt;Personal data leaves Xperience and is visible to everyone in the channel.&lt;br&gt;Only enable when the channel is allowed to receive personal data.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeadminlink.label" xml:space="preserve">
+    <value>Include link to the contact</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeadminlink.explanation" xml:space="preserve">
+    <value>Adds a link that opens the contact in the Xperience administration. Only works when your developers configured the administration URL.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeformsubmissionlink.label" xml:space="preserve">
+    <value>Include link to the form submission</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeformsubmissionlink.explanation" xml:space="preserve">
+    <value>Only for processes started by a form submission. Adds a link that opens the submitted form data in the Xperience administration. Only works when your developers configured the administration URL.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeprocesslink.label" xml:space="preserve">
+    <value>Include link to this process</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeprocesslink.explanation" xml:space="preserve">
+    <value>Adds a link that opens the Contacts tab of this automation process. The process is found by its name: no link is added when several processes share the name. Only works when your developers configured the administration URL.</value>
+  </data>
+
   <!-- Write to log -->
   <data name="labs.automationextensions.writetolog.displayname" xml:space="preserve">
     <value>Write to log</value>

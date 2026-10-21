@@ -82,7 +82,7 @@ public sealed class SetContactFieldAction(
         cancellationToken.ThrowIfCancellationRequested();
 
         var contact = await context.GetProcessedObject(cancellationToken);
-        var tokens = await CreateTokenValues(context, contact, processName, cancellationToken);
+        var tokens = await ContactFieldTokenValues.Create(context, contact, fieldResolver, triggerProvider, timeProvider, cancellationToken);
         object? currentValue = contact.GetValue(field!.Name);
 
         var outcome = SetContactFieldEvaluator.Evaluate(properties, field, mode, arithmeticOperator, currentValue, tokens);
@@ -145,38 +145,6 @@ public sealed class SetContactFieldAction(
             LogFailed(processName, contact.ContactID, fieldName, $"saving the contact failed ({exception.GetType().Name})");
             return false;
         }
-    }
-
-
-    private async Task<ContactFieldTokenValues> CreateTokenValues(
-        AutomationProcessContext context,
-        ContactInfo contact,
-        string processName,
-        CancellationToken cancellationToken)
-    {
-        string triggerIdentifier = await context.GetTriggerIdentifier(cancellationToken) ?? string.Empty;
-
-        return new()
-        {
-            Now = timeProvider.GetLocalNow().DateTime,
-            ProcessName = processName,
-            TriggerIdentifier = triggerIdentifier,
-            ContactId = contact.ContactID,
-            ContactGuid = contact.ContactGUID,
-            GetContactFieldValue = name => GetContactFieldValue(contact, name),
-            Trigger = RegisteredTriggers.Find(triggerProvider, triggerIdentifier),
-            TriggerData = await context.GetTriggerData<IAutomationTriggerData>(cancellationToken)
-        };
-    }
-
-
-    private string? GetContactFieldValue(ContactInfo contact, string name)
-    {
-        var field = fieldResolver.ResolveReadable(name);
-
-        return field is null
-            ? null
-            : ContactFieldValueConverter.Format(contact.GetValue(field.Name), dateOnly: field.IsDataType(FieldDataType.Date));
     }
 
 
