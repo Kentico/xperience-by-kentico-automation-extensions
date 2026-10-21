@@ -27,11 +27,25 @@ export class AutomationProcessListPage {
       .locator(`a[href*="/admin/${automationListPath}/"]`);
   }
 
+  // Searches for `name`. An empty list shows no search input (new database), so there's nothing to search.
+  private async search(name: string): Promise<void> {
+    const searchInput = this.page.getByTestId("search-input");
+    const hasSearch = await searchInput
+      .waitFor({ timeout: 5_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!hasSearch) {
+      return;
+    }
+
+    await searchInput.fill(name);
+    await searchInput.press("Enter");
+  }
+
   // Creates the process with the built-in create form unless the list already has it
   async ensureProcess(name: string): Promise<void> {
     await this.goto();
-    await this.page.getByTestId("search-input").fill(name);
-    await this.page.getByTestId("search-input").press("Enter");
+    await this.search(name);
 
     // The listing reloads after the search; give it time before deciding the process is missing
     const exists = await this.processLink(name)
@@ -52,8 +66,7 @@ export class AutomationProcessListPage {
 
   async openProcess(name: string): Promise<void> {
     await this.goto();
-    await this.page.getByTestId("search-input").fill(name);
-    await this.page.getByTestId("search-input").press("Enter");
+    await this.search(name);
 
     const link = this.processLink(name).first();
     await expect(link, `Automation process '${name}' not found; admin/automation.setup.ts creates it.`).toBeVisible({
