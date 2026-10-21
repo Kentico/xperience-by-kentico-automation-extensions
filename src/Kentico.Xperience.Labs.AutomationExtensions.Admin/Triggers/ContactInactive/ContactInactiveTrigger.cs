@@ -8,7 +8,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
 
 [assembly: RegisterAutomationTrigger<ContactInactiveTrigger>(
     ContactInactiveTrigger.IDENTIFIER,
-    "labs.automationextensions.contactinactive.displayname",
+    "Contact inactive for N days",
     Description = "labs.automationextensions.contactinactive.description",
     IconName = Icons.Pause)]
 

@@ -8,7 +8,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversar
 
 [assembly: RegisterAutomationTrigger<ContactDateAnniversaryTrigger>(
     ContactDateAnniversaryTrigger.IDENTIFIER,
-    "labs.automationextensions.contactdateanniversary.displayname",
+    "Contact date anniversary",
     Description = "labs.automationextensions.contactdateanniversary.description",
     IconName = Icons.Gift)]
 

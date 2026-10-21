@@ -49,12 +49,14 @@ public partial class CommerceAssemblyTests
     [Test]
     public void RegistrationAttributes_DisplayNameAndDescriptionKeysExist()
     {
+        // Trigger display names are plain text: the platform stores them unresolved (kentico-issue-trigger-display-name-resource-key.md).
         var keys = GetRegistrationAttributes()
             .SelectMany(attribute => new[]
             {
-                (string)attribute.GetType().GetProperty("DisplayName")!.GetValue(attribute)!,
+                IsTrigger(attribute) ? null : (string)attribute.GetType().GetProperty("DisplayName")!.GetValue(attribute)!,
                 (string)attribute.GetType().GetProperty("Description")!.GetValue(attribute)!
             })
+            .OfType<string>()
             .ToList();
 
         Assert.Multiple(() =>
@@ -63,6 +65,22 @@ public partial class CommerceAssemblyTests
             AssertKeysExist(keys);
         });
     }
+
+
+    [Test]
+    public void TriggerRegistrationAttributes_DisplayNamesArePlainText()
+    {
+        var displayNames = GetRegistrationAttributes()
+            .Where(IsTrigger)
+            .Select(attribute => (string)attribute.GetType().GetProperty("DisplayName")!.GetValue(attribute)!)
+            .ToList();
+
+        Assert.That(displayNames, Is.Not.Empty.And.None.StartsWith(KEY_PREFIX));
+    }
+
+
+    private static bool IsTrigger(Attribute attribute) =>
+        attribute.GetType().GetGenericTypeDefinition() == typeof(RegisterAutomationTriggerAttribute<>);
 
 
     [Test]

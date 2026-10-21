@@ -6,7 +6,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
 
 [assembly: RegisterAutomationTrigger<ContactGroupMemberTrigger>(
     ContactGroupMemberTrigger.IDENTIFIER,
-    "labs.automationextensions.contactgroupmember.displayname",
+    "Contact in contact group (daily)",
     Description = "labs.automationextensions.contactgroupmember.description",
     IconName = Icons.Users)]
 

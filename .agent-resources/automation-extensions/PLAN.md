@@ -182,7 +182,7 @@ Legend: **T** trigger, **C** condition, **A** action. "Showcases" = XbyK automat
 | 17 | **Set contact field (dynamic value)** | A | Stamp "LastCampaign = {process}", "LeadStatus", dates – built-in step only sets fixed value | Token values: `{now}`, `{processName}`, `{triggerData.X}`, literal | Field, value template | extends built-in step, trigger data use |
 | 18 | **Subscribe / unsubscribe recipient list** | A | Move contact between lists (e.g. remove from "Prospects" after purchase) | Recipient list subscription API; subscribe only if consent/opt-in rules allow **[verify API + double opt-in implications]** | List, operation, require consent (consent dropdown) | email marketing integration |
 | 19 | **Assign contact owner (round-robin)** | A | Route new leads to sales reps evenly | Pick next owner from configured list, store in custom field, persisted counter | Owner pool (from appsettings or admin users/roles), field | stateful assignment, pairs with #15 |
-| 20 | **Enrich contact from external API** | A | Fill company/country/industry from email domain | Provider abstraction (`IContactEnrichmentProvider`), default sample provider, only fill empty fields, writes `StepResultData` | Provider, field mapping, overwrite? | docs' "enrich contact profiles" use case, timeouts/cancellation |
+| 20 | **Enrich contact from external API** | A | Fill company/country/industry from email domain | Provider abstraction (`IContactEnrichmentProvider`), real default provider (email TLD + business info, decided 2026-10-20), only fill empty fields, writes `StepResultData` | Provider, field mapping, overwrite? | docs' "enrich contact profiles" use case, timeouts/cancellation |
 
 ### 3.4 Added after review
 
@@ -308,7 +308,7 @@ Sources: [Admin UI localization](https://docs.kentico.com/documentation/develope
 - Strings live in `.resx` files in the package assembly. One resource class per `.cs` file (empty class encapsulating the `.resx`).
 - Register: `[assembly: RegisterLocalizationResource(typeof(AutomationExtensionsResources), LocalizationTarget.Server, SystemContext.SYSTEM_CULTURE_NAME)]`.
   - Targets: `Server` (default, resolved per request in API responses), `Client` (bundled to browser at admin load), `Builder` (Page/Form Builder components).
-  - DancingGoat sample registers its automation strings with `LocalizationTarget.Builder` – **verified:** `Builder` is sufficient for step names/properties in the Automation Builder (DancingGoat coffee club step). The library registers both `Server` and `Builder` (open item 2).
+  - DancingGoat sample registers its automation strings with `LocalizationTarget.Builder` – **verified:** `Builder` is sufficient for step names/properties in the Automation Builder (DancingGoat coffee club step). The library registered both `Server` and `Builder`; `Server` dropped 2026-10-20 (pending running-app check).
 - Usage patterns seen in `examples/DancingGoat/Samples/Automation`:
   - registration attribute `displayName` / `Description`: plain key (`"labs.automationextensions.sendwebhook.displayname"`).
   - property attributes (`Label`, `ExplanationText`, …): macro form `"{$labs.automationextensions.sendwebhook.endpoint.label$}"`.
@@ -699,6 +699,13 @@ User decisions:
 2. New public `ITriggerDataDescription { string Describe(); }` – Write to log uses it; output must hold identifiers / non-personal values only (logged). Library data types implement it; built-in Kentico types keep hard-coded formats; others → identifier only.
 3. No `{triggerData.X}` placeholders in the Write to log message – keeps its "no personal data" design (trigger data can hold personal data, e.g. custom activity value).
 ---
+
+### Decision (2026-10-20): trigger display names plain text; `Builder`-only localization; #15/#20 real
+
+- Trigger `displayName` in `RegisterAutomationTrigger` = plain text. Platform stores the unresolved key in `CMS_ObjectWorkflowTrigger.TriggerDisplayName`; process listing shows it (31.9.3) and it names the CI file. Actions/conditions unaffected: their display name is not stored (DB or CI) and shows only in the step selection dialog (resolved), so they keep keys. Issue: `kentico-issue-trigger-display-name-resource-key.md`. Resx `*.displayname` keys kept (step registry fallback for unregistered components). Tests: trigger display names must not be keys. Issue submitted 2026-10-21; revert to keys when fixed.
+- Localization registered for `Builder` only (`Builder` verified for Automation Builder texts). Revert if the step registry page or other admin texts show raw keys.
+- #15 Teams/Slack and #20 enrichment ship real implementations. #20 default provider derives fields from email TLD + business info.
+
 
 ## 8. Within time window condition (historical log)
 

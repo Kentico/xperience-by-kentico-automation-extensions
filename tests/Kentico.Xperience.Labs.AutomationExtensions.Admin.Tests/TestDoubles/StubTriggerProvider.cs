@@ -19,9 +19,9 @@ internal sealed class StubTriggerProvider(params AutomationTriggerDefinition[] d
 
 
     public static StubTriggerProvider WithLibraryTriggers() => new(
-        CreateDefinition(ContactDateAnniversaryTrigger.IDENTIFIER, "labs.automationextensions.contactdateanniversary.displayname", typeof(ContactDateAnniversaryTrigger)),
-        CreateDefinition(ContactInactiveTrigger.IDENTIFIER, "labs.automationextensions.contactinactive.displayname", typeof(ContactInactiveTrigger)),
-        CreateDefinition(ContactGroupMemberTrigger.IDENTIFIER, "labs.automationextensions.contactgroupmember.displayname", typeof(ContactGroupMemberTrigger)),
+        CreateDefinition(ContactDateAnniversaryTrigger.IDENTIFIER, "Contact date anniversary", typeof(ContactDateAnniversaryTrigger)),
+        CreateDefinition(ContactInactiveTrigger.IDENTIFIER, "Contact inactive for N days", typeof(ContactInactiveTrigger)),
+        CreateDefinition(ContactGroupMemberTrigger.IDENTIFIER, "Contact in contact group (daily)", typeof(ContactGroupMemberTrigger)),
         CreateDefinition(NO_DATA_TRIGGER, "Acme trigger without data", typeof(NoDataTrigger)));
 
 

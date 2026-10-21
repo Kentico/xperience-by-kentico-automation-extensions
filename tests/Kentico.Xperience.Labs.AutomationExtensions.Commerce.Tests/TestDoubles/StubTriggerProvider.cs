@@ -16,7 +16,7 @@ namespace Kentico.Xperience.Labs.AutomationExtensions.Commerce.Tests.TestDoubles
 internal sealed class StubTriggerProvider(params AutomationTriggerDefinition[] definitions) : ICustomAutomationTriggerProvider
 {
     public static StubTriggerProvider WithOrderCompleted() => new(
-        CreateDefinition(OrderCompletedTrigger.IDENTIFIER, "labs.automationextensions.ordercompleted.displayname", typeof(OrderCompletedTrigger)));
+        CreateDefinition(OrderCompletedTrigger.IDENTIFIER, "Order completed", typeof(OrderCompletedTrigger)));
 
 
     /// <summary>

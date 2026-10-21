@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Resources;
 using System.Text.RegularExpressions;
 
+using CMS.Automation;
+
 using Kentico.Xperience.Labs.AutomationExtensions.Conditions.StartedByTrigger;
 using Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 using Kentico.Xperience.Labs.AutomationExtensions.Core;
@@ -25,12 +27,14 @@ public partial class LocalizationResourceTests
     [Test]
     public void RegistrationAttributes_DisplayNameAndDescriptionKeysExist()
     {
+        // Trigger display names are plain text: the platform stores them unresolved (kentico-issue-trigger-display-name-resource-key.md).
         var keys = AutomationComponentCatalogTests.GetRegistrationAttributes()
             .SelectMany(attribute => new[]
             {
-                (string?)attribute.GetType().GetProperty("DisplayName")!.GetValue(attribute),
+                IsTrigger(attribute) ? null : (string?)attribute.GetType().GetProperty("DisplayName")!.GetValue(attribute),
                 (string?)attribute.GetType().GetProperty("Description")!.GetValue(attribute)
             })
+            .Where(key => key is not null)
             .ToList();
 
         Assert.Multiple(() =>
@@ -39,6 +43,22 @@ public partial class LocalizationResourceTests
             AssertKeysExist(keys!);
         });
     }
+
+
+    [Test]
+    public void TriggerRegistrationAttributes_DisplayNamesArePlainText()
+    {
+        var displayNames = AutomationComponentCatalogTests.GetRegistrationAttributes()
+            .Where(IsTrigger)
+            .Select(attribute => (string?)attribute.GetType().GetProperty("DisplayName")!.GetValue(attribute))
+            .ToList();
+
+        Assert.That(displayNames, Is.Not.Empty.And.None.StartsWith(KEY_PREFIX));
+    }
+
+
+    private static bool IsTrigger(Attribute attribute) =>
+        attribute.GetType().GetGenericTypeDefinition() == typeof(RegisterAutomationTriggerAttribute<>);
 
 
     [Test]
