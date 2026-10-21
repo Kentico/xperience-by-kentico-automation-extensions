@@ -5,13 +5,14 @@ What this repository changes in the generated `kentico-xperience-sample-mvc` pro
 | File | Overlay |
 | --- | --- |
 | `DancingGoat.csproj` | `ProjectReference` to the `.Admin` and `.Commerce` projects (unconditional, `SeparatedAdmin` ignored); repository's own `UserSecretsId` |
-| `Program.cs` | after `AddDancingGoatServices()`: `AddAutomationExtensions(builder.Configuration)`, `.AddAutomationExtensionsCommerce()`, `.AddStepResultSource(CoffeeClubEnrollmentAutomationAction...)`; before `app.Run()`: `app.MapWebhookTestReceiver()` in Development |
+| `Program.cs` | `using CMS.EmailEngine;`; after `AddDancingGoatServices()`: `AddAutomationExtensions(builder.Configuration)`, `.AddAutomationExtensionsCommerce()`, `.AddStepResultSource(CoffeeClubEnrollmentAutomationAction...)`; `AddXperienceSystemSmtp()`, `ConfigureSystemSmtpOptions(...)`, `Configure<SystemEmailOptions>(...)` before `AddDancingGoatManagementApi()`; before `app.Run()`: `app.MapWebhookTestReceiver()` in Development |
 | `Commerce/Checkout/DancingGoatCheckoutController.cs` | `IOrderCompletedTriggerDispatcher` injected; `ConfirmOrder` loads the `OrderInfo` (`GetOrder` replaces `OrderIdToOrderNumber`) and calls `orderCompletedTriggerDispatcher.Fire(orderInfo, contact, ...)` with the current contact (`createAnonymous: false`) |
 | `Resources/DancingGoatResources.resx` | `dancinggoat.automation.coffeeclubenrollment.*` strings |
 | `Samples/Automation/CoffeeClubEnrollment*.cs` | repository-only: sample custom action that records a step result for the "Previous step succeeded" condition |
 | `Samples/AutomationExtensions/WebhookTestReceiverEndpoint.cs` | repository-only: local webhook receiver for the Send webhook action |
 | `appsettings.json` | `CMSConnectionString` to `localhost,1433`, database = repository slug, `sa` / `Pass@12345`; `CMSHashStringSalt` as `dbmanager` wrote it; `AutomationExtensions` section (`EnabledByDefault: false`, demo-only components off) |
-| `appsettings.Development.json` | repository's ManagementApi port and secret; `CMSAdminClientModuleSettings` Proxy entry for `kentico-xperience-labs-automation-extensions-admin`; `AutomationExtensions` section (all components on, webhook test endpoints, trigger options) |
+| `appsettings.Development.json` | repository's ManagementApi port and secret; `SystemSmtpOptions` (localhost:1025, Mailpit); `SystemEmailOptions`; `CMSAdminClientModuleSettings` Proxy entry (HTTP, port 3009) for `kentico-xperience-labs-automation-extensions-admin`; `AutomationExtensions` section (all components on, webhook test endpoints, trigger options) |
+| `appsettings.CI.json` | repository-only file for the CI e2e job (`ASPNETCORE_ENVIRONMENT=CI`): SMTP to Mailpit, `SystemEmailOptions`, no admin client Proxy entry |
 | `Properties/launchSettings.json` | single `DancingGoat` profile, no IIS settings, `launchBrowser: false`, repository's port |
 | `AGENTS.md` | MCP servers described as configured in the repository root `.mcp.json`; `npm rebuild chromedriver` row in Useful commands |
 | `.npmrc` | repository-only: `ignore-scripts=true` (chromedriver opt-in noted inside) |

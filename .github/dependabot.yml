@@ -9,6 +9,9 @@ updates:
     ignore:
       - dependency-name: "Kentico.Xperience.*"
     groups:
+      # Bumps together; keep the Aspire.AppHost.Sdk version in examples/AppHost/AppHost.csproj in step
+      aspire:
+        patterns: ["Aspire.*", "CommunityToolkit.Aspire.*"]
       nuget:
         update-types: [minor, patch]
 
@@ -25,6 +28,14 @@ updates:
       - dependency-name: "@types/react-dom"
     groups:
       npm:
+        update-types: [minor, patch]
+
+  - package-ecosystem: npm
+    directory: /tests/e2e
+    schedule:
+      interval: weekly
+    groups:
+      e2e:
         update-types: [minor, patch]
 
   - package-ecosystem: github-actions
