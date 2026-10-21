@@ -6,7 +6,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Triggers.OrderCompleted;
 
 [assembly: RegisterAutomationTrigger<OrderCompletedTrigger>(
     OrderCompletedTrigger.IDENTIFIER,
-    "Order Completed",
+    "Order completed",
     Description = "labs.automationextensions.ordercompleted.description",
     IconName = Icons.ShoppingCart)]
 
