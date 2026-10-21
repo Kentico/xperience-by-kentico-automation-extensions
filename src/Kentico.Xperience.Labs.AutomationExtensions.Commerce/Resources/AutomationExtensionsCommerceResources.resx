@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root"
+    xmlns=""
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Order completed -->
+  <data name="labs.automationextensions.ordercompleted.displayname" xml:space="preserve">
+    <value>Order completed</value>
+  </data>
+  <data name="labs.automationextensions.ordercompleted.description" xml:space="preserve">
+    <value>Starts when a visitor completes an order – requires checkout code set up by your developers.</value>
+  </data>
+  <data name="labs.automationextensions.ordercompleted.minimumtotal.label" xml:space="preserve">
+    <value>Minimum order total</value>
+  </data>
+  <data name="labs.automationextensions.ordercompleted.minimumtotal.explanation" xml:space="preserve">
+    <value>Starts only for orders with a grand total (including tax and shipping) of at least this amount. Use 0 for any order.</value>
+  </data>
+  <data name="labs.automationextensions.ordercompleted.minimumtotal.minimum" xml:space="preserve">
+    <value>Enter 0 or a higher amount.</value>
+  </data>
+  <data name="labs.automationextensions.ordercompleted.currency.label" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="labs.automationextensions.ordercompleted.currency.explanation" xml:space="preserve">
+    <value>Starts only for orders in this currency, e.g. USD.&lt;br&gt;Leave empty for any currency.&lt;br&gt;Must match the currency code your site sends with each order.</value>
+  </data>
+  <data name="labs.automationextensions.ordercompleted.currency.maxlength" xml:space="preserve">
+    <value>Enter at most 10 characters.</value>
+  </data>
+  <data name="labs.automationextensions.ordercompleted.firstorderonly.label" xml:space="preserve">
+    <value>First order only</value>
+  </data>
+  <data name="labs.automationextensions.ordercompleted.firstorderonly.explanation" xml:space="preserve">
+    <value>Starts only when the customer has no earlier order.&lt;br&gt;Matched by customer record, not contact.</value>
+  </data>
+</root>

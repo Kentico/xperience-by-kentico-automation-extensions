@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "azuresigntool": {
+      "version": "4.0.1",
+      "commands": [
+        "azuresigntool"
+      ]
+    },
+    "kentico.xperience.dbmanager": {
+      "version": "31.9.3",
+      "commands": [
+        "kentico-xperience-dbmanager"
+      ]
+    }
+  }
+}

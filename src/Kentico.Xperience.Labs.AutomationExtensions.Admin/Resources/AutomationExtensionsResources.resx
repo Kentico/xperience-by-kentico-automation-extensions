@@ -1,0 +1,979 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root"
+    xmlns=""
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Shared -->
+  <data name="labs.automationextensions.category.general" xml:space="preserve">
+    <value>General</value>
+  </data>
+  <data name="labs.automationextensions.category.result" xml:space="preserve">
+    <value>Result for later steps</value>
+  </data>
+  <data name="labs.automationextensions.recordresult.label" xml:space="preserve">
+    <value>Record result for later steps</value>
+  </data>
+  <data name="labs.automationextensions.recordresult.explanation" xml:space="preserve">
+    <value>Saves whether this step succeeded, so a later "Previous step succeeded" condition can branch on it.</value>
+  </data>
+  <data name="labs.automationextensions.resultsource.label" xml:space="preserve">
+    <value>Step</value>
+  </data>
+  <data name="labs.automationextensions.resultsource.explanation" xml:space="preserve">
+    <value>Type of the earlier step whose result is checked. The step must have "Record result for later steps" turned on.</value>
+  </data>
+  <data name="labs.automationextensions.resultnumber.label" xml:space="preserve">
+    <value>Result number</value>
+  </data>
+  <data name="labs.automationextensions.resultnumber.write.explanation" xml:space="preserve">
+    <value>Select the same step and number in the "Previous step succeeded" condition. When a process has several steps of this type, give each one a different number.</value>
+  </data>
+  <data name="labs.automationextensions.resultnumber.read.explanation" xml:space="preserve">
+    <value>Number selected on the earlier step. If no earlier step saved this result, contacts follow the No branch.</value>
+  </data>
+  <data name="labs.automationextensions.stepresult.number.text" xml:space="preserve">
+    <value>Result {0}</value>
+    <comment>{0} = result number</comment>
+  </data>
+
+  <!-- Skippable steps -->
+  <data name="labs.automationextensions.category.stepbehavior" xml:space="preserve">
+    <value>Step behavior</value>
+  </data>
+  <data name="labs.automationextensions.skipstep.label" xml:space="preserve">
+    <value>Skip this step</value>
+  </data>
+  <data name="labs.automationextensions.skipstep.action.explanation" xml:space="preserve">
+    <value>Contacts move on without this step running.&lt;br&gt;Use when you can't delete the step because the process already has contact history.&lt;br&gt;Tip: start the step name with "[Skipped]" (or ⏭️) so it's visible in the builder.</value>
+  </data>
+  <data name="labs.automationextensions.skipstep.condition.explanation" xml:space="preserve">
+    <value>The condition isn't checked and all contacts follow the branch selected below.&lt;br&gt;This applies only when the component is enabled by your administrator.&lt;br&gt;If disabled by application configuration, all library conditions follow No, regardless of this setting.&lt;br&gt;Use when you can't delete the step because the process already has contact history.&lt;br&gt;Tip: start the step name with "[Skipped → Yes]" or "[Skipped → No]" so it's visible in the builder.&lt;br&gt;If you turn skipping off later, make sure both branches lead to further steps.</value>
+  </data>
+  <data name="labs.automationextensions.skippedbranch.label" xml:space="preserve">
+    <value>Always follow</value>
+  </data>
+  <data name="labs.automationextensions.skippedbranch.explanation" xml:space="preserve">
+    <value>Branch all contacts follow while the step is skipped.</value>
+  </data>
+  <data name="labs.automationextensions.skippedbranch.yes" xml:space="preserve">
+    <value>Yes branch</value>
+  </data>
+  <data name="labs.automationextensions.skippedbranch.no" xml:space="preserve">
+    <value>No branch</value>
+  </data>
+
+  <!-- Send webhook -->
+  <data name="labs.automationextensions.sendwebhook.displayname" xml:space="preserve">
+    <value>Send webhook</value>
+  </data>
+  <data name="labs.automationextensions.sendwebhook.description" xml:space="preserve">
+    <value>Sends the contact to an external system (CRM, CDP, Zapier, Power Automate). Endpoints are set up by your developers.</value>
+  </data>
+  <data name="labs.automationextensions.sendwebhook.endpoint.label" xml:space="preserve">
+    <value>Destination</value>
+  </data>
+  <data name="labs.automationextensions.sendwebhook.endpoint.explanation" xml:space="preserve">
+    <value>System that receives the contact.&lt;br&gt;Missing a destination?&lt;br&gt;Ask your developers to add it to the application configuration.</value>
+  </data>
+  <data name="labs.automationextensions.sendwebhook.eventname.label" xml:space="preserve">
+    <value>Event name</value>
+  </data>
+  <data name="labs.automationextensions.sendwebhook.eventname.explanation" xml:space="preserve">
+    <value>Tells the receiving system what happened, for example "lead-qualified" or "webinar-registered".</value>
+  </data>
+  <data name="labs.automationextensions.sendwebhook.includecontactdetails.label" xml:space="preserve">
+    <value>Include contact details</value>
+  </data>
+  <data name="labs.automationextensions.sendwebhook.includecontactdetails.explanation" xml:space="preserve">
+    <value>Adds email, first name, last name, and company name.&lt;br&gt;Leave off to send only an anonymous contact ID.&lt;br&gt;Only enable when the destination is allowed to receive personal data.</value>
+  </data>
+
+  <!-- Post to Teams / Slack -->
+  <data name="labs.automationextensions.postchatmessage.displayname" xml:space="preserve">
+    <value>Post to Teams / Slack</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.description" xml:space="preserve">
+    <value>Posts a message about the contact to a Microsoft Teams or Slack channel configured by your developers.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.channel.label" xml:space="preserve">
+    <value>Channel</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.channel.explanation" xml:space="preserve">
+    <value>Teams or Slack channel that receives the message.&lt;br&gt;Channels are configured by your developers.&lt;br&gt;Missing a channel? Ask them to add it to the application configuration.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.channel.required" xml:space="preserve">
+    <value>Select a channel.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.title.label" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.title.explanation" xml:space="preserve">
+    <value>Optional heading, for example Hot lead: {contact.ContactFirstName} {contact.ContactLastName}. Placeholders as in the message.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.message.label" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.message.explanation" xml:space="preserve">
+    <value>Plain text, line breaks are kept. Placeholders:&lt;br&gt;{now} – current date and time, {today} – current date.&lt;br&gt;{processName}, {triggerIdentifier}, {contactId}, {contactGuid}.&lt;br&gt;{contact.FieldName} – value of a contact field, for example {contact.ContactEmail}.&lt;br&gt;{triggerData.PropertyName} – data of the trigger that started the process.&lt;br&gt;Unknown placeholders become empty and a warning is logged.&lt;br&gt;Contact fields in placeholders leave Xperience like contact details do.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.message.required" xml:space="preserve">
+    <value>Enter a message.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includecontactdetails.label" xml:space="preserve">
+    <value>Include contact details</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includecontactdetails.explanation" xml:space="preserve">
+    <value>Adds email, name, and company name.&lt;br&gt;Personal data leaves Xperience and is visible to everyone in the channel.&lt;br&gt;Only enable when the channel is allowed to receive personal data.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeadminlink.label" xml:space="preserve">
+    <value>Include link to the contact</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeadminlink.explanation" xml:space="preserve">
+    <value>Adds a link that opens the contact in the Xperience administration. Only works when your developers configured the administration URL.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeformsubmissionlink.label" xml:space="preserve">
+    <value>Include link to the form submission</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeformsubmissionlink.explanation" xml:space="preserve">
+    <value>Only for processes started by a form submission. Adds a link that opens the submitted form data in the Xperience administration. Only works when your developers configured the administration URL.</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeprocesslink.label" xml:space="preserve">
+    <value>Include link to this process</value>
+  </data>
+  <data name="labs.automationextensions.postchatmessage.includeprocesslink.explanation" xml:space="preserve">
+    <value>Adds a link that opens the Contacts tab of this automation process. The process is found by its name: no link is added when several processes share the name. Only works when your developers configured the administration URL.</value>
+  </data>
+
+  <!-- Write to log -->
+  <data name="labs.automationextensions.writetolog.displayname" xml:space="preserve">
+    <value>Write to log</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.description" xml:space="preserve">
+    <value>Writes a message to the Event log for every contact reaching this step. Use to check which path contacts take. Usually enabled only during testing.</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.category.details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.message.label" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.message.explanation" xml:space="preserve">
+    <value>Text written to the log.&lt;br&gt;You can use {processName}, {contactId}, {contactGuid}, and {triggerIdentifier}.&lt;br&gt;Don't include personal data.</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.level.label" xml:space="preserve">
+    <value>Level</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.level.explanation" xml:space="preserve">
+    <value>Use Warning or Error for paths that need attention, for example when a webhook failed.</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.level.information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.level.warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.level.error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.includestepresults.label" xml:space="preserve">
+    <value>Include results of earlier steps</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.includestepresults.explanation" xml:space="preserve">
+    <value>Adds results saved by earlier steps, for example whether "Send webhook" succeeded. Helps explain why a "Previous step succeeded" condition took a branch.</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.includetriggerdetails.label" xml:space="preserve">
+    <value>Include trigger details</value>
+  </data>
+  <data name="labs.automationextensions.writetolog.includetriggerdetails.explanation" xml:space="preserve">
+    <value>Adds what started the process, for example the submitted form or the contact date.</value>
+  </data>
+
+  <!-- Previous step succeeded -->
+  <data name="labs.automationextensions.previousstepsucceeded.displayname" xml:space="preserve">
+    <value>Previous step succeeded</value>
+  </data>
+  <data name="labs.automationextensions.previousstepsucceeded.description" xml:space="preserve">
+    <value>Checks whether an earlier step (for example "Send webhook") succeeded. Use after a step with "Record result for later steps" turned on.</value>
+  </data>
+
+  <!-- Random split -->
+  <data name="labs.automationextensions.randomsplit.displayname" xml:space="preserve">
+    <value>Random split (A/B)</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.description" xml:space="preserve">
+    <value>Assigns each contact to a stable Yes (A) or No (B) branch. Requires administrator enablement; when disabled by application configuration, all contacts follow No (B), regardless of skip settings.</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.percentage.label" xml:space="preserve">
+    <value>Yes branch percentage</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.percentage.explanation" xml:space="preserve">
+    <value>When enabled by your administrator, this percentage (0–100) of contacts follows Yes (A); the rest follow No (B).&lt;br&gt;Allocation is approximate, not an exact count.&lt;br&gt;When disabled by application configuration, all contacts follow No (B), regardless of this percentage or skip settings.&lt;br&gt;Ask your administrator to confirm whether this component is enabled.</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.percentage.minimum" xml:space="preserve">
+    <value>Enter a percentage from 0 to 100.</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.percentage.maximum" xml:space="preserve">
+    <value>Enter a percentage from 0 to 100.</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.splitkey.label" xml:space="preserve">
+    <value>Split key</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.splitkey.explanation" xml:space="preserve">
+    <value>Stable name for this split, default "default".&lt;br&gt;Same contact and key always get the same bucket, even after a process is renamed.&lt;br&gt;Keys are case-sensitive; spaces matter.</value>
+  </data>
+  <data name="labs.automationextensions.randomsplit.splitkey.required" xml:space="preserve">
+    <value>Enter a split key containing at least one non-space character.</value>
+  </data>
+
+  <!-- Contact date anniversary -->
+  <data name="labs.automationextensions.contactdateanniversary.displayname" xml:space="preserve">
+    <value>Contact date anniversary</value>
+  </data>
+  <data name="labs.automationextensions.contactdateanniversary.description" xml:space="preserve">
+    <value>Starts once a year on (or before) a contact date, such as a birthday. Runs daily – requires a scheduled task set up by your developers.</value>
+  </data>
+  <data name="labs.automationextensions.contactdateanniversary.datefield.label" xml:space="preserve">
+    <value>Contact date</value>
+  </data>
+  <data name="labs.automationextensions.contactdateanniversary.datefield.explanation" xml:space="preserve">
+    <value>Only the month and day are used, so the process starts every year.&lt;br&gt;Missing a field?&lt;br&gt;Ask your developers to add it to the application configuration.</value>
+  </data>
+  <data name="labs.automationextensions.contactdateanniversary.daysbefore.label" xml:space="preserve">
+    <value>When to start</value>
+  </data>
+  <data name="labs.automationextensions.contactdateanniversary.daysbefore.explanation" xml:space="preserve">
+    <value>Start on the date or a number of days before it. Set the process recurrence to "If not already running" ("Only once" would start it only in the first year).</value>
+  </data>
+  <data name="labs.automationextensions.contactdateanniversary.daysbefore.ontheday" xml:space="preserve">
+    <value>On the date</value>
+  </data>
+  <data name="labs.automationextensions.contactdateanniversary.daysbefore.format" xml:space="preserve">
+    <value>{0} days before</value>
+    <comment>{0} = number of days</comment>
+  </data>
+  <!-- Contact inactive -->
+  <data name="labs.automationextensions.contactinactive.displayname" xml:space="preserve">
+    <value>Contact inactive for N days</value>
+  </data>
+  <data name="labs.automationextensions.contactinactive.description" xml:space="preserve">
+    <value>Starts when a contact's last activity was exactly the selected number of days ago – requires a scheduled task set up by your developers.</value>
+  </data>
+  <data name="labs.automationextensions.contactinactive.inactivedays.label" xml:space="preserve">
+    <value>Days without activity</value>
+  </data>
+  <data name="labs.automationextensions.contactinactive.inactivedays.explanation" xml:space="preserve">
+    <value>Starts once on the day the contact's last activity (of any type) reaches this number of days.&lt;br&gt;Missing a value?&lt;br&gt;Ask your developers to add it to the application configuration.&lt;br&gt;Contacts without any activity never start the process.&lt;br&gt;If the scheduled task doesn't run on a day, contacts reaching the value that day aren't started later.&lt;br&gt;If the task runs more than once a day, set the process recurrence to "If not already running" and keep contacts in the process for at least one day (e.g. with a Wait step).</value>
+  </data>
+  <data name="labs.automationextensions.contactinactive.inactivedays.format" xml:space="preserve">
+    <value>{0} days</value>
+    <comment>{0} = number of days</comment>
+  </data>
+  <!-- Contact in contact group -->
+  <data name="labs.automationextensions.contactgroupmember.displayname" xml:space="preserve">
+    <value>Contact in contact group (daily)</value>
+  </data>
+  <data name="labs.automationextensions.contactgroupmember.description" xml:space="preserve">
+    <value>Starts for contacts in the selected contact group, checked once per day – requires a scheduled task set up by your developers.</value>
+  </data>
+  <data name="labs.automationextensions.contactgroupmember.contactgroup.label" xml:space="preserve">
+    <value>Contact group</value>
+  </data>
+  <data name="labs.automationextensions.contactgroupmember.contactgroup.explanation" xml:space="preserve">
+    <value>Only contact groups listed in the application configuration can be selected.&lt;br&gt;Missing a group?&lt;br&gt;Ask your developers to add it to the application configuration. Recipient lists aren't supported.&lt;br&gt;Fires every day for every contact in the group, not only for new members. Set the process recurrence to "If not already running" or "Only once" – "Always" restarts the process for every member every day.&lt;br&gt;Group membership is updated by Xperience's contact group recalculation and can lag behind.</value>
+  </data>
+  <data name="labs.automationextensions.contactgroupmember.contactgroup.format" xml:space="preserve">
+    <value>{0} ({1})</value>
+    <comment>{0} = contact group display name, {1} = contact group code name</comment>
+  </data>
+
+  <!-- Within time window -->
+  <data name="labs.automationextensions.withintimewindow.displayname" xml:space="preserve">
+    <value>Within time window</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.description" xml:space="preserve">
+    <value>Checks if the current time (when this condition runs) falls within a configured time window. This is NOT a Wait step – time is evaluated immediately.</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.weekday.sunday" xml:space="preserve">
+    <value>Sunday</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.weekday.monday" xml:space="preserve">
+    <value>Monday</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.weekday.tuesday" xml:space="preserve">
+    <value>Tuesday</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.weekday.wednesday" xml:space="preserve">
+    <value>Wednesday</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.weekday.thursday" xml:space="preserve">
+    <value>Thursday</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.weekday.friday" xml:space="preserve">
+    <value>Friday</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.weekday.saturday" xml:space="preserve">
+    <value>Saturday</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.starttime.label" xml:space="preserve">
+    <value>Start time</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.starttime.explanation" xml:space="preserve">
+    <value>Window opens at this time, inclusive (e.g., 2:00 PM / 14:00 is included). For overnight windows (e.g., 10:00 PM–2:00 AM / 22:00–02:00), the selected weekday refers to the day the window starts.</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.starttime.required" xml:space="preserve">
+    <value>Select a start time.</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.endtime.label" xml:space="preserve">
+    <value>End time</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.endtime.explanation" xml:space="preserve">
+    <value>Window closes at this time, exclusive (e.g., 4:00 PM / 16:00 is not included). Can be earlier than start time for overnight windows (e.g., 10:00 PM–2:00 AM / 22:00–02:00).</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.endtime.required" xml:space="preserve">
+    <value>Select an end time.</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.timezone.label" xml:space="preserve">
+    <value>Time zone</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.timezone.explanation" xml:space="preserve">
+    <value>The host's local time zone.&lt;br&gt;UTC is the default.&lt;br&gt;The time zone ID is saved and must exist on any deployment host.&lt;br&gt;Zones not available on deployment hosts cause an error – contact your administrator.</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.timezone.required" xml:space="preserve">
+    <value>Select a time zone.</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.startdate.label" xml:space="preserve">
+    <value>Start date (optional)</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.startdate.explanation" xml:space="preserve">
+    <value>Limits the time window to dates on or after this date, inclusive. Leave blank for no limit.</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.enddate.label" xml:space="preserve">
+    <value>End date (optional)</value>
+  </data>
+  <data name="labs.automationextensions.withintimewindow.enddate.explanation" xml:space="preserve">
+    <value>Limits the time window to dates on or before this date, inclusive.&lt;br&gt;Leave blank for no limit.&lt;br&gt;Must be on or after the start date.</value>
+  </data>
+
+  <!-- Step registry -->
+  <data name="labs.automationextensions.stepregistry.caption" xml:space="preserve">
+    <value>Step registry</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.kind" xml:space="preserve">
+    <value>Kind</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.all" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.identifier" xml:space="preserve">
+    <value>Identifier</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.scope.content" xml:space="preserve">
+    <value>This tab lists the registered trigger, action, and condition definitions for the whole application, not just this process. It does not inspect which steps this process uses.&lt;br&gt;&lt;br&gt;Status shows the effective state of library components; the default is disabled unless application configuration enables them.</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.disabled.content" xml:space="preserve">
+    <value>When a library condition is disabled, all contacts follow the "No" path without evaluating the condition. Administrator disablement overrides marketer skip settings.&lt;br&gt;Disabled library actions do nothing (contacts continue); disabled library triggers cannot start processes. All disabled steps log warnings in the Event Log when run.</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.trigger" xml:space="preserve">
+    <value>Trigger</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.action" xml:space="preserve">
+    <value>Action</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.condition" xml:space="preserve">
+    <value>Condition</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.unknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.notmanaged" xml:space="preserve">
+    <value>Not managed</value>
+  </data>
+  <data name="labs.automationextensions.stepregistry.notapplicable" xml:space="preserve">
+    <value>Not applicable</value>
+  </data>
+
+  <!-- Adjust contact score -->
+  <data name="labs.automationextensions.adjustcontactscore.displayname" xml:space="preserve">
+    <value>Adjust contact score</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.description" xml:space="preserve">
+    <value>Changes a number field of the contact (add, subtract, or set), with an optional minimum and maximum. Requires an integer custom contact field.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.category.limits" xml:space="preserve">
+    <value>Limits</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.field.label" xml:space="preserve">
+    <value>Score field</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.field.explanation" xml:space="preserve">
+    <value>Contact field that stores the score.&lt;br&gt;Lists custom contact fields of the integer type; ask your developer to add one if the list is empty.&lt;br&gt;Empty values count as 0.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.field.required" xml:space="preserve">
+    <value>Select a score field.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.label" xml:space="preserve">
+    <value>Operation</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.explanation" xml:space="preserve">
+    <value>Add: increases the current score by the amount.&lt;br&gt;Subtract: decreases the current score by the amount.&lt;br&gt;Set: replaces the current score with the amount.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.required" xml:space="preserve">
+    <value>Select an operation.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.subtract" xml:space="preserve">
+    <value>Subtract</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.operation.set" xml:space="preserve">
+    <value>Set</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.amount.label" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.amount.explanation" xml:space="preserve">
+    <value>Points to add or subtract, or the new score for Set. Use 0 or more; the operation sets the direction.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.amount.minimum" xml:space="preserve">
+    <value>Enter 0 or more.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.limitrange.label" xml:space="preserve">
+    <value>Limit score to a range</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.limitrange.explanation" xml:space="preserve">
+    <value>Keeps the new score between the minimum and maximum (both included). Applies to all operations.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.minimum.label" xml:space="preserve">
+    <value>Minimum</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.minimum.explanation" xml:space="preserve">
+    <value>Lowest allowed score. Must not be greater than the maximum, otherwise the step does nothing.</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.maximum.label" xml:space="preserve">
+    <value>Maximum</value>
+  </data>
+  <data name="labs.automationextensions.adjustcontactscore.maximum.explanation" xml:space="preserve">
+    <value>Highest allowed score.</value>
+  </data>
+
+  <!-- Set contact field (dynamic value) -->
+  <data name="labs.automationextensions.setcontactfield.displayname" xml:space="preserve">
+    <value>Set contact field (dynamic value)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.description" xml:space="preserve">
+    <value>Sets a contact field to a value built from placeholders (date, process, trigger data, other fields) or calculates a number from the current value.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.field.label" xml:space="preserve">
+    <value>Field</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.field.explanation" xml:space="preserve">
+    <value>Contact field to change. Custom fields are listed first, built-in fields are marked as system fields.&lt;br&gt;Built-in fields drive Xperience features (for example, the email address is used for recipient lists and contact matching), so prefer custom fields.&lt;br&gt;Fields maintained by Xperience (IDs, created and modified dates, bounces) aren't listed.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.field.required" xml:space="preserve">
+    <value>Select a field.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.field.systemformat" xml:space="preserve">
+    <value>{0} – system field</value>
+    <comment>{0} = field caption and code name</comment>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.mode.label" xml:space="preserve">
+    <value>Mode</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.mode.explanation" xml:space="preserve">
+    <value>Set to value: replaces the field value with the value below (placeholders allowed).&lt;br&gt;Calculate: combines the current number with an operand, for example + 1. Only for number fields.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.mode.required" xml:space="preserve">
+    <value>Select a mode.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.mode.setvalue" xml:space="preserve">
+    <value>Set to value</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.mode.calculate" xml:space="preserve">
+    <value>Calculate (number fields)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.valuetemplate.label" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.valuetemplate.explanation" xml:space="preserve">
+    <value>Text and placeholders, for example Spring sale or {processName}.&lt;br&gt;{now} – current date and time, {today} – current date.&lt;br&gt;{processName}, {triggerIdentifier}, {contactId}, {contactGuid}.&lt;br&gt;{contact.FieldName} – value of another contact field.&lt;br&gt;{triggerData.PropertyName} – data of the trigger that started the process, for example {triggerData.InactiveDays}.&lt;br&gt;Unknown placeholders become empty and a warning is logged.&lt;br&gt;Numbers use a dot as decimal separator, dates yyyy-MM-dd, yes/no fields true or false.&lt;br&gt;An empty value clears the field.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.onlyifempty.label" xml:space="preserve">
+    <value>Only if the field is empty</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.onlyifempty.explanation" xml:space="preserve">
+    <value>Leaves fields that already have a value unchanged. The step still counts as succeeded.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.label" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.explanation" xml:space="preserve">
+    <value>Calculates: current value, operator, operand. An empty field counts as 0.&lt;br&gt;Whole-number fields divide without decimals (7 ÷ 2 = 3).&lt;br&gt;Division by zero or a result outside the field's range fails the step without changing the field.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.add" xml:space="preserve">
+    <value>+ (add)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.subtract" xml:space="preserve">
+    <value>− (subtract)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.multiply" xml:space="preserve">
+    <value>× (multiply)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.divide" xml:space="preserve">
+    <value>÷ (divide)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operator.modulo" xml:space="preserve">
+    <value>% (remainder)</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operand.label" xml:space="preserve">
+    <value>Operand</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.operand.explanation" xml:space="preserve">
+    <value>Number combined with the current value, for example 1 or 2.5 (dot as decimal separator).&lt;br&gt;Placeholders are allowed, for example {triggerData.Years}.&lt;br&gt;Whole-number fields accept whole numbers only.</value>
+  </data>
+  <data name="labs.automationextensions.setcontactfield.resultnumber.explanation" xml:space="preserve">
+    <value>The step always saves whether it succeeded. Select the same step and number in the "Previous step succeeded" condition. When a process has several steps of this type, give each one a different number.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.displayname" xml:space="preserve">
+    <value>Compare contact number field</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.description" xml:space="preserve">
+    <value>Checks whether an integer custom contact field (for example a score set by "Adjust contact score") is equal to, greater than, or less than a value; empty fields count as 0.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.field.label" xml:space="preserve">
+    <value>Number field</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.field.explanation" xml:space="preserve">
+    <value>Contact field to compare, for example the score field of "Adjust contact score".&lt;br&gt;Lists custom contact fields of the integer type; ask your developer to add one if the list is empty.&lt;br&gt;Empty values count as 0.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.field.required" xml:space="preserve">
+    <value>Select a number field.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.label" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.explanation" xml:space="preserve">
+    <value>Contacts whose field value matches follow Yes; all others follow No.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.required" xml:space="preserve">
+    <value>Select an operator.</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.equal" xml:space="preserve">
+    <value>is equal to</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.notequal" xml:space="preserve">
+    <value>is not equal to</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.greaterthan" xml:space="preserve">
+    <value>is greater than</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.greaterthanorequal" xml:space="preserve">
+    <value>is greater than or equal to</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.lessthan" xml:space="preserve">
+    <value>is less than</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.operator.lessthanorequal" xml:space="preserve">
+    <value>is less than or equal to</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.value.label" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="labs.automationextensions.contactnumberfieldcompare.value.explanation" xml:space="preserve">
+    <value>Whole number the field value is compared with. Negative numbers are allowed.</value>
+  </data>
+  <!-- Started by trigger -->
+  <data name="labs.automationextensions.startedbytrigger.displayname" xml:space="preserve">
+    <value>Started by trigger</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.description" xml:space="preserve">
+    <value>Checks which trigger started the process and, optionally, a value of its trigger data.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.category.triggerdata" xml:space="preserve">
+    <value>Trigger data</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.label" xml:space="preserve">
+    <value>Trigger</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.explanation" xml:space="preserve">
+    <value>Built-in triggers and all triggers registered in the application. Contacts whose process was started by this trigger follow Yes; all others follow No.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.required" xml:space="preserve">
+    <value>Select a trigger.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.formsubmission" xml:space="preserve">
+    <value>Form submission</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.registration" xml:space="preserve">
+    <value>Member registration</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.trigger.customactivity" xml:space="preserve">
+    <value>Custom activity</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.checktriggerdata.label" xml:space="preserve">
+    <value>Also check trigger data</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.checktriggerdata.explanation" xml:space="preserve">
+    <value>Follow Yes only when a value of the trigger data also matches. Shown only for triggers that provide data.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.field.label" xml:space="preserve">
+    <value>Trigger data field</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.field.explanation" xml:space="preserve">
+    <value>Data field of the selected trigger.&lt;br&gt;Changing the trigger clears the field.&lt;br&gt;If the trigger no longer has the field, all contacts follow No.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.label" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.explanation" xml:space="preserve">
+    <value>Is equal to, is not equal to: any field (numbers and dates by value).&lt;br&gt;Contains, does not contain, starts with, ends with: the field value as text.&lt;br&gt;Greater than, less than: number and date fields only.&lt;br&gt;Is empty, is not empty: any field, no value needed.</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.equal" xml:space="preserve">
+    <value>is equal to</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.notequal" xml:space="preserve">
+    <value>is not equal to</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.contains" xml:space="preserve">
+    <value>contains</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.doesnotcontain" xml:space="preserve">
+    <value>does not contain</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.startswith" xml:space="preserve">
+    <value>starts with</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.endswith" xml:space="preserve">
+    <value>ends with</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.greaterthan" xml:space="preserve">
+    <value>is greater than</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.greaterthanorequal" xml:space="preserve">
+    <value>is greater than or equal to</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.lessthan" xml:space="preserve">
+    <value>is less than</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.lessthanorequal" xml:space="preserve">
+    <value>is less than or equal to</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.isempty" xml:space="preserve">
+    <value>is empty</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.operator.isnotempty" xml:space="preserve">
+    <value>is not empty</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.value.label" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="labs.automationextensions.startedbytrigger.value.explanation" xml:space="preserve">
+    <value>Numbers with a dot as decimal separator, for example 12.5.&lt;br&gt;Dates as yyyy-MM-dd, for example 2026-10-11 (time is ignored).&lt;br&gt;Text ignores upper and lower case; yes/no values are true or false.&lt;br&gt;Don't enter personal data.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.displayname" xml:space="preserve">
+    <value>Activity frequency</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.description" xml:space="preserve">
+    <value>Checks how many times the contact performed an activity type in the last N days (for example 3 or more page visits in 7 days); to check whether a contact performed an activity at all, use the built-in Rule-based condition.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.activitytype.label" xml:space="preserve">
+    <value>Activity type</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.activitytype.explanation" xml:space="preserve">
+    <value>Type of activity to count. Lists enabled activity types.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.activitytype.required" xml:space="preserve">
+    <value>Select an activity type.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.operator.label" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.operator.explanation" xml:space="preserve">
+    <value>Contacts whose number of activities matches follow Yes; all others follow No.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.operator.required" xml:space="preserve">
+    <value>Select an operator.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.count.label" xml:space="preserve">
+    <value>Number of activities</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.count.explanation" xml:space="preserve">
+    <value>Whole number the activity count is compared with, for example 3.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.count.minimum" xml:space="preserve">
+    <value>Enter 0 or more.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.days.label" xml:space="preserve">
+    <value>In the last (days)</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.days.explanation" xml:space="preserve">
+    <value>Counts activities logged in the last N × 24 hours up to now (server time). Enter 1–365.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.days.minimum" xml:space="preserve">
+    <value>Enter at least 1 day.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.days.maximum" xml:space="preserve">
+    <value>Enter at most 365 days.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.explanation" xml:space="preserve">
+    <value>How the text below is matched (not case-sensitive with the default database collation).</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.contains" xml:space="preserve">
+    <value>contains</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.doesnotcontain" xml:space="preserve">
+    <value>does not contain</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.equal" xml:space="preserve">
+    <value>is equal to</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.notequal" xml:space="preserve">
+    <value>is not equal to</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.startswith" xml:space="preserve">
+    <value>starts with</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.textoperator.endswith" xml:space="preserve">
+    <value>ends with</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.urlrules.label" xml:space="preserve">
+    <value>URL rules</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.urlrules.explanation" xml:space="preserve">
+    <value>Optional; counts only activities whose URL matches all rules. No rules = all URLs.&lt;br&gt;Page visit, landing page, form submission: the page URL. Email link click: the clicked link.&lt;br&gt;Not case-sensitive; fragments (#…), default ports, and trailing slashes are ignored, and the path never includes the query string.&lt;br&gt;Use Test a URL to see the compared parts. The referrer URL isn't searched.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.titleoperator.label" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.title.label" xml:space="preserve">
+    <value>Title text</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.title.explanation" xml:space="preserve">
+    <value>Optional; leave empty to count all activities of the type.&lt;br&gt;Compares only the name in quotes of the stored title, for example Home in Page visit 'Home' – is equal to Home doesn't match Home page.&lt;br&gt;Page visit, landing page: page name.&lt;br&gt;Form submission: form name.&lt;br&gt;Member registration: member name or email.&lt;br&gt;Email link click: email name.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.valueoperator.label" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.value.label" xml:space="preserve">
+    <value>Value text</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.value.explanation" xml:space="preserve">
+    <value>Optional; leave empty to count all activities of the type.&lt;br&gt;Compares the value logged with the activity (custom and other activity types).</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.pages.label" xml:space="preserve">
+    <value>Pages</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.pages.explanation" xml:space="preserve">
+    <value>Optional; counts only activities on the selected pages (any of them). Leave empty to count all pages.&lt;br&gt;Works only for pages from the content tree tracked by Xperience – matched by page, so URL changes, query strings, and fragments don't matter.&lt;br&gt;For other URLs use URL rules.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.language.label" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.language.explanation" xml:space="preserve">
+    <value>Optional; counts only activities on this language version of the pages. Any counts all languages.</value>
+  </data>
+  <data name="labs.automationextensions.activityfrequency.language.any" xml:space="preserve">
+    <value>Any</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.rule" xml:space="preserve">
+    <value>Rule {0}</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.part.label" xml:space="preserve">
+    <value>URL part</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.parameter.label" xml:space="preserve">
+    <value>Parameter name</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.label" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.value.label" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.value.pattern" xml:space="preserve">
+    <value>Use * for any characters, for example /blog/*</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.addrule" xml:space="preserve">
+    <value>Add rule</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.removerule" xml:space="preserve">
+    <value>Remove rule</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.norules" xml:space="preserve">
+    <value>No rules – all URLs count.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.part.url" xml:space="preserve">
+    <value>Full URL</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.part.host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.part.path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.part.queryparameter" xml:space="preserve">
+    <value>Query parameter</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.equal" xml:space="preserve">
+    <value>is equal to</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.notequal" xml:space="preserve">
+    <value>is not equal to</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.contains" xml:space="preserve">
+    <value>contains</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.doesnotcontain" xml:space="preserve">
+    <value>does not contain</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.startswith" xml:space="preserve">
+    <value>starts with</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.endswith" xml:space="preserve">
+    <value>ends with</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.matches" xml:space="preserve">
+    <value>matches pattern</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.exists" xml:space="preserve">
+    <value>is present</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.operator.doesnotexist" xml:space="preserve">
+    <value>is not present</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.label" xml:space="preserve">
+    <value>Test a URL</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.placeholder" xml:space="preserve">
+    <value>https://www.example.com/pricing?utm_campaign=spring</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.button" xml:space="preserve">
+    <value>Test</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.match" xml:space="preserve">
+    <value>Matches all rules – the activity counts.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.nomatch" xml:space="preserve">
+    <value>Doesn't match – the activity doesn't count.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.norules" xml:space="preserve">
+    <value>No rules – every URL counts.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.rulematch" xml:space="preserve">
+    <value>matches</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.rulenomatch" xml:space="preserve">
+    <value>doesn't match</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.unrecognized" xml:space="preserve">
+    <value>Not a recognized URL – it matches only "is not equal to", "does not contain", and "is not present" rules.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.timedout" xml:space="preserve">
+    <value>A pattern took too long to compare and counts as not matching. Simplify the pattern.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.failed" xml:space="preserve">
+    <value>The URL couldn't be tested. Try again.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.query" xml:space="preserve">
+    <value>Query parameters</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.test.none" xml:space="preserve">
+    <value>(none)</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.rule" xml:space="preserve">
+    <value>Rule {0}: {1}</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.invalidjson" xml:space="preserve">
+    <value>The saved URL rules can't be read. Remove the rules and add them again.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.unsupportedversion" xml:space="preserve">
+    <value>The saved URL rules have an unsupported format. Remove the rules and add them again.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.toomanyrules" xml:space="preserve">
+    <value>Use at most {0} rules.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.unknownpart" xml:space="preserve">
+    <value>Select a URL part.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.unknownoperator" xml:space="preserve">
+    <value>Select an operator.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.operatornotallowed" xml:space="preserve">
+    <value>The operator isn't available for this URL part.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.missingparameter" xml:space="preserve">
+    <value>Enter the query parameter name.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.missingvalue" xml:space="preserve">
+    <value>Enter a value.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.valuetoolong" xml:space="preserve">
+    <value>Enter at most {1} characters.</value>
+  </data>
+  <data name="labs.automationextensions.urlmatch.error.parametertoolong" xml:space="preserve">
+    <value>Enter a parameter name of at most {2} characters.</value>
+  </data>
+</root>

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Code uses the Kentico.Xperience.Labs.AutomationExtensions namespace (no .Commerce suffix) -->
+    <RootNamespace>Kentico.Xperience.Labs.AutomationExtensions</RootNamespace>
+    <Product>Xperience by Kentico Labs: Automation Extensions – Commerce</Product>
+    <Title>$(Product)</Title>
+    <Description>Commerce automation triggers for Xperience by Kentico (e.g. Order completed).</Description>
+    <PackageTags>$(PackageTags);automation;marketing;commerce</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Kentico.Xperience.Admin" />
+    <PackageReference Include="Kentico.Xperience.WebApp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Shared configuration (enablement, component catalog, log categories). Package split: STATUS.md pending decision 3. -->
+    <ProjectReference Include="..\Kentico.Xperience.Labs.AutomationExtensions.Admin\Kentico.Xperience.Labs.AutomationExtensions.Admin.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Required for Xperience to process the assembly's registration attributes (triggers, localization resources) -->
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute" />
+    <InternalsVisibleTo Include="Kentico.Xperience.Labs.AutomationExtensions.Commerce.Tests" />
+  </ItemGroup>
+
+</Project>

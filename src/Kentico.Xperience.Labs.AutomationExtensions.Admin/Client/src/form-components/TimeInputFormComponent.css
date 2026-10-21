@@ -1,0 +1,138 @@
+.automation-extensions-time-select {
+  width: 100%;
+}
+
+.automation-extensions-time-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
+  height: var(--size-m, 40px);
+  box-sizing: border-box;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-pill, 5000px);
+  padding: 0 var(--spacing-l, 16px);
+  background-color: var(--color-input-background);
+  color: var(--color-text-default-on-light);
+  font-family: var(--font-family-inter, "Inter", sans-serif);
+  font-size: var(--font-size-m, 14px);
+  font-weight: var(--font-weight-regular, 400);
+  line-height: 20px;
+}
+
+.automation-extensions-time-input:hover,
+.automation-extensions-time-input[data-focus-within] {
+  border-color: var(--color-border-hover);
+}
+
+.automation-extensions-time-input[data-focus-visible] {
+  box-shadow: var(--focus-default, 0 0 0 1px var(--color-focus-light, var(--palette-white)), 0 0 0 3px var(--color-focus));
+}
+
+.automation-extensions-time-input[data-invalid] {
+  border-color: var(--color-border-alert);
+}
+
+.automation-extensions-time-input[data-invalid]:hover,
+.automation-extensions-time-input[data-invalid][data-focus-within] {
+  border-color: var(--color-alert-hover);
+}
+
+.automation-extensions-time-input[data-invalid][data-focus-visible] {
+  box-shadow: var(--focus-alert, 0 0 0 1px var(--color-focus-light, var(--palette-white)), 0 0 0 3px var(--color-alert-focus, var(--color-border-alert)));
+}
+
+.automation-extensions-time-input[data-disabled] {
+  background-color: var(--color-background-disabled);
+  border-color: var(--color-border-disabled);
+  color: var(--color-text-disabled);
+  box-shadow: none;
+}
+
+.automation-extensions-time-segments {
+  display: flex;
+  flex: 1;
+  outline: none;
+}
+
+.automation-extensions-time-segment {
+  border-radius: var(--radius-xs, 2px);
+  white-space: pre;
+  outline: none;
+}
+
+.automation-extensions-time-segment[data-placeholder] {
+  color: var(--color-text-hint);
+}
+
+.automation-extensions-time-segment[data-focused] {
+  outline: 1px solid var(--color-product);
+  background-color: var(--color-background-selected-hover);
+}
+
+.automation-extensions-time-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-xl, 24px);
+  height: var(--spacing-xl, 24px);
+  border: none;
+  border-radius: var(--radius-s, 4px);
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+.automation-extensions-time-button:hover:not([data-disabled]) {
+  background-color: var(--color-hover);
+}
+
+.automation-extensions-time-button[data-disabled] {
+  cursor: default;
+}
+
+.automation-extensions-time-button[data-focus-visible] {
+  box-shadow: var(--focus-default, 0 0 0 1px var(--color-focus-light, var(--palette-white)), 0 0 0 3px var(--color-focus));
+}
+
+.automation-extensions-time-popover {
+  width: var(--trigger-width);
+}
+
+.automation-extensions-time-options {
+  max-height: 33vh;
+  overflow-y: auto;
+  padding: var(--spacing-s, 8px) var(--focus-ring-width, 3px);
+  outline: none;
+}
+
+.automation-extensions-time-option {
+  box-sizing: border-box;
+  padding: var(--spacing-l, 16px);
+  color: var(--color-text-default-on-light);
+  font-family: var(--typeface-product-primary, "GT Walsheim", sans-serif);
+  font-size: var(--font-size-m, 14px);
+  line-height: var(--line-m, 16px);
+  cursor: pointer;
+  outline: none;
+}
+
+.automation-extensions-time-option[data-focused] {
+  background-color: var(--color-hover);
+}
+
+.automation-extensions-time-option[data-pressed] {
+  background-color: var(--color-background-highlighted);
+}
+
+.automation-extensions-time-option[data-selected] {
+  color: var(--color-product-selected);
+  background-color: var(--color-background-selected);
+}
+
+.automation-extensions-time-option[data-focus-visible] {
+  box-shadow: var(--focus-default, 0 0 0 1px var(--color-focus-light, var(--palette-white)), 0 0 0 3px var(--color-focus));
+}

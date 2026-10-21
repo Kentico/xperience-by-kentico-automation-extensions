@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Kentico.Xperience.Labs.AutomationExtensions.Admin/Kentico.Xperience.Labs.AutomationExtensions.Admin.csproj" />
+  <Project Path="Kentico.Xperience.Labs.AutomationExtensions.Commerce/Kentico.Xperience.Labs.AutomationExtensions.Commerce.csproj" />
+</Solution>
