@@ -41,6 +41,7 @@ Most steps can be skipped per step, and actions can record their result for *Pre
 - *Send webhook* and *Post to Teams / Slack* send once, without retries. *Post to Teams / Slack* hasn't been tested with a real Teams channel yet.
 - The *Post to Teams / Slack* process link is added only when exactly one automation process has the process's display name.
 - Trigger names are plain English (not localized) because of a platform issue with localized trigger names.
+- *Started by trigger*, *Set contact field*, *Write to log*, *Post to Teams / Slack*, and the *Step registry* tab use Xperience types from `*.Internal` namespaces. These can change in any Xperience release, not only major versions, so check these components after each Xperience update. See [Internal Xperience APIs](./docs/Usage-Guide.md#internal-xperience-apis).
 
 ## Requirements
 

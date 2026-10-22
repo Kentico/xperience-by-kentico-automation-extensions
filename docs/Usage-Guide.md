@@ -131,24 +131,26 @@ verify signatures, tab order, and routing when upgrading Xperience.
 
 ## Components
 
-| Component | Name (configuration key) | Identifier |
-| --- | --- | --- |
-| Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExtensions.ContactDateAnniversary` |
-| Trigger – Contact in contact group (daily) | `ContactGroupMember` | `Labs.AutomationExtensions.ContactGroupMember` |
-| Trigger – Contact in recipient list (daily) | `RecipientListMember` | `Labs.AutomationExtensions.RecipientListMember` |
-| Trigger – Contact inactive for N days | `ContactInactive` | `Labs.AutomationExtensions.ContactInactive` |
-| Trigger – Order completed (`.Commerce` package) | `OrderCompleted` | `Labs.AutomationExtensions.OrderCompleted` |
-| Condition – Activity frequency | `ActivityFrequency` | `Labs.AutomationExtensions.ActivityFrequency` |
-| Condition – Compare contact number field | `ContactNumberFieldCompare` | `Labs.AutomationExtensions.ContactNumberFieldCompare` |
-| Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` |
-| Condition – Random split (A/B) | `RandomSplit` | `Labs.AutomationExtensions.RandomSplit` |
-| Condition – Started by trigger | `StartedByTrigger` | `Labs.AutomationExtensions.StartedByTrigger` |
-| Condition – Within time window | `WithinTimeWindow` | `Labs.AutomationExtensions.WithinTimeWindow` |
-| Action – Adjust contact score | `AdjustContactScore` | `Labs.AutomationExtensions.AdjustContactScore` |
-| Action – Post to Teams / Slack | `PostChatMessage` | `Labs.AutomationExtensions.PostChatMessage` |
-| Action – Send webhook | `SendWebhook` | `Labs.AutomationExtensions.SendWebhook` |
-| Action – Set contact field (dynamic value) | `SetContactField` | `Labs.AutomationExtensions.SetContactField` |
-| Action – Write to log | `WriteToLog` | `Labs.AutomationExtensions.WriteToLog` |
+| Component | Name (configuration key) | Identifier | [Internal APIs](#internal-xperience-apis) |
+| --- | --- | --- | --- |
+| Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExtensions.ContactDateAnniversary` | – |
+| Trigger – Contact in contact group (daily) | `ContactGroupMember` | `Labs.AutomationExtensions.ContactGroupMember` | – |
+| Trigger – Contact in recipient list (daily) | `RecipientListMember` | `Labs.AutomationExtensions.RecipientListMember` | – (copies internal behavior) |
+| Trigger – Contact inactive for N days | `ContactInactive` | `Labs.AutomationExtensions.ContactInactive` | – |
+| Trigger – Order completed (`.Commerce` package) | `OrderCompleted` | `Labs.AutomationExtensions.OrderCompleted` | – |
+| Condition – Activity frequency | `ActivityFrequency` | `Labs.AutomationExtensions.ActivityFrequency` | – |
+| Condition – Compare contact number field | `ContactNumberFieldCompare` | `Labs.AutomationExtensions.ContactNumberFieldCompare` | – |
+| Condition – Previous step succeeded | `PreviousStepSucceeded` | `Labs.AutomationExtensions.PreviousStepSucceeded` | – |
+| Condition – Random split (A/B) | `RandomSplit` | `Labs.AutomationExtensions.RandomSplit` | – |
+| Condition – Started by trigger | `StartedByTrigger` | `Labs.AutomationExtensions.StartedByTrigger` | **Yes** |
+| Condition – Within time window | `WithinTimeWindow` | `Labs.AutomationExtensions.WithinTimeWindow` | – |
+| Action – Adjust contact score | `AdjustContactScore` | `Labs.AutomationExtensions.AdjustContactScore` | – |
+| Action – Post to Teams / Slack | `PostChatMessage` | `Labs.AutomationExtensions.PostChatMessage` | **Yes** |
+| Action – Send webhook | `SendWebhook` | `Labs.AutomationExtensions.SendWebhook` | – |
+| Action – Set contact field (dynamic value) | `SetContactField` | `Labs.AutomationExtensions.SetContactField` | **Yes** |
+| Action – Write to log | `WriteToLog` | `Labs.AutomationExtensions.WriteToLog` | **Yes** |
+
+The *Step registry* tab also uses internal APIs.
 
 ### Trigger – Contact date anniversary
 
@@ -1081,6 +1083,24 @@ Keep your own property and category `Order` values below `SkippableStep.CATEGORY
 | Set contact field (dynamic value) | Custom contact field (recommended); trigger providing data for `{triggerData.…}` placeholders | Field list has system fields only; placeholder empty, warning logged |
 | Started by trigger | Process started by the selected trigger; trigger data of that trigger for the data check | Follows **No** branch; missing data logs a warning
 | Write to log | Logging configuration routing `Kentico*` categories at the selected level | Nothing visible in the Event log |
+
+## Internal Xperience APIs
+
+Some components use Xperience types from `*.Internal` namespaces, directly or through a shared library service. Kentico doesn't treat these as part of the supported API: they can change or disappear in any Xperience release, including minor versions and hotfixes, not only major ones. A change can break the component (errors when the step runs or its dialog opens) or change its behavior, and needs a new library version.
+
+This library is tested only against the Xperience version in the [version matrix](../README.md#library-version-matrix). Before you update Xperience, check the components below.
+
+| Component | Internal types | Used for |
+| --- | --- | --- |
+| Condition – Started by trigger | `CMS.Automation.Internal.ICustomAutomationTriggerProvider`, `Trigger` | Trigger drop-down, trigger data fields, matching registered triggers |
+| Action – Set contact field (dynamic value) | `ICustomAutomationTriggerProvider`, `Trigger` (shared trigger store) | `{triggerData.…}` placeholders |
+| Action – Write to log | `ICustomAutomationTriggerProvider`, `Trigger` (shared trigger store) | *Include trigger details* |
+| Action – Post to Teams / Slack | `ICustomAutomationTriggerProvider`, `Trigger` (shared trigger store); `CMS.AutomationEngine.Internal.WorkflowInfo`, `WorkflowTypeEnum` | `{triggerData.…}` placeholders; *Process* link (finds the process by display name) |
+| *Step registry* tab (administration) | `ICustomAutomationActionProvider`, `ICustomAutomationConditionProvider`, `ICustomAutomationTriggerProvider`, `Trigger`; `Kentico.Xperience.Admin.DigitalMarketing.UIPages.Internal.AutomationProcessEditSection` | Listing registered steps; placing the tab in the automation process editor |
+
+Components not listed use only public APIs.
+
+*Contact in recipient list (daily)* uses only public types, but copies rules from internal Xperience code. Its subscribed rule matches `CMS.EmailMarketing.Internal.IEmailSubscriptionConfirmationService.IsConfirmed`, and its bounce rule matches the *Contact is in recipient list* macro rule. If Xperience changes those rules, the trigger can disagree with the administration until the library is updated.
 
 ## Example process – CRM sync with retry
 

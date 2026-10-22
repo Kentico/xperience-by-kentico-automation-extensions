@@ -251,6 +251,7 @@ Follow best practices from the docs above for automations, logging, error handli
 - [Custom automation triggers – Best practices](https://docs.kentico.com/documentation/developers-and-admins/digital-marketing-setup/automation-customization/automation-custom-triggers#best-practices): stateless, lightweight `Evaluate`, trigger data guidelines, versioning.
 - Logging via `ILogger<T>` ([Logging](https://docs.kentico.com/documentation/developers-and-admins/development/logging)): include component identifier, process name, contact ID (not PII). Catch expected errors (`HttpRequestException`, timeouts) when not cancelled; let conditions fail to the false branch.
 - Never change identifiers after release; version with `_V2`.
+- Prefer public APIs. A component that uses a `*.Internal` type (directly or via a shared service, e.g. `RegisteredTriggers`) or copies internal platform rules must be listed in Usage Guide *Internal Xperience APIs* (Components table column + section) and the README Limitations bullet (user, 2026-10-22: these can break outside Xperience major versions).
 - Use the KentiCopilot `automation-action`, `automation-condition`, `automation-trigger` skills as reference patterns.
 
 ### 5.2 Ask when unsure
