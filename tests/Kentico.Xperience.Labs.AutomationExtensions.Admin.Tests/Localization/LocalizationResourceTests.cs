@@ -128,6 +128,7 @@ public partial class LocalizationResourceTests
     [TestCase("labs.automationextensions.contactdateanniversary.daysbefore.format")]
     [TestCase("labs.automationextensions.contactinactive.inactivedays.format")]
     [TestCase("labs.automationextensions.contactgroupmember.contactgroup.format")]
+    [TestCase("labs.automationextensions.recipientlistmember.recipientlist.format")]
     [TestCase("labs.automationextensions.adjustcontactscore.operation.add")]
     [TestCase("labs.automationextensions.adjustcontactscore.operation.subtract")]
     [TestCase("labs.automationextensions.adjustcontactscore.operation.set")]

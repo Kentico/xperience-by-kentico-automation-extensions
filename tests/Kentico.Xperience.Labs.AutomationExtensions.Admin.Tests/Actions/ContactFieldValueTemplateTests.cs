@@ -6,6 +6,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Tests.TestDoubles;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.RecipientListMember;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Actions;
 
@@ -157,6 +158,12 @@ public class ContactFieldValueTemplateTests
     public void TriggerData_ContactGroupMember() => AssertTriggerData(
         new ContactGroupMemberTriggerData { ContactGroupName = "HighIntent", ContactGroupDisplayName = "High intent" },
         ("ContactGroupName", "HighIntent"), ("ContactGroupDisplayName", "High intent"));
+
+
+    [Test]
+    public void TriggerData_RecipientListMember() => AssertTriggerData(
+        new RecipientListMemberTriggerData { RecipientListName = "Newsletter", RecipientListDisplayName = "Monthly newsletter" },
+        ("RecipientListName", "Newsletter"), ("RecipientListDisplayName", "Monthly newsletter"));
 
 
     [Test]

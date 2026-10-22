@@ -15,6 +15,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Tests.TestDoubles;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.RecipientListMember;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Conditions;
 
@@ -138,6 +139,7 @@ public class StartedByTriggerConfigurationTests
             "Labs.AutomationExtensions.ContactDateAnniversary",
             "Labs.AutomationExtensions.ContactInactive",
             "Labs.AutomationExtensions.ContactGroupMember",
+            "Labs.AutomationExtensions.RecipientListMember",
             StubTriggerProvider.NO_DATA_TRIGGER
         }));
         Assert.That(all.Select(trigger => trigger.DataType), Is.EqualTo(new[]
@@ -148,6 +150,7 @@ public class StartedByTriggerConfigurationTests
             typeof(ContactDateAnniversaryTriggerData),
             typeof(ContactInactiveTriggerData),
             typeof(ContactGroupMemberTriggerData),
+            typeof(RecipientListMemberTriggerData),
             null
         }));
     });
@@ -181,9 +184,10 @@ public class StartedByTriggerConfigurationTests
         {
             Assert.That(items.Select(item => item.Text), Is.EqualTo(new[]
             {
-                "Acme trigger without data", "Contact date anniversary", "Contact in contact group (daily)", "Contact inactive for N days",
-                "Custom activity", "Form submission", "Member registration"
+                "Acme trigger without data", "Contact date anniversary", "Contact in contact group (daily)", "Contact in recipient list (daily)",
+                "Contact inactive for N days", "Custom activity", "Form submission", "Member registration"
             }));
+            Assert.That(items.Single(item => item.Text == "Contact in recipient list (daily)").Value, Is.EqualTo(RecipientListMemberTrigger.IDENTIFIER));
             Assert.That(items.Single(item => item.Text == "Form submission").Value, Is.EqualTo(DefaultTriggerIdentifiers.FORM_SUBMISSION));
             Assert.That(items.Single(item => item.Text == "Contact inactive for N days").Value, Is.EqualTo(ContactInactiveTrigger.IDENTIFIER));
         });
@@ -203,7 +207,7 @@ public class StartedByTriggerConfigurationTests
             {
                 "BizFormId", "BizFormItemId", "MemberId", "ActivityType", "ActivityItemId", "ActivityItemDetailId", "ActivityValue",
                 "ActivityChannelId", "FieldName", "DaysBefore", "AnniversaryDate", "Years", "InactiveDays", "LastActivityDate",
-                "ContactGroupName", "ContactGroupDisplayName"
+                "ContactGroupName", "ContactGroupDisplayName", "RecipientListName", "RecipientListDisplayName"
             }));
             Assert.That(items.Select(item => item.Text), Is.EqualTo(items.Select(item => item.Value)));
         });

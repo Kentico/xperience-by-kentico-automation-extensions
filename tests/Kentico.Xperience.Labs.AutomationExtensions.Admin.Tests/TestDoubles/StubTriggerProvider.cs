@@ -6,6 +6,7 @@ using CMS.Automation.Internal;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.RecipientListMember;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.TestDoubles;
 
@@ -22,6 +23,7 @@ internal sealed class StubTriggerProvider(params AutomationTriggerDefinition[] d
         CreateDefinition(ContactDateAnniversaryTrigger.IDENTIFIER, "Contact date anniversary", typeof(ContactDateAnniversaryTrigger)),
         CreateDefinition(ContactInactiveTrigger.IDENTIFIER, "Contact inactive for N days", typeof(ContactInactiveTrigger)),
         CreateDefinition(ContactGroupMemberTrigger.IDENTIFIER, "Contact in contact group (daily)", typeof(ContactGroupMemberTrigger)),
+        CreateDefinition(RecipientListMemberTrigger.IDENTIFIER, "Contact in recipient list (daily)", typeof(RecipientListMemberTrigger)),
         CreateDefinition(NO_DATA_TRIGGER, "Acme trigger without data", typeof(NoDataTrigger)));
 
 

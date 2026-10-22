@@ -3,6 +3,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Actions.SendWebhook;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.RecipientListMember;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 
@@ -58,4 +59,10 @@ public sealed class AutomationExtensionsOptions
     /// Settings of the <see cref="ContactGroupMemberTrigger"/>.
     /// </summary>
     public ContactGroupMemberOptions ContactGroupMember { get; set; } = new();
+
+
+    /// <summary>
+    /// Settings of the <see cref="RecipientListMemberTrigger"/>.
+    /// </summary>
+    public RecipientListMemberOptions RecipientListMember { get; set; } = new();
 }

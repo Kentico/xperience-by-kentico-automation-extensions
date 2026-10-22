@@ -327,6 +327,22 @@
     <value>{0} ({1})</value>
     <comment>{0} = contact group display name, {1} = contact group code name</comment>
   </data>
+  <data name="labs.automationextensions.recipientlistmember.displayname" xml:space="preserve">
+    <value>Contact in recipient list (daily)</value>
+  </data>
+  <data name="labs.automationextensions.recipientlistmember.description" xml:space="preserve">
+    <value>Starts for contacts subscribed to the selected recipient list, checked once per day – requires a scheduled task set up by your developers.</value>
+  </data>
+  <data name="labs.automationextensions.recipientlistmember.recipientlist.label" xml:space="preserve">
+    <value>Recipient list</value>
+  </data>
+  <data name="labs.automationextensions.recipientlistmember.recipientlist.explanation" xml:space="preserve">
+    <value>Only recipient lists listed in the application configuration can be selected.&lt;br&gt;Missing a list?&lt;br&gt;Ask your developers to add it to the application configuration. Contact groups aren't supported.&lt;br&gt;Fires every day for every subscribed contact of the list, not only for new subscribers. Set the process recurrence to "If not already running" or "Only once" – "Always" restarts the process for every subscriber every day.&lt;br&gt;Unsubscribed contacts, contacts that haven't confirmed their subscription (double opt-in), and contacts with a bounced email address are skipped.</value>
+  </data>
+  <data name="labs.automationextensions.recipientlistmember.recipientlist.format" xml:space="preserve">
+    <value>{0} ({1})</value>
+    <comment>{0} = recipient list display name, {1} = recipient list code name</comment>
+  </data>
 
   <!-- Within time window -->
   <data name="labs.automationextensions.withintimewindow.displayname" xml:space="preserve">

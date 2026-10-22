@@ -53,6 +53,7 @@ At application start, the library logs which components are enabled and warns ab
       "PostChatMessage": true,
       "PreviousStepSucceeded": true,
       "RandomSplit": true,
+      "RecipientListMember": true,
       "SendWebhook": true,
       "SetContactField": true,
       "StartedByTrigger": true,
@@ -134,6 +135,7 @@ verify signatures, tab order, and routing when upgrading Xperience.
 | --- | --- | --- |
 | Trigger – Contact date anniversary | `ContactDateAnniversary` | `Labs.AutomationExtensions.ContactDateAnniversary` |
 | Trigger – Contact in contact group (daily) | `ContactGroupMember` | `Labs.AutomationExtensions.ContactGroupMember` |
+| Trigger – Contact in recipient list (daily) | `RecipientListMember` | `Labs.AutomationExtensions.RecipientListMember` |
 | Trigger – Contact inactive for N days | `ContactInactive` | `Labs.AutomationExtensions.ContactInactive` |
 | Trigger – Order completed (`.Commerce` package) | `OrderCompleted` | `Labs.AutomationExtensions.OrderCompleted` |
 | Condition – Activity frequency | `ActivityFrequency` | `Labs.AutomationExtensions.ActivityFrequency` |
@@ -251,7 +253,7 @@ Process recurrence:
 Limitations:
 
 - **No "newly joined" detection.** No state is stored: the task doesn't know when a contact joined. Every member fires on every run; recurrence prevents repeated starts.
-- **Recipient lists aren't supported.** A separate trigger (*Contact in recipient list (daily)*) is planned.
+- **Recipient lists aren't supported.** Use [Contact in recipient list (daily)](#trigger--contact-in-recipient-list-daily) for recipient lists.
 - **Membership lags.** Group membership is maintained by Xperience's [contact group recalculation](https://docs.kentico.com/documentation/business-users/digital-marketing/contact-groups#recalculate-contact-groups). Contacts that recently started or stopped matching the conditions, or members of a group whose conditions changed but which wasn't recalculated yet, are fired according to the stored membership.
 - **Missed runs are not caught up.** If the task doesn't run on a day, or fired triggers are lost from the in-memory trigger queue (application restart), no start happens for that day – members are fired again on the next run.
 - Leaving the group doesn't stop a running process.
@@ -266,6 +268,93 @@ Example – high-intent nurture:
 2. Trigger: *Contact in contact group (daily)* (*High intent*), recurrence **Only once**.
 3. *Send email* – case study, *Wait* 3 days, *Send email* – demo offer.
 4. *Adjust contact score* (+20) or internal notification for sales.
+
+### Trigger – Contact in recipient list (daily)
+
+Starts a process for contacts subscribed to the selected recipient list, checked once per day – for example a welcome series for a newsletter.
+The scheduled task fires the trigger every day for **every** subscribed contact of the list (not only for contacts that subscribed since the last run); the process recurrence decides whether a contact starts again.
+
+**Requires** a scheduled task configuration – without it the trigger never fires:
+
+1. Open the **Scheduled tasks** application and select **New scheduled task configuration**.
+2. Set **Task implementation** to `Labs.AutomationExtensions.RecipientListMemberTask`.
+3. Set the **Task schedule** to run **once per day**, preferably off-peak.
+4. Select **Enabled** and **Save**.
+
+When the component is disabled, the task does nothing and its **Last result** shows `Disabled via configuration (…)`.
+When no recipient lists are configured, it shows `No recipient lists configured in 'AutomationExtensions:RecipientListMember:RecipientLists'. …`; when none of the configured lists exists, `None of the recipient lists configured … exist as recipient lists …`.
+
+Configuration:
+
+```json
+{
+  "AutomationExtensions": {
+    "RecipientListMember": {
+      "RecipientLists": [ "Newsletter", "EventInvitations" ],
+      "BatchSize": 500
+    }
+  }
+}
+```
+
+| Setting | Default | Description |
+| --- | --- | --- |
+| `RecipientLists` | `[]` | Code names of the recipient lists scanned by the task (trimmed; empty entries and duplicates ignored, case-insensitive). Marketers can select only these lists. Each list adds one set of queries and one trigger per subscribed contact to every run. Empty: the task fires nothing. |
+| `BatchSize` | `500` | Contacts loaded per database query. |
+
+Unknown code names (`RecipientListNotFound`) and contact groups or other object types such as segments (`RecipientListIsContactGroup`) are skipped with a warning on every task run and aren't listed in the drop-down.
+Use [Contact in contact group (daily)](#trigger--contact-in-contact-group-daily) for contact groups.
+
+Marketer properties:
+
+- **Recipient list** – one of the configured recipient lists that exist, shown as *Display name (code name)*.
+
+Trigger data (`RecipientListMemberTriggerData`, available to custom steps via `GetTriggerData`): `RecipientListName` (code name), `RecipientListDisplayName`.
+
+Who fires – the same rule as Xperience's `CMSContactIsInRecipientList` macro rule (*Contact is receiving in the recipient list*) and the *Unsubscribed* / *Bounced* statuses in the recipient list's *Recipients* listing:
+
+- The contact is a contact member of the list (`OM_ContactGroupMember`, member type *contact*), **and**
+- its latest subscription confirmation for the list (`EmailLibrary_EmailSubscriptionConfirmation`, newest by date) is approved, **and**
+- its email address isn't bounced (`EmailLibrary_EmailBounce`): no hard bounce and fewer soft bounces than `BouncedEmailsGlobalOptions.SoftBounceLimit` (default 5, set by your developers, see [Set up email tracking](https://docs.kentico.com/documentation/developers-and-admins/digital-marketing-setup/set-up-email-tracking)). A limit of 0 treats every address with a bounce record as bounced. The limit is read once per task run.
+
+What that means in practice:
+
+| Contact | Fired |
+| --- | --- |
+| Confirmed the double opt-in link | Yes |
+| Submitted the subscription form but didn't click the double opt-in link yet | No – Xperience adds the contact to the list only after confirmation |
+| Unsubscribed (unsubscribe link or one-click unsubscribe) | No – the contact stays in the list with the *Unsubscribed* status |
+| Subscribed again after unsubscribing | Yes – the newest confirmation counts |
+| Added to the list by code or import without a subscription confirmation | No – add an approved `EmailSubscriptionConfirmationInfo` when adding recipients by code |
+| Bounced email address (hard bounce, or soft bounce limit reached) | No – fires again on later runs after a marketer selects **Reset bounces** in the contact's profile (deletes the bounce records) |
+
+How the task finds contacts: on each run, for every configured list, it reads the subscribed contact members in batches ordered by contact ID and fires the trigger for each existing contact. A contact in several configured lists fires once per list; each process starts only for its selected list.
+
+Process recurrence:
+
+| Recurrence | Behavior |
+| --- | --- |
+| **If not already running** (recommended) | A subscriber starts when it isn't currently in the process – again the day after it finishes, while it is still subscribed. Keep subscribers in the process (e.g. *Wait* steps) as long as they shouldn't restart. |
+| **Only once** (recommended) | Each contact starts once, ever – even if it unsubscribes and subscribes again. |
+| **Always** | Every task run starts the process again for every subscriber – daily duplicates. Avoid. |
+
+Limitations:
+
+- **No "newly subscribed" detection.** No state is stored: the task doesn't fire only for new subscribers. Every subscribed contact fires on every run; recurrence prevents repeated starts. Enabling the trigger for an existing list starts the process for all current subscribers.
+- **Up to a day of delay.** A contact that subscribes after the task ran starts with the next run.
+- **Missed runs are not caught up.** If the task doesn't run on a day, or fired triggers are lost from the in-memory trigger queue (application restart), no start happens for that day – subscribers are fired again on the next run.
+- Unsubscribing doesn't stop a running process. Regular emails respect the unsubscription, but other steps of a running process still run.
+
+> **Load:** each task run fires one trigger per subscribed contact per configured list into Xperience's shared in-memory trigger queue (also used by the *Form* trigger).
+> When the queue is full, Xperience drops further triggers and logs a warning. Run the task off-peak, and for large lists raise the `CMSAutomationTriggerQueueCapacity` application setting (default 5000, see [configuration keys](https://docs.kentico.com/documentation/developers-and-admins/configuration/reference-configuration-keys#automation-settings)).
+> Recurrence settings don't reduce the load: triggers are fired for every subscriber and filtered when processes evaluate them.
+
+Example – newsletter welcome series:
+
+1. Recipient list *Newsletter* with a double opt-in subscription form, code name added to `RecipientLists`.
+2. Trigger: *Contact in recipient list (daily)* (*Newsletter*), recurrence **Only once**.
+3. *Send email* – welcome, *Wait* 3 days, *Send email* – best-of content.
+4. *Adjust contact score* (+5).
 
 ### Trigger – Contact inactive for N days
 
@@ -605,6 +694,7 @@ Placeholders (case-insensitive):
 | Contact date anniversary | `FieldName`, `DaysBefore`, `AnniversaryDate`, `Years` |
 | Contact inactive for N days | `InactiveDays`, `LastActivityDate` |
 | Contact in contact group (daily) | `ContactGroupName`, `ContactGroupDisplayName` |
+| Contact in recipient list (daily) | `RecipientListName`, `RecipientListDisplayName` |
 | Order completed (`.Commerce`) | `OrderId`, `CustomerId`, `Total`, `Currency`, `ItemCount`, `IsFirstOrder` |
 
 - An unknown placeholder, an unknown field or property, or a `{triggerData.…}` placeholder in a process started by another trigger (or by a trigger that is no longer registered or provides no data) is replaced by empty text and logs a `SetContactFieldTokenUnresolved` warning (once per hour per process and placeholder). The step continues.
@@ -847,6 +937,7 @@ Fields of built-in and library triggers (custom triggers list the properties of 
 | Contact date anniversary | `FieldName`, `DaysBefore`, `AnniversaryDate`, `Years` |
 | Contact inactive for N days | `InactiveDays`, `LastActivityDate` |
 | Contact in contact group (daily) | `ContactGroupName`, `ContactGroupDisplayName` |
+| Contact in recipient list (daily) | `RecipientListName`, `RecipientListDisplayName` |
 | Order completed (`.Commerce`) | `OrderId`, `CustomerId`, `Total`, `Currency`, `ItemCount`, `IsFirstOrder` |
 
 | Field type | Operators and value format |
@@ -981,6 +1072,7 @@ Keep your own property and category `Order` values below `SkippableStep.CATEGORY
 | Compare contact number field | Integer custom contact field (usually kept by *Adjust contact score*) | Field list empty; invalid step follows **No** branch, warning logged |
 | Contact date anniversary | Scheduled task configuration | Trigger never fires |
 | Contact in contact group (daily) | Scheduled task configuration; contact group code names in `ContactGroups`; contact group recalculation | Trigger never fires; drop-down empty; stale membership |
+| Contact in recipient list (daily) | Scheduled task configuration; recipient list code names in `RecipientLists`; subscriptions with approved confirmations (double opt-in) | Trigger never fires; drop-down empty; unconfirmed, unsubscribed, or bounced contacts never start |
 | Contact inactive for N days | Scheduled task configuration; logged activities | Trigger never fires; contacts without activity never start |
 | Order completed | `.Commerce` package; checkout code calling `IOrderCompletedTriggerDispatcher.Fire` with the visitor's contact | Trigger never fires; untracked visitors (no contact) never start |
 | Previous step succeeded | Earlier step of the selected type saving the same result number | Follows **No** branch, warning logged |
@@ -1118,6 +1210,9 @@ All library log entries use named event IDs, shown in the **Code** column of the
 | 41122 | `ChatMessageTokensUnresolved` | Warning | *Post to Teams / Slack* placeholder replaced by empty text (once per hour per process and placeholder) |
 | 41123 | `ChatMessageResponse` | Debug | Chat webhook status code |
 | 41124 | `ChatMessageProcessLinkSkipped` | Debug | *Post to Teams / Slack* added no process link: none or several automation processes have the process display name |
+| 41130 | `RecipientListMemberTaskCompleted` | Information | *Contact in recipient list (daily)* scheduled task run summary (total and per-list trigger counts) |
+| 41131 | `RecipientListNotFound` | Warning | Configured recipient list doesn't exist; skipped (every task run) |
+| 41132 | `RecipientListIsContactGroup` | Warning | Configured recipient list is a contact group or another object type (e.g. a segment); skipped (every task run) |
 
 ## Localization
 

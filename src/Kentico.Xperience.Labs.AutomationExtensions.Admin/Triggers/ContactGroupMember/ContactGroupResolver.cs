@@ -140,7 +140,11 @@ internal sealed class ContactGroupResolver
     }
 
 
-    private static async Task<IEnumerable<ContactGroupCandidate>> LoadCandidates(
+    /// <summary>
+    /// Loads the rows of the contact group table with the given code names: contact groups first, then rows of other object
+    /// types (recipient lists, segments) for names not found as contact groups. Also used by the recipient list resolver.
+    /// </summary>
+    internal static async Task<IEnumerable<ContactGroupCandidate>> LoadCandidates(
         IInfoProvider<ContactGroupInfo> contactGroupInfoProvider,
         IReadOnlyList<string> codeNames,
         CancellationToken cancellationToken)

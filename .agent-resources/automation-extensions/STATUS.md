@@ -3,7 +3,7 @@
 Single source for current state. Update after every slice (and when a check or decision closes).
 Design, research, decisions with reasons, and the slice log: `PLAN.md`. Per-slice scope: `implementation-spec-*.md`.
 
-Last updated: 2026-10-21. Xperience: version in `Directory.Packages.props` (31.9.3). Unit tests: 1474 passed (Admin 1407, Commerce 67).
+Last updated: 2026-10-21. Xperience: version in `Directory.Packages.props` (31.9.3). Unit tests: 1505 passed (Admin 1438, Commerce 67).
 
 ## Components
 
@@ -21,7 +21,7 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 | 22 | Compare contact number field | C | Done | unit | Field dropdown, Yes/No per operator, 41050 warning |
 | 8 | Activity frequency | C | Done | app | Invalid config → No + 41060; disabled → No + 41003 |
 | 1 | Contact in contact group (daily) (+ scheduled task) | T | Done | unit | Type filter excludes recipient lists (`UseObjectTypeCondition = false` lookup), end-to-end firing (group has 0 members), dropdown, *Last result* texts |
-| 23 | Contact in recipient list (daily) | T | Not started | | Split from #1 (recipient lists = static groups); spec #1 excludes them |
+| 23 | Contact in recipient list (daily) (+ scheduled task) | T | Done | unit | Task run vs. SQL Server (member subquery never executed), double opt-in fires only after confirm, unsubscribe stops / re-subscribe resumes, *Last result* texts, dropdown, trigger data in #11 / #17 / Write to log, bounced contact (hard / soft ≥ limit) skipped + fires after *Reset bounces*. Needs `aspire run` restart (channel SMTP added) |
 | 3 | Contact inactive for N days (+ scheduled task) | T | Done | unit + PROD-DB query check | Task config, firing (`InactiveDays: [1]`), *If not already running* + Wait blocks same-day re-run, disabled *Last result* shown as failure? |
 | 4 | Content engagement threshold | T | Not started | | |
 | 5 | Inbound webhook received | T | Not started | | |
@@ -58,8 +58,8 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 ## Pending decisions
 
 1. ~~Localization~~: `Server` dropped 2026-10-20, pending running-app check (see Infrastructure). Restore `Server` if any text shows a raw key.
-2. ~~Trigger display names~~: plain text (2026-10-20); resx `*.displayname` keys kept for step registry fallback. Issue submitted 2026-10-21; revert trigger names to keys when fixed (see Other open items). Existing processes keep the stored key until the trigger is re-selected.
-3. Package split. Proposal under consideration (user, 2026-10-13, not decided): `Kentico.Xperience.Labs.AutomationExtensions` (general steps), `.Admin` (admin UI extensions: form components, pages, client module), `.Commerce` (commerce steps #6, #13, #24). Now: `.Commerce` project exists (#6) and references `.Admin`; existing projects not restructured. Blockers for a clean split: see `PLAN.md` slice 12.
+2. ~~Trigger display names~~: plain text, kept (user, 2026-10-21); resx `*.displayname` keys kept for step registry fallback. Existing processes keep the stored key until the trigger is re-selected.
+3. Package split: deferred, decide before v1.0.0 (user, 2026-10-21). Proposal: `Kentico.Xperience.Labs.AutomationExtensions` (general steps), `.Admin` (admin UI extensions), `.Commerce` (#6, #13, #24). Now: `.Commerce` references `.Admin`. Blockers: `PLAN.md` slice 12. Doesn't block #24.
 4. ~~#15, #20~~: real (2026-10-20). #20 default provider: simple lookup from email TLD + business info, fills empty fields only.
 5. Minimum supported Xperience version: the version in `Directory.Packages.props` (decided 2026-10-20).
 6. ~~#15 process link~~: look up by display name, link only if exactly one match; target process Contacts tab (`automation/list/{id}/automation-contacts`) (user, 2026-10-21; built, app-verified). Step context exposes no process ID.
@@ -67,8 +67,7 @@ Numbers = `PLAN.md` section 3. Validation: **app** = verified in running Dancing
 ## Other open items
 
 1. Anniversary task same-day re-run protection (deferred; option: store last processed date).
-2. Local test data cleanup: contacts 8 and 9, *Contact Anniversary* process, Email queue.
-3. `ContactScore` field exists only in local DB (CI repository off) – recreate per environment.
-4. Local DBs `Kentico.SaaS.Analysis` (QA env) and `Kentico.SaaS.Prod.Analysis` (PROD, 298k activities): `OM_Contact` PII, `ActivityComment`, member registration titles cleared; members/users/form/email tables **not** scrubbed. Kept for real-data checks and 7B benchmark. Local only, never share. Backup files deleted.
-5. Event log length issue reported (`kentico-issue-event-log-source-length.md`); no response tracked.
-6. Trigger display name issue submitted 2026-10-21 (`kentico-issue-trigger-display-name-resource-key.md`). When fixed: switch the 4 trigger registrations back to `*.displayname` keys (kept in resx), restore key tests (drop `TriggerRegistrationAttributes_DisplayNamesArePlainText`).
+2. `ContactScore` field exists only in local DB (CI repository off) – recreate per environment.
+3. Local DBs `Kentico.SaaS.Analysis` (QA env) and `Kentico.SaaS.Prod.Analysis` (PROD, 298k activities): `OM_Contact` PII, `ActivityComment`, member registration titles cleared; members/users/form/email tables **not** scrubbed. Kept for real-data checks and 7B benchmark. Local only, never share. Backup files deleted.
+4. Event log length issue fixed by Kentico (user, 2026-10-21; `kentico-issue-event-log-source-length.md`). Library length guards kept (still valid for older versions); fixed-in version not recorded.
+5. Trigger display name issue submitted 2026-10-21 (`kentico-issue-trigger-display-name-resource-key.md`). Plain text stays (decision 2) even if fixed.

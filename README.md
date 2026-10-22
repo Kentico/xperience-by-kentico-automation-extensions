@@ -10,6 +10,7 @@ Extra triggers, conditions, and actions for the Xperience by Kentico **Automatio
 
 - **Contact date anniversary** – yearly on (or N days before) a contact date field, such as a birthday.
 - **Contact in contact group (daily)** – daily for members of a contact group (nurture series).
+- **Contact in recipient list (daily)** – daily for subscribed contacts of a recipient list (newsletter welcome series).
 - **Contact inactive for N days** – when a contact's last activity was N days ago (win-back).
 - **Order completed** (`.Commerce` package) – when a visitor completes an order, with minimum total, currency, and first-order filters.
 
@@ -35,7 +36,7 @@ Most steps can be skipped per step, and actions can record their result for *Pre
 ### Limitations
 
 - All components are **disabled by default** and are turned on in `appsettings.json`.
-- *Contact date anniversary*, *Contact in contact group*, and *Contact inactive* need scheduled task configuration.
+- *Contact date anniversary*, *Contact in contact group*, *Contact in recipient list*, and *Contact inactive* need scheduled task configuration.
 - *Order completed* needs a call from your checkout code; Xperience doesn't fire it on its own.
 - *Send webhook* and *Post to Teams / Slack* send once, without retries. *Post to Teams / Slack* hasn't been tested with a real Teams channel yet.
 - The *Post to Teams / Slack* process link is added only when exactly one automation process has the process's display name.

@@ -685,6 +685,18 @@ Spec: `implementation-spec-post-chat-message.md`. Action `Labs.AutomationExtensi
 - Addendum (2026-10-21): links list (Slack one line, Teams one `Action.OpenUrl` each). Form submission link (`forms/list/{BizFormId}/submissions/{BizFormItemId}`, only for built-in Form submission trigger). Process link (`automation/list/{id}/automation-contacts`): step context exposes only process display name → lookup `WorkflowInfo` (type Automation) by exact display name, link only if exactly 1 match (display names not unique). Route constants, not `IPageLinkGenerator` (internal impl needs admin UI tree). Tests: Admin 1407.
 - App (2026-10-21): Slack post, all 3 links, bad URL → failure. Teams not tested (no admin access).
 
+### Slice 15 (2026-10-21) – Contact in recipient list (daily) (#23), implemented and unit-validated
+
+Spec: `implementation-spec-recipient-list-member.md`. Trigger `Labs.AutomationExtensions.RecipientListMember` + `RecipientListMemberTask` (`Triggers/RecipientListMember/`). Implemented by subagent, reviewed by caller.
+
+- Subscribed (verified 31.9.3 DLLs): contact member of list **and** newest `EmailSubscriptionConfirmationInfo` for the list (date desc, ID desc) `IsApproved`. Same rule as `IEmailSubscriptionConfirmationService.IsConfirmed` (internal), admin "Unsubscribed" tag, `CMSContactIsInRecipientList` macro. `Confirm`/`Revoke` insert rows, never update. Double opt-in: member + confirmation added only after link click. Unsubscribe keeps member row. Members added by API without confirmation → not subscribed (docs guide adds confirmation).
+- Bounced contacts excluded (user, 2026-10-21), same rule as macro rule (`CMSContactIsInRecipientListInstanceTranslator.GetBouncedContacts`): `EmailBounceIsHardBounce` or `EmailBounceSoftBounceCount >= BouncedEmailsGlobalOptions.SoftBounceLimit` (default 5, plain `>=`, no 0 special case), matched by `ContactEmail`. Filter inside the keyset batch query. *Reset bounces* deletes rows → fires again.
+- DancingGoat (2026-10-21): channel `DancingGoatEmails` had no email client (only system SMTP) → queue error "No email client registered". Fixed with fallback `AddXperienceSmtp()` + `SmtpOptions` section (system, notifications, all channels; same as repo-template `a1b0189`), Mailpit via AppHost env, Development + CI settings, overlay doc.
+- Reuses #1 `SelectContactIds` (keyset) + `ContactGroupResolver.LoadCandidates` (private → internal); #1 behavior unchanged. Code name matching both a list and a group → list wins; groups/segments → warning `RecipientListIsContactGroup`.
+- Full member query (nested `ROW_NUMBER` subquery) not unit-testable (needs DB) – subquery shape tested only.
+- Config `RecipientListMember:RecipientLists`, `BatchSize`. DancingGoat: `DancingGoat.RecipientList` (local DB; not in CI repository; 0 confirmation rows).
+- Icon `ListBullets`; log events 41130–41132. Tests: Admin 1438 (+31), Commerce 67.
+
 ### Decision (2026-10-05): disabled library conditions → No
 
 History: Yes (Slice 2) → texts said "No (A)" while code returned `true` (Yes) → final **No** for all library conditions (`return false`). Changed several times; don't revisit without the user.
@@ -716,7 +728,7 @@ User decisions:
 
 ### Decision (2026-10-20): trigger display names plain text; `Builder`-only localization; #15/#20 real
 
-- Trigger `displayName` in `RegisterAutomationTrigger` = plain text. Platform stores the unresolved key in `CMS_ObjectWorkflowTrigger.TriggerDisplayName`; process listing shows it (31.9.3) and it names the CI file. Actions/conditions unaffected: their display name is not stored (DB or CI) and shows only in the step selection dialog (resolved), so they keep keys. Issue: `kentico-issue-trigger-display-name-resource-key.md`. Resx `*.displayname` keys kept (step registry fallback for unregistered components). Tests: trigger display names must not be keys. Issue submitted 2026-10-21; revert to keys when fixed.
+- Trigger `displayName` in `RegisterAutomationTrigger` = plain text. Platform stores the unresolved key in `CMS_ObjectWorkflowTrigger.TriggerDisplayName`; process listing shows it (31.9.3) and it names the CI file. Actions/conditions unaffected: their display name is not stored (DB or CI) and shows only in the step selection dialog (resolved), so they keep keys. Issue: `kentico-issue-trigger-display-name-resource-key.md`. Resx `*.displayname` keys kept (step registry fallback for unregistered components). Tests: trigger display names must not be keys. Issue submitted 2026-10-21. Plain text kept even after a fix (user, 2026-10-21).
 - Localization registered for `Builder` only (`Builder` verified for Automation Builder texts). Revert if the step registry page or other admin texts show raw keys.
 - #15 Teams/Slack and #20 enrichment ship real implementations. #20 default provider derives fields from email TLD + business info.
 

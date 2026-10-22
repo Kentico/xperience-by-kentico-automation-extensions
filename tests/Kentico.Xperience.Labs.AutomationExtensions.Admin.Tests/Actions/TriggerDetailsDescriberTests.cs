@@ -5,6 +5,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Tests.TestDoubles;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.RecipientListMember;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Tests.Actions;
 
@@ -33,6 +34,8 @@ public class TriggerDetailsDescriberTests
             .Returns("Labs.AutomationExtensions.ContactInactive (inactive 30 day(s), last activity 2026-09-11)"),
         new TestCaseData(ContactGroupMemberTrigger.IDENTIFIER, new ContactGroupMemberTriggerData { ContactGroupName = "HighIntent" })
             .Returns("Labs.AutomationExtensions.ContactGroupMember (contact group HighIntent)"),
+        new TestCaseData(RecipientListMemberTrigger.IDENTIFIER, new RecipientListMemberTriggerData { RecipientListName = "Newsletter" })
+            .Returns("Labs.AutomationExtensions.RecipientListMember (recipient list Newsletter)"),
         new TestCaseData(DefaultTriggerIdentifiers.FORM_SUBMISSION, null).Returns("Kentico.FormSubmissionTrigger"),
         new TestCaseData(DefaultTriggerIdentifiers.FORM_SUBMISSION, new RegistrationTriggerData { MemberId = 5 }).Returns("Kentico.FormSubmissionTrigger"),
         new TestCaseData("Acme.OrderCompleted", new FormSubmissionTriggerData { BizFormId = 3 }).Returns("Acme.OrderCompleted"),

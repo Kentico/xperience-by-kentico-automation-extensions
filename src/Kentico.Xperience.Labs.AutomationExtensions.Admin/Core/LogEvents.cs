@@ -41,4 +41,7 @@ public static class LogEvents
     public static readonly EventId ChatMessageTokensUnresolved = new(41122, nameof(ChatMessageTokensUnresolved));
     public static readonly EventId ChatMessageResponse = new(41123, nameof(ChatMessageResponse));
     public static readonly EventId ChatMessageProcessLinkSkipped = new(41124, nameof(ChatMessageProcessLinkSkipped));
+    public static readonly EventId RecipientListMemberTaskCompleted = new(41130, nameof(RecipientListMemberTaskCompleted));
+    public static readonly EventId RecipientListNotFound = new(41131, nameof(RecipientListNotFound));
+    public static readonly EventId RecipientListIsContactGroup = new(41132, nameof(RecipientListIsContactGroup));
 }

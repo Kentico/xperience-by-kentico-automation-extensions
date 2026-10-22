@@ -7,6 +7,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 using Kentico.Xperience.Labs.AutomationExtensions.Core;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.RecipientListMember;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -42,6 +43,7 @@ public static class AutomationExtensionsServiceCollectionExtensions
 
         services.TryAddSingleton<DateFieldResolver>();
         services.TryAddSingleton<ContactGroupResolver>();
+        services.TryAddSingleton<RecipientListResolver>();
         services.TryAddSingleton<ContactScoreFieldResolver>();
         services.TryAddSingleton<ContactFieldResolver>();
         services.TryAddSingleton<ActivityTypeResolver>();

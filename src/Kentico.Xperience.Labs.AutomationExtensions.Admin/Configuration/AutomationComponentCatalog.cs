@@ -12,6 +12,7 @@ using Kentico.Xperience.Labs.AutomationExtensions.Conditions.WithinTimeWindow;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactDateAnniversary;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactGroupMember;
 using Kentico.Xperience.Labs.AutomationExtensions.Triggers.ContactInactive;
+using Kentico.Xperience.Labs.AutomationExtensions.Triggers.RecipientListMember;
 
 namespace Kentico.Xperience.Labs.AutomationExtensions.Configuration;
 
@@ -29,6 +30,7 @@ public static class AutomationComponentCatalog
     public static readonly AutomationComponentDescriptor ContactDateAnniversary = new(ContactDateAnniversaryTrigger.NAME, AutomationComponentKind.Trigger);
     public static readonly AutomationComponentDescriptor ContactGroupMember = new(ContactGroupMemberTrigger.NAME, AutomationComponentKind.Trigger);
     public static readonly AutomationComponentDescriptor ContactInactive = new(ContactInactiveTrigger.NAME, AutomationComponentKind.Trigger);
+    public static readonly AutomationComponentDescriptor RecipientListMember = new(RecipientListMemberTrigger.NAME, AutomationComponentKind.Trigger);
     public static readonly AutomationComponentDescriptor ActivityFrequency = new(ActivityFrequencyCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor ContactNumberFieldCompare = new(ContactNumberFieldCompareCondition.NAME, AutomationComponentKind.Condition);
     public static readonly AutomationComponentDescriptor PreviousStepSucceeded = new(PreviousStepSucceededCondition.NAME, AutomationComponentKind.Condition);
@@ -50,6 +52,7 @@ public static class AutomationComponentCatalog
         ContactDateAnniversary,
         ContactGroupMember,
         ContactInactive,
+        RecipientListMember,
         ActivityFrequency,
         ContactNumberFieldCompare,
         PreviousStepSucceeded,
