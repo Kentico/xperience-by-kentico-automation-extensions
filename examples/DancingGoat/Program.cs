@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using CMS.Base;
-using CMS.EmailEngine;
 
 using DancingGoat;
 using DancingGoat.EmailComponents;
@@ -83,10 +82,7 @@ if (builder.Environment.IsDevelopment())
     builder.Services.Configure<UrlResolveOptions>(options => options.UseSSL = false);
 }
 
-builder.Services.AddXperienceSystemSmtp();
-builder.Services.ConfigureSystemSmtpOptions(builder.Configuration.GetSection("SystemSmtpOptions"));
-builder.Services.Configure<SystemEmailOptions>(builder.Configuration.GetSection("SystemEmailOptions"));
-
+builder.AddDancingGoatLocalEnvironment();
 builder.AddDancingGoatManagementApi();
 
 var app = builder.Build();
